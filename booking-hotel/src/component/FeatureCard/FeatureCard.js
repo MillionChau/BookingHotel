@@ -26,15 +26,15 @@ const FeatureCard = () => {
 
   return (
     <>
-      <div class="container">
-        <div className="grid d-flex grid-cols-1 md:grid-cols-3 mt-5 gap-6 p-6 featureCard ">
-          {features.map((f, index) => (
-            <div
-              key={index}
-              className="border rounded-lg p-4 shadow-sm flex flex-col items-start">
-              <div className="text-2xl mb-2">{f.icon}</div>
-              <h3 className="font-bold text-lg">{f.title}</h3>
-              <p className="text-gray-600">{f.description}</p>
+      <div className="container mt-5">
+        <div className="row g-4">
+          {features.map((feature, index) => (
+            <div key={index} className="col-12 col-md-4 col-sm-12">
+              <div className="border rounded p-4 shadow-sm d-flex flex-column align-items-start h-100">
+                <div className="fs-3 mb-2">{feature.icon}</div>
+                <h3 className="fw-bold fs-5">{feature.title}</h3>
+                <p className="text-muted">{feature.description}</p>
+              </div>
             </div>
           ))}
         </div>
