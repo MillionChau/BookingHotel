@@ -8,6 +8,8 @@
 }
 
 .footer-links-grid {
+  margin: auto;
+  width: 80%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 30px;
@@ -15,6 +17,7 @@
   margin-bottom: 40px;
   border-bottom: 1px solid #e7e7e7;
 }
+
 
 .footer-column h3 {
   font-size: 15px;
