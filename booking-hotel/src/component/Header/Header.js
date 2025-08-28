@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
-
+import "bootstrap/dist/css/bootstrap.min.css";
 export function Header() {
   // state lưu thông tin user
   // null = chưa đăng nhập,có = chứa thông tin user
@@ -49,9 +49,10 @@ export function Header() {
                   </span>
                 }
                 id="basic-nav-dropdown"
-                align="end"
-              >
-                <NavDropdown.Item onClick={handleLogin}>Đăng nhập</NavDropdown.Item>
+                align="end">
+                <NavDropdown.Item onClick={handleLogin}>
+                  Đăng nhập
+                </NavDropdown.Item>
                 <NavDropdown.Item href="/register">Đăng ký</NavDropdown.Item>
               </NavDropdown>
             )}
@@ -65,9 +66,10 @@ export function Header() {
                   </span>
                 }
                 id="user-nav-dropdown"
-                align="end"
-              >
-                <NavDropdown.Item onClick={handleLogout}>Đăng xuất</NavDropdown.Item>
+                align="end">
+                <NavDropdown.Item onClick={handleLogout}>
+                  Đăng xuất
+                </NavDropdown.Item>
               </NavDropdown>
             )}
           </Nav>
