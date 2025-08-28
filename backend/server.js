@@ -40,8 +40,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.use('/api/auth', authRoutes)
-app.use('/api/user', userRoutes)
+app.use('/auth', authRoutes)
+app.use('/user', userRoutes)
 
 const port = process.env.PORT || 5000;
 const server = process.env.NODE_ENV !== 'test' 
