@@ -1,6 +1,0 @@
-# pack-refs with: peeled fully-peeled sorted 
-c1902ef65002378763856b8a7662485d35a1dbcb refs/heads/dev-dung
-246e33947367e6b4e4c3b58ffe8d97fa1030ea69 refs/heads/dev_hieu
-baabc6daa76153397486a419cfa322730c79742f refs/heads/main
-ca845586547f3e3debd7359e14af6cb6a1b8b6d6 refs/heads/toan_dev
-eb97b12fd6244975436d0ed56284543161498270 refs/heads/vanh_dev
