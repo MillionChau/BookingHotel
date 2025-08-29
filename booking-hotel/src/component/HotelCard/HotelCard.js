@@ -74,7 +74,7 @@ function HotelCard() {
           <div className="h4 mb-4">Khách sạn nổi bật</div>
           <div className="row g-4">
             {hotelCard.map((hotelItem, index) => (
-              <div key={index} className="col-12 col-md-4 col-lg-3">
+              <div key={index} className="hotelCard col-12 col-md-4 col-lg-3">
                 <div className="border rounded shadow-sm d-flex flex-column align-items-start h-100">
                   <img
                     src={hotelItem.img}

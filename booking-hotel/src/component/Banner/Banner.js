@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
 
-export function Banner() {
+function Banner() {
   return (
     <div className="bg-primary text-white py-5 text-center">
       <Container>
@@ -18,3 +18,4 @@ export function Banner() {
     </div>
   );
 }
+export default Banner;
