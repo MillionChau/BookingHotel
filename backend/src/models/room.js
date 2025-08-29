@@ -5,7 +5,7 @@ const roomSchema = new mongoose.Schema({
     hotelId: String,
     name: String,
     type: String,
-    price: Float,
+    price: Number,
     imageUrl: String,
     status: String,
 })

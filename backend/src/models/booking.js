@@ -9,9 +9,9 @@ const bookingSchema = new mongoose.Schema({
   status: String,
   paymentStatus: String,
   paymentMethod: String,
-  unitPrice: Float,
+  unitPrice: Number,
   paymentDay: DateTime,
-  totalPrice: Float,
+  totalPrice: Number,
 })
 
 module.exports = mongoose.model('Booking', bookingSchema)
