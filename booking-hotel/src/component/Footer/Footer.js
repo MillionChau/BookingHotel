@@ -1,5 +1,5 @@
 import React from 'react';
-import './Footer.css'; // Import file CSS để tạo kiểu
+import './Footer.css'; 
 
 function Footer() {
   return (

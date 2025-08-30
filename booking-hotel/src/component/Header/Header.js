@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export function Header() {
   // state lưu thông tin user
@@ -51,8 +52,9 @@ export function Header() {
                 id="basic-nav-dropdown"
                 align="end"
               >
-                <NavDropdown.Item onClick={handleLogin}>Đăng nhập</NavDropdown.Item>
-                <NavDropdown.Item href="/register">Đăng ký</NavDropdown.Item>
+                {/* === THAY ĐỔI DÒNG NÀY === */}
+                <NavDropdown.Item as={Link} to="/login">Đăng nhập</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/register">Đăng ký</NavDropdown.Item>
               </NavDropdown>
             )}
 

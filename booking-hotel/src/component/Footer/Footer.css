@@ -112,7 +112,6 @@
     font-weight: normal;
   }
 
-  /* Thêm icon mũi tên (chevron) */
   .footer-column h3::after {
     content: '›';
     position: absolute;
@@ -124,22 +123,20 @@
     transition: transform 0.3s ease;
   }
   
-  /* Xoay mũi tên khi mở */
   .footer-column.open h3::after {
     transform: translateY(-50%) rotate(-90deg);
   }
 
   .footer-column ul {
-    max-height: 0; /* Ẩn danh sách link mặc định */
+    max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease-out, padding 0.4s ease;
     padding: 0 10px;
-    text-align: left; /* Căn lề trái cho các link */
+    text-align: left;
   }
   
-  /* Hiển thị danh sách link khi cột được mở */
   .footer-column.open ul {
-    max-height: 500px; /* Chiều cao đủ lớn để chứa các link */
+    max-height: 500px;
     padding: 10px 10px 20px 10px;
   }
 
