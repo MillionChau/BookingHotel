@@ -1,0 +1,37 @@
+var _excluded = ["color", "size", "title", "className"];
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+function _objectWithoutProperties(e, t) { if (null == e) return {}; var o, r, i = _objectWithoutPropertiesLoose(e, t); if (Object.getOwnPropertySymbols) { var n = Object.getOwnPropertySymbols(e); for (r = 0; r < n.length; r++) o = n[r], -1 === t.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]); } return i; }
+function _objectWithoutPropertiesLoose(r, e) { if (null == r) return {}; var t = {}; for (var n in r) if ({}.hasOwnProperty.call(r, n)) { if (-1 !== e.indexOf(n)) continue; t[n] = r[n]; } return t; }
+import React, { forwardRef } from 'react';
+import PropTypes from 'prop-types';
+var Badge8kFill = /*#__PURE__*/forwardRef(function (_ref, ref) {
+  var _ref$color = _ref.color,
+    color = _ref$color === void 0 ? 'currentColor' : _ref$color,
+    _ref$size = _ref.size,
+    size = _ref$size === void 0 ? '1em' : _ref$size,
+    _ref$title = _ref.title,
+    title = _ref$title === void 0 ? null : _ref$title,
+    _ref$className = _ref.className,
+    className = _ref$className === void 0 ? '' : _ref$className,
+    rest = _objectWithoutProperties(_ref, _excluded);
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    ref: ref,
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 16 16",
+    width: size,
+    height: size,
+    fill: color,
+    className: ['bi', 'bi-badge-8k-fill', className].filter(Boolean).join(' ')
+  }, rest), title ? /*#__PURE__*/React.createElement("title", null, title) : null, /*#__PURE__*/React.createElement("path", {
+    d: "M3.9 6.605c0 .51.405.866.95.866s.945-.356.945-.866-.4-.852-.945-.852-.95.343-.95.852m-.192 2.668c0 .589.492.984 1.142.984.646 0 1.143-.395 1.143-.984S5.496 8.28 4.85 8.28c-.65 0-1.142.404-1.142.993"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm5.17 7.348c0 1.041-.927 1.766-2.333 1.766s-2.312-.72-2.312-1.762c0-.954.712-1.384 1.257-1.494v-.053c-.51-.154-1.02-.558-1.02-1.331 0-.914.831-1.587 2.088-1.587 1.253 0 2.083.673 2.083 1.587 0 .782-.523 1.182-1.02 1.331v.053c.545.11 1.257.545 1.257 1.49M12.102 5h1.306l-2.14 2.584 2.232 3.415h-1.428l-1.679-2.624-.615.699v1.925H8.59V5h1.187v2.685h.057z"
+  }));
+});
+Badge8kFill.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  title: PropTypes.string,
+  className: PropTypes.string
+};
+export default Badge8kFill;
