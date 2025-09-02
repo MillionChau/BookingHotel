@@ -23,7 +23,7 @@ function Banner() {
             <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
           </Button>
           <Button variant="outline-light" className="fw-semibold">
-            <i className="bi bi-search me-1"></i> Khám phá
+            <i className="bi bi-search me-1"><a href=""></a></i> Khám phá
           </Button>
         </div>
       </Container>
