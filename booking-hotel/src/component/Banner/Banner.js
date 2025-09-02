@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export function Banner() {
+function Banner() {
   return (
     <div
       className="text-white text-center d-flex align-items-center"
@@ -30,3 +30,4 @@ export function Banner() {
     </div>
   );
 }
+export default Banner;
