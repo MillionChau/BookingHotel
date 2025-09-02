@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+//có db thì sửa 
 function HotelDetail() {
   const rooms = [
     {
