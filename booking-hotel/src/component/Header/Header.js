@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Link } from "react-router-dom";
 export function Header() {
   // state lưu thông tin user
   // null = chưa đăng nhập,có = chứa thông tin user
@@ -29,7 +30,9 @@ export function Header() {
           {/* menu trái */}
           <Nav className="me-auto">
             <Nav.Link href="/">Trang chủ</Nav.Link>
-            <Nav.Link href="/dat-phong">Đặt phòng</Nav.Link>
+            <Nav.Link as={Link} to="./BookingHotel">
+              Đặt phòng
+            </Nav.Link>
             <Nav.Link href="/yeu-thich">Yêu thích</Nav.Link>
             <Nav.Link href="/phong-da-dat">Phòng đã đặt</Nav.Link>
           </Nav>
