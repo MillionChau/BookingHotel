@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
-<<<<<<< HEAD
 import { Link } from "react-router-dom";
 
-=======
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./Header.scss";
-import { Link } from "react-router-dom";
->>>>>>> 33908288ac41bcac83272fde0062efc30a570954
 export function Header() {
   // state lưu thông tin user
   // null = chưa đăng nhập,có = chứa thông tin user
@@ -51,7 +45,6 @@ export function Header() {
                   <i className="bi bi-star me-1"></i> Đánh giá
                 </Nav.Link>
 
-<<<<<<< HEAD
             {/*chưa đăng nhập */}
             {!user && (
               <NavDropdown
@@ -68,26 +61,6 @@ export function Header() {
                 <NavDropdown.Item as={Link} to="/register">Đăng ký</NavDropdown.Item>
               </NavDropdown>
             )}
-=======
-                {/*chưa đăng nhập */}
-                {!user && (
-                  <NavDropdown
-                    title={
-                      <span className="evaluate">
-                        <i className="bi bi-person-circle me-1"></i> Tài khoản
-                      </span>
-                    }
-                    id="basic-nav-dropdown"
-                    align="end">
-                    <NavDropdown.Item onClick={handleLogin}>
-                      Đăng nhập
-                    </NavDropdown.Item>
-                    <NavDropdown.Item href="/register">
-                      Đăng ký
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                )}
->>>>>>> 33908288ac41bcac83272fde0062efc30a570954
 
                 {/*đã đăng nhập */}
                 {user && (
