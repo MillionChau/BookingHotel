@@ -23,18 +23,14 @@ function Login() {
 
   return (
     <div className="login-body">
-      <div className="login-container">
-        {/* ---- CỘT BÊN TRÁI - HÌNH MINH HỌA ---- */}
+      <div className="login-container">git
         <div className="login-illustration">
-          {/* 2. BỌC KHỐI DIV NÀY BẰNG THẺ LINK */}
           <Link to="/" className="illustration-circle-link">
             <div className="illustration-circle">
               <i className="bi bi-building"></i>
             </div>
           </Link>
         </div>
-
-        {/* ---- CỘT BÊN PHẢI - FORM ĐĂNG NHẬP ---- */}
         <div className="login-form-section">
           <form onSubmit={handleSubmit} noValidate>
             <h2>Member Login</h2>
@@ -66,7 +62,6 @@ function Login() {
             <button type="submit" className="login-button">LOGIN</button>
 
             <div className="login-links">
-              {/* Sửa lại thẻ <a> thành <Link> để điều hướng tốt hơn */}
               <Link to="/register">Create your Account <i className="bi bi-arrow-right"></i></Link>
             </div>
           </form>

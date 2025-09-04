@@ -28,7 +28,6 @@ function Register() {
   return (
     <div className="register-body">
       <div className="register-container">
-        {/* ---- CỘT BÊN TRÁI - HÌNH MINH HỌA ---- */}
         <div className="register-illustration">
           <Link to="/" className="illustration-circle-link">
             <div className="illustration-circle">
@@ -36,8 +35,6 @@ function Register() {
             </div>
           </Link>
         </div>
-
-        {/* ---- CỘT BÊN PHẢI - FORM ĐĂNG KÝ ---- */}
         <div className="register-form-section">
           <form onSubmit={handleSubmit} noValidate>
             <h2>Create Account</h2>
