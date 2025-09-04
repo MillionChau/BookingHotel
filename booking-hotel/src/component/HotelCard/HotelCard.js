@@ -8,6 +8,8 @@ const hotelCard = [
     iconStar: 3,
     addressHotel: "TP. Hồ Chí Minh",
     price: 950000,
+    type: "Cao cấp",
+    room: "A201",
   },
   {
     id: 2,
@@ -16,6 +18,8 @@ const hotelCard = [
     iconStar: 5,
     addressHotel: "Đà Nẵng",
     price: 2200000,
+    type: "Tổng thống",
+    room: "P01",
   },
   {
     id: 3,
@@ -24,6 +28,8 @@ const hotelCard = [
     iconStar: 3,
     addressHotel: "Hà Nội",
     price: 500000,
+    type: "Tiêu chuẩn",
+    room: "B12",
   },
   {
     id: 4,
@@ -32,6 +38,8 @@ const hotelCard = [
     iconStar: 4,
     addressHotel: "Nha Trang",
     price: 1200000,
+    type: "Cao cấp",
+    room: "C08",
   },
   {
     id: 5,
@@ -40,6 +48,8 @@ const hotelCard = [
     iconStar: 4,
     addressHotel: "Đà Lạt",
     price: 1350000,
+    type: "Tiêu chuẩn",
+    room: "B12",
   },
   {
     id: 6,
@@ -48,6 +58,8 @@ const hotelCard = [
     iconStar: 5,
     addressHotel: "Huế",
     price: 1850000,
+    type: "Cao cấp",
+    room: "A201",
   },
   {
     id: 7,
@@ -56,6 +68,8 @@ const hotelCard = [
     iconStar: 3,
     addressHotel: "TP. Hồ Chí Minh",
     price: 950000,
+    type: "Cao cấp",
+    room: "A201",
   },
   {
     id: 8,
@@ -64,12 +78,14 @@ const hotelCard = [
     iconStar: 5,
     addressHotel: "Đà Nẵng",
     price: 2200000,
+    type: "Tiêu chuẩn",
+    room: "B12",
   },
 ];
 function HotelCard() {
   return (
     <>
-      <section className="py-4 bg-light">
+      <section className="py-4 bg-light mt-5">
         <div className="container  mb-5">
           <div className="h4 mb-4">Khách sạn nổi bật</div>
           <div className="row g-4">

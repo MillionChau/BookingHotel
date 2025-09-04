@@ -3,7 +3,7 @@ import { Container, Button } from "react-bootstrap";
 
 function Banner() {
   return (
-    <div className="bg-primary text-white py-5 text-center">
+    <div className="bg-primary text-white py-5 text-center mt-5">
       <Container>
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng và tiện lợi

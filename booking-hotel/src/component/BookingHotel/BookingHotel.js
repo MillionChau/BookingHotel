@@ -1,86 +1,115 @@
-import { Card, Form, Button, Row, Col } from "react-bootstrap";
+// import { Card, Form, Button, Row, Col } from "react-bootstrap";
+import { ArrowClockwise, StarFill } from "react-bootstrap-icons";
 import { hotelCard } from "../HotelCard/HotelCard";
-
+import "./BookingHotel.scss";
 function BookingHotel() {
   return (
-    <div className="container my-4">
-      <h3 className="mb-4">Đặt phòng</h3>
-      <Row>
-        {/* Form đặt phòng */}
-        <Col md={4}>
-          <Card className="shadow-sm p-3">
-            <h5>Thông tin đặt</h5>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Nhận phòng</Form.Label>
-                <Form.Control type="date" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Trả phòng</Form.Label>
-                <Form.Control type="date" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Số khách</Form.Label>
-                <Form.Control type="number" defaultValue={2} min="1" />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Phương thức thanh toán</Form.Label>
-                <Form.Select>
-                  <option>Thanh toán khi nhận phòng</option>
-                  <option>Thẻ tín dụng</option>
-                  <option>Chuyển khoản</option>
-                </Form.Select>
-              </Form.Group>
-
-              <Button className="w-100" variant="primary">
-                <i className="bi bi-check2-square me-1"></i>
-                Xác nhận đặt phòng
-              </Button>
-            </Form>
-          </Card>
-        </Col>
-
-        {/* Danh sách khách sạn */}
-        <Col md={8}>
-          <Row>
-            {hotelCard.map((hotel) => (
-              <Col md={6} sm={12} key={hotel.id} className="mb-3">
-                <Card className="h-100 shadow-sm">
-                  <Card.Img
-                    variant="top"
-                    src={hotel.img}
-                    style={{ height: "180px", objectFit: "cover" }}
-                  />
-                  <Card.Body>
-                    <Card.Title className="d-flex justify-content-between align-items-center">
-                      {hotel.nameHotel}
-                      <span className="bg-warning text-dark px-2 py-1 rounded ms-2">
-                        <i className="bi bi-star-fill me-1"></i>
-                        {hotel.iconStar}
-                      </span>
-                    </Card.Title>
-
-                    <Card.Text className="text-muted mb-2">
-                      <i className="bi bi-geo-alt me-1"></i>
-                      {hotel.addressHotel}
-                    </Card.Text>
-
-                    <h6 className="fw-bold mb-3">
-                      {hotel.price.toLocaleString()} đ/đêm
-                    </h6>
-
-                    <Button variant="primary">Chọn</Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-    </div>
+    <>
+      <div className="container my-5 bookingHotel">
+        <h2 className="h4 mb-3">Đặt phòng</h2>
+        <div className="row">
+          <div className="col-lg-5">
+            <div className="card shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title">Thông tin đặt</h5>
+                <div className="row g-2">
+                  <div className="col-6">
+                    <label className="form-label">Nhận phòng</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      id="bkCheckin"
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label">Trả phòng</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      id="bkCheckout"
+                    />
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Số khách</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="bkGuests"
+                      min="1"
+                    />
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Phương thức thanh toán</label>
+                    <select className="form-select" id="bkPayment">
+                      <option>Thanh toán khi nhận phòng</option>
+                      <option>Thẻ nội địa</option>
+                      <option>Visa/MasterCard</option>
+                      <option>Ví điện tử</option>
+                    </select>
+                  </div>
+                  <div className="col-12 d-grid mt-2">
+                    <button className="btn btn-primary" id="btnPlaceBooking">
+                      <i className="bi bi-bag-check me-2"></i>Xác nhận đặt phòng
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-7">
+            <div className="card shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title d-flex justify-content-between align-items-center">
+                  Chọn phòng
+                  <button
+                    className="btn btn-sm btn-outline-secondary  d-flex align-items-center"
+                    id="btnReloadRooms">
+                    <ArrowClockwise /> Tải lại
+                  </button>
+                </h5>
+                <div className="row g-3" id="roomList">
+                  {hotelCard.slice(0, 4).map((item, index) => (
+                    <div className="col-md-6">
+                      <div className="card h-100">
+                        <img
+                          src={item.img}
+                          className="card-img-top"
+                          alt={item.name}
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title d-flex align-items-center">
+                            {item.nameHotel}
+                            <span className="d-flex align-items-center badge text-bg-warning ms-2">
+                              <StarFill />
+                              {item.iconStar}
+                            </span>
+                          </h5>
+                          <div className="small text-muted mb-2">
+                            <i className="bi bi-geo-alt me-1"></i>
+                            {item.addressHotel} • Phòng {item.room} •{" "}
+                            {item.type}
+                          </div>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <span className="fw-semibold">
+                              {item.price.toLocaleString("vi-VN")} ₫/đêm
+                            </span>
+                            <button
+                              className="btn btn-primary btn-sm btnChooseRoom"
+                              data-id={item.id}>
+                              Chọn
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
