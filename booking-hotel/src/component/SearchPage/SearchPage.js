@@ -2,7 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-import HotelCard from "../HotelCard/HotelCard"; // bạn đã có sẵn
+import HotelCard from "../HotelCard/HotelCard"; 
 
 function SearchPage() {
   return (
@@ -71,8 +71,6 @@ function SearchPage() {
 
         {/* Danh sách khách sạn */}
         <div className="col-md-9">
-          <HotelCard />
-          <HotelCard />
           <HotelCard />
         </div>
       </div>
