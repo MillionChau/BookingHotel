@@ -12,7 +12,7 @@
 .register-container {
   display: flex;
   width: 100%;
-  max-width: 900px; /* Limit max width */
+  max-width: 900px;
   min-height: 600px; 
   background-color: #fff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);

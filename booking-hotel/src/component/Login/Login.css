@@ -12,7 +12,7 @@
 .login-container {
   display: flex;
   width: 100%;
-  max-width: 900px; /* Limit max width on large screens */
+  max-width: 900px;
   min-height: 550px;
   background-color: #fff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);

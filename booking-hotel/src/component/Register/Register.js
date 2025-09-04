@@ -11,7 +11,6 @@ function Register() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     if (!fullName || !email || !password || !confirmPassword) {
       setError('Please fill in all fields.');
       return;
