@@ -4,13 +4,12 @@ const bookingSchema = new mongoose.Schema({
   bookingId: String,
   userId: String,
   userId: String,
-  checkinDate: DateTime,
-  checkOutDate: DateTime,
-  status: String,
+  checkinDate: Date,
+  checkOutDate: Date,
   paymentStatus: String,
   paymentMethod: String,
   unitPrice: Number,
-  paymentDay: DateTime,
+  paymentDay: Date,
   totalPrice: Number,
 })
 
