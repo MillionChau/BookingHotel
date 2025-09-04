@@ -1,5 +1,5 @@
-import React from "react";
-import "./Footer.scss"; // Import file CSS để tạo kiểu
+import React from 'react';
+import './Footer.scss'; 
 
 function Footer() {
   return (
