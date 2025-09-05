@@ -35,7 +35,7 @@ export function Header() {
                 <Nav.Link as={Link} to="./BookingHotel">
                   Đặt phòng
                 </Nav.Link>
-                <Nav.Link href="/yeu-thich">Yêu thích</Nav.Link>
+                <Nav.Link as={Link} to="/Favorites">Yêu thích</Nav.Link>
                 <Nav.Link href="/phong-da-dat">Phòng đã đặt</Nav.Link>
               </Nav>
 

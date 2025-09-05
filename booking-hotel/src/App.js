@@ -10,12 +10,15 @@ import Register from "./component/Register/Register";
 import { HotelCard } from "./component/HotelCard/HotelCard";
 import BookingHotel from "./component/BookingHotel/BookingHotel";
 import FeatureCard from "./component/FeatureCard/FeatureCard";
+import FavoriteList from "./component/Favorite/FavoriteList"; 
 
 const MainLayout = () => {
   return (
     <>
       <Header />
-      <HotelCard />
+      <main>
+        <Outlet />
+      </main>
       <Footer />
     </>
   );
@@ -24,33 +27,36 @@ const MainLayout = () => {
 const HomePage = () => {
   return (
     <>
-      <Banner />;
+      <Banner />
       <FeatureCard />
+      <HotelCard />
     </>
   );
 };
+
 const HeaderOnlyLayout = () => (
   <>
     <Header />
-    <BookingHotel />
+    <main>
+      <Outlet />
+    </main>
   </>
 );
+
 function App() {
   return (
     <div className="App">
       <Routes>
-        {/* Layout có cả Header + Footer */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/hotels" element={<HotelCard />} />
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="hotels" element={<HotelCard />} />
+          <Route path="favorites" element={<FavoriteList />} />
         </Route>
 
-        {/* Layout chỉ có Header */}
-        <Route element={<HeaderOnlyLayout />}>
-          <Route path="/BookingHotel" element={<BookingHotel />} />
+        <Route path="/BookingHotel" element={<HeaderOnlyLayout />}>
+            <Route index element={<BookingHotel />} />
         </Route>
 
-        {/* Trang không có Header/Footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
