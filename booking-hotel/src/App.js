@@ -35,6 +35,7 @@ const HeaderOnlyLayout = () => (
   <>
     <Header />
     <Outlet />
+    <Footer />
   </>
 );
 function App() {
