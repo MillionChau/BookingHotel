@@ -1,61 +1,28 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
-import { Routes, Route, Outlet } from "react-router-dom";
-
-import { Header } from "./component/Header/Header";
-import Footer from "./component/Footer/Footer";
-import Banner from "./component/Banner/Banner";
-import Login from "./component/Login/Login";
-import Register from "./component/Register/Register";
-import { HotelCard } from "./component/HotelCard/HotelCard";
-import BookingHotel from "./component/BookingHotel/BookingHotel";
-import BookingList from "./component/BookingList/BookingList";
-import FeatureCard from "./component/FeatureCard/FeatureCard";
-import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
-const MainLayout = () => {
-  return (
-    <>
-      <Header />
-      <Outlet />
-      <Footer />
-    </>
-  );
-};
-
-const HomePage = () => {
-  return (
-    <>
-      <Banner />;
-      <FeatureCard />
-      <HotelCard />
-    </>
-  );
-};
-const HeaderOnlyLayout = () => (
-  <>
-    <Header />
-    <Outlet />
-    <Footer />
-  </>
-);
+import { Routes, Route } from "react-router-dom";
+import Loading from "./component/Loading/Loading";
+import { Suspense } from "react";
+import routes from "./routes/routes";
 function App() {
   return (
     <div className="App">
-      <Routes>
-        {/* Layout có cả Header + Footer */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-        </Route>
-
-        <Route element={<HeaderOnlyLayout />}>
-          <Route path="/BookingHotel" element={<BookingHotel />} />
-          <Route path="/BookingList" element={<BookingList />} />
-          <Route path="/FavoriteCard" element={<FavoriteCard />} />
-        </Route>
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {routes.map((item) => {
+            const { path, component: Component, layout: Layout } = item;
+            if (Layout) {
+              return (
+                <Route key={path} element={<Layout />}>
+                  <Route path={path} element={<Component />} />
+                </Route>
+              );
+            } else {
+              return <Route key={path} path={path} element={<Component />} />;
+            }
+          })}
+        </Routes>
+      </Suspense>
     </div>
   );
 }

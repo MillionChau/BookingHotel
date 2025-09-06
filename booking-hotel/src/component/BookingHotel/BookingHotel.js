@@ -69,8 +69,8 @@ function BookingHotel() {
                 </h5>
                 <div className="row g-3" id="roomList">
                   {hotelCard.slice(0, 4).map((item, index) => (
-                    <div className="col-md-6">
-                      <div className="card h-100">
+                    <div key={index} className=" col-md-6">
+                      <div className="hotelCard card h-100">
                         <img
                           src={item.img}
                           className="card-img-top"
