@@ -76,4 +76,4 @@ class roomController {
         }
     }
 }
-module.exports = new RoomController()
+module.exports = new roomController()
