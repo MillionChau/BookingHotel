@@ -1,4 +1,4 @@
-const Favorite = require('.../model/favorite')
+const Favorite = require('../models/favorite')
 
 class favoriteController {
     async createFavorite(req, res) {
@@ -47,3 +47,5 @@ class favoriteController {
     }
 
 }
+
+module.exports = new favoriteController
