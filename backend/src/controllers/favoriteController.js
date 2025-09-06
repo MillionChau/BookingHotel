@@ -47,5 +47,4 @@ class favoriteController {
     }
 }
 
-
 module.exports = new favoriteController
