@@ -58,7 +58,7 @@ const hotelsData = {
   },
 };
 
-// dữ liệu user 
+// dữ liệu user
 const totalUsers = 2430;
 
 // format tiền VNĐ
@@ -76,9 +76,6 @@ const Dashboard = () => {
 
   return (
     <div className="d-flex">
-
-      
-
       {/* Main Content */}
       <div className="flex-grow-1 p-4">
         <h4 className="mb-4">Tổng quan</h4>
@@ -88,8 +85,7 @@ const Dashboard = () => {
           <Col md={3}>
             <Form.Select
               value={selectedHotel}
-              onChange={(e) => setSelectedHotel(e.target.value)}
-            >
+              onChange={(e) => setSelectedHotel(e.target.value)}>
               {Object.keys(hotelsData).map((hotelName) => (
                 <option key={hotelName} value={hotelName}>
                   {hotelName}
@@ -100,8 +96,7 @@ const Dashboard = () => {
           <Col md={2}>
             <Form.Select
               value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-            >
+              onChange={(e) => setSelectedYear(e.target.value)}>
               <option value="2023">Năm 2023</option>
               <option value="2024">Năm 2024</option>
             </Form.Select>
