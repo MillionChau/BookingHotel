@@ -1,6 +1,6 @@
 const Favorite = require('../models/favorite')
 
-class favoriteController {
+class FavoriteController {
     async createFavorite(req, res) {
         const { roomId, userId } = req.body
         try {
@@ -8,7 +8,7 @@ class favoriteController {
             await favorite.save()
             res.status(201).json({
                 favorite,
-                message: 'Đã thêm vào danh sách thích'
+                message: 'Đã thêm vào danh sách yêu thích'
             })
         } catch (err) {
             res.status(500).json({ message: err.message })
@@ -26,16 +26,16 @@ class favoriteController {
     async getUserFavorites(req, res) {
         const { userId } = req.params
         try {
-            const favorites = await Favorite.find({ userId }).populate("hotelId")
+            const favorites = await Favorite.find({ userId }).populate("roomId")
             res.status(200).json(favorites)
         } catch (err) {
             res.status(500).json({ message: "Lỗi server", error: err })
         }
     }
     async checkFavorite(req, res) {
-        const { userId, hotelId } = req.query
+        const { userId, roomId } = req.query
         try {
-            const favorite = await Favorite.findOne({ userId, hotelId })
+            const favorite = await Favorite.findOne({ userId, roomId })
             if (favorite) {
                 res.status(200).json({ isFavorite: true, favoriteId: favorite._id })
             } else {
@@ -45,7 +45,9 @@ class favoriteController {
             res.status(500).json({ message: "Lỗi server", error: err })
         }
     }
+}
 
 }
 
 module.exports = new favoriteController
+
