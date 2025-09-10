@@ -3,15 +3,15 @@ const mongoose = require('mongoose')
 const bookingSchema = new mongoose.Schema({
   bookingId: String,
   userId: String,
-  userId: String,
-  checkinDate: DateTime,
-  checkOutDate: DateTime,
+  hotelId: String,
+  checkinDate: Date,
+  checkOutDate: Date,
   status: String,
   paymentStatus: String,
   paymentMethod: String,
   unitPrice: Number,
-  paymentDay: DateTime,
+  paymentDay: Date,
   totalPrice: Number,
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Booking', bookingSchema)

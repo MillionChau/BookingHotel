@@ -1,5 +1,3 @@
-import Footer from "./component/Footer/Footer";
-import { Header } from "./component/Header/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import FeatureCard from "./component/FeatureCard/FeatureCard";

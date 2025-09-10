@@ -1,11 +1,13 @@
 const mongoose = require('mongoose')
 
-const reviewidSchema = new mongoose.Schema({
+const reviewSchema = new mongoose.Schema({
   reviewId: String,
+  roomId: String,
+  userId: String,
   bookingId: String,
   content: String,
   rating: String,
-  addedDate: DateTime,
+  addedDate: Date,
 })
 
 module.exports = mongoose.model('Review', reviewSchema)

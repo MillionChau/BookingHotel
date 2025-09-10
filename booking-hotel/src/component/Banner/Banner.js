@@ -1,16 +1,10 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import "./Banner.scss";
 function Banner() {
   return (
-    <div
-      className="text-white text-center d-flex align-items-center"
-      style={{
-        background: "linear-gradient(to right, #007bff, #4c00ff)", // màu xanh chuyển sắc
-        minHeight: "300px",
-      }}
-    >
+    <div className="bg-primary banner text-white  text-center">
       <Container>
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng, minh bạch
@@ -23,7 +17,10 @@ function Banner() {
             <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
           </Button>
           <Button variant="outline-light" className="fw-semibold">
-            <i className="bi bi-search me-1"><a href=""></a></i> Khám phá
+            <i className="bi bi-search me-1">
+              <a href=""></a>
+            </i>{" "}
+            Khám phá
           </Button>
         </div>
       </Container>
