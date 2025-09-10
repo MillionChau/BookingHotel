@@ -1,4 +1,5 @@
 const Booking = require('../models/booking')
+const bookingMiddleware = require('../middlewares/bookingMiddleware')
 
 class BookingController {
     constructor() {
@@ -9,9 +10,8 @@ class BookingController {
         this.getAllBookings = this.getAllBookings.bind(this)
     }
 
-    // POST /bookings/create
     async createBooking(req, res) {
-        const { userId, checkinDate, checkOutDate, status,
+        const { userId, hotelId, checkinDate, checkOutDate, status,
             paymentStatus, paymentMethod, unitPrice, paymentDay, totalPrice } = req.body
 
         try {
@@ -20,6 +20,7 @@ class BookingController {
             const booking = new Booking({
                 bookingId, 
                 userId, 
+                hotelId,
                 checkinDate: new Date(checkinDate), 
                 checkOutDate: new Date(checkOutDate), 
                 status: 'Booked',
@@ -32,8 +33,40 @@ class BookingController {
 
             await booking.save()
 
+            await bookingMiddleware.updateRevenueOnPayment(booking)
+
             res.status(201).json({
                 message: 'Đăng ký khách sạn thành công!',
+                booking: booking
+            })
+        } catch (err) {
+            return res.status(500).json({ message: err.message })
+        }
+    }
+
+    // PUT /bookings/:id/payment
+    async updatePaymentStatus(req, res) {
+        const { bookingId } = req.params
+        const { paymentStatus, paymentMethod, paymentDay } = req.body
+        
+        try {  
+            const booking = await Booking.findOne({ bookingId })
+
+            if (!booking)
+                return res.status(404).json({ message: 'Không tìm thấy đơn đặt!' })
+
+            const previousPaymentStatus = booking.paymentStatus
+            
+            booking.paymentStatus = paymentStatus
+            booking.paymentMethod = paymentMethod || booking.paymentMethod
+            booking.paymentDay = paymentDay ? new Date(paymentDay) : booking.paymentDay
+
+            await booking.save()
+
+            await bookingMiddleware.updateRevenueOnPayment(booking)
+
+            res.status(200).json({
+                message: 'Cập nhật trạng thái thanh toán thành công!',
                 booking: booking
             })
         } catch (err) {

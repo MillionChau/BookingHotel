@@ -5,7 +5,6 @@ class ReviewController {
     constructor() {
         this.createReview = this.createReview.bind(this)
         this.getReviewsByRoom = this.getReviewsByRoom.bind(this)
-        this.getReviewsByHotel = this.getReviewsByHotel.bind(this)
         this.getReviewById = this.getReviewById.bind(this)
         this.updateReview = this.updateReview.bind(this)
         this.deleteReview = this.deleteReview.bind(this)

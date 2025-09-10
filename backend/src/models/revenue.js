@@ -8,4 +8,6 @@ const revenueSchema = new mongoose.Schema({
   totalPrice: Number,
 })
 
+revenueSchema.index({ hotelId: 1, month: 1, year: 1 }, { unique: true })
+
 module.exports = mongoose.model('Revenue', revenueSchema)
