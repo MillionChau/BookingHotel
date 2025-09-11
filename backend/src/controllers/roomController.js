@@ -76,6 +76,29 @@ class roomController {
             res.status(500).json({ message: err.message })
         }
     }
+    async occupancyRoom(req, res) {
+        try {
+            const totalRooms = await Room.countDocuments({})
+            const activeBookings = await Booking.countDocuments({
+                hotelId,
+                status: 'Booked',
+                checkinDate: { $lte: today },
+                checkOutDate: { $gte: today }
+            })
+
+            const occupancyRate = totalRooms > 0
+                ? (activeBookings / totalRooms) * 100
+                : 0
+
+            res.status(200).json({
+                totalRooms,
+                occupiedRooms: activeBookings,
+                occupancyRate: occupancyRate.toFixed(2) + '%'
+            })
+        } catch (err) {
+            res.status(500).json({ message: err.message })
+        }
+    }
 }
 
 module.exports = new roomController()
