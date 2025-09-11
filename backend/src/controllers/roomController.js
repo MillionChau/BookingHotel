@@ -2,9 +2,9 @@ const Room = require('../models/room')
 
 class roomController {
     async createRoom(req, res) {
-        const { hotelId, name, price, capacity, description } = req.body
+        const { hotelId, name, type, price, imageUrl, status } = req.body
         try {
-            const room = new Room({ hotelId, name, price, capacity, description })
+            const room = new Room({ hotelId, name, type, price, imageUrl, status })
             await room.save()
             res.status(201).json({
                 room,
@@ -16,15 +16,16 @@ class roomController {
     }
     async updateRoom(req, res) {
         const { id } = req.params
-        const { name, price, capacity, description } = req.body
+        const { name, type, price, imageUrl, status } = req.body
         try {
             const room = await Room.findById(id)
             if (!room) return res.status(404).json({ message: 'Không tìm thấy phòng!' })
 
             room.name = name || room.name
+            room.type = type || room.type
             room.price = price || room.price
-            room.capacity = capacity || room.capacity
-            room.description = description || room.description
+            room.imageUrl = imageUrl || room.imageUrl
+            room.status = status || room.status
 
             await room.save()
             res.status(200).json({
@@ -77,4 +78,4 @@ class roomController {
     }
 }
 
-module.exports = new roomController
+module.exports = new roomController()
