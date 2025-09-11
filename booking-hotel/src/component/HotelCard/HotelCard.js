@@ -132,4 +132,4 @@ function HotelCard() {
   );
 }
 
-export { HotelCard, hotelCard };
+export default HotelCard;
