@@ -46,22 +46,8 @@ export function Header() {
                   to="./BookingHotel">
                   Đặt phòng
                 </Nav.Link>
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  as={NavLink}
-                  to="./FavoriteCard">
-                  Yêu thích
-                </Nav.Link>
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  as={NavLink}
-                  to="./BookingList">
-                  Phòng đã đặt
-                </Nav.Link>
+                <Nav.Link as={Link} to="/Favorites">Yêu thích</Nav.Link>
+                <Nav.Link href="/phong-da-dat">Phòng đã đặt</Nav.Link>
               </Nav>
 
               {/* menu phải */}
