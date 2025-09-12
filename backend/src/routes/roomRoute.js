@@ -7,5 +7,7 @@ router.put('/:id', roomController.updateRoom)
 router.get('/hotel/:hotelId', roomController.getRoomsByHotel)
 router.get('/:id', roomController.getRoomById)
 router.delete('/:id', roomController.deleteRoom)
+router.get('/hotel/:hotelId/occupancy', roomController.getHotelOccupany)
+router.get('/hotel/:hotelId/occupied-count', roomController.getOccupiedRoomCount)
 
 module.exports = router
