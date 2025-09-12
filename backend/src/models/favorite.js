@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const favoriteSchema = new mongoose.Schema({
   roomId: String,
-  roomId: String,
-  addedDate: DateTime,
+  userId: String,
+  addedDate: Date,
 })
 
 module.exports = mongoose.model('Favorite', favoriteSchema)

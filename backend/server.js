@@ -5,6 +5,7 @@ const cors = require('cors')
 const allRoutes = require('./src/routes/index')
 const db = require('./src/config/db')
 const app = express()
+require('./src/services/roomScheduler')
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',

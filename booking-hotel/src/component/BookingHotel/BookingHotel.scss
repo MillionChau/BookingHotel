@@ -1,8 +1,12 @@
 .bookingHotel {
   margin-top: 75px !important;
 }
-
+.hotelCard:hover {
+  transform: translateY(-2px);
+  transition: 0.2s;
+}
 .badge,
-.btn-sm {
+.btn-sm,
+.bookingHotel-search {
   gap: 5px;
 }

@@ -5,6 +5,7 @@ import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserManager.css';
 
+
 export default function UserManager() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,8 +21,6 @@ export default function UserManager() {
     phone: "",
     address: "",
   });
-  // ĐÃ BỎ: State cho dữ liệu mật khẩu
-  // const [passwordData, setPasswordData] = useState({ ... });
   const [createData, setCreateData] = useState({
     fullname: "",
     email: "",
@@ -70,8 +69,6 @@ export default function UserManager() {
       alert(err.response?.data?.message || "Có lỗi xảy ra!");
     }
   };
-
-  // ĐÃ BỎ: Hàm xử lý đổi mật khẩu (handleChangePassword và handleSavePassword)
 
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Bạn có chắc muốn xóa người dùng này?")) return;

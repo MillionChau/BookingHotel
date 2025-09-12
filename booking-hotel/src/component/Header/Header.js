@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Header.scss";
 export function Header() {
   // state lưu thông tin user
@@ -31,8 +31,19 @@ export function Header() {
             <Navbar.Collapse id="basic-navbar-nav">
               {/* menu trái */}
               <Nav className="me-auto">
-                <Nav.Link href="/">Trang chủ</Nav.Link>
-                <Nav.Link as={Link} to="./BookingHotel">
+                <Nav.Link
+                  className={({ isActive }) =>
+                    isActive ? "active nav-link" : "nav-link"
+                  }
+                  href="/">
+                  Trang chủ
+                </Nav.Link>
+                <Nav.Link
+                  className={({ isActive }) =>
+                    isActive ? "active nav-link" : "nav-link"
+                  }
+                  as={NavLink}
+                  to="./BookingHotel">
                   Đặt phòng
                 </Nav.Link>
                 <Nav.Link as={Link} to="/Favorites">Yêu thích</Nav.Link>
@@ -56,10 +67,10 @@ export function Header() {
                     id="basic-nav-dropdown"
                     align="end">
                     {/* === THAY ĐỔI DÒNG NÀY === */}
-                    <NavDropdown.Item as={Link} to="/login">
+                    <NavDropdown.Item as={NavLink} to="/login">
                       Đăng nhập
                     </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/register">
+                    <NavDropdown.Item as={NavLink} to="/register">
                       Đăng ký
                     </NavDropdown.Item>
                   </NavDropdown>

@@ -1,14 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.min.css";
-import { Routes, Route, Outlet } from "react-router-dom";
-
-import { Header } from "./component/Header/Header";
-import Footer from "./component/Footer/Footer";
-import Banner from "./component/Banner/Banner";
-import Login from "./component/Login/Login";
-import Register from "./component/Register/Register";
-import { HotelCard } from "./component/HotelCard/HotelCard";
-import BookingHotel from "./component/BookingHotel/BookingHotel";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import FeatureCard from "./component/FeatureCard/FeatureCard";
 import FavoriteList from "./component/Favorite/FavoriteList"; 
 
@@ -61,6 +52,7 @@ function App() {
         <Route path="/register" element={<Register />} />
       </Routes>
     </div>
+  </BrowserRouter>
   );
 }
 
