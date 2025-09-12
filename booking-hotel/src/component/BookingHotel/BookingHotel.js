@@ -2,17 +2,23 @@
 import { ArrowClockwise, StarFill, Heart } from "react-bootstrap-icons";
 import { hotelCard } from "../HotelCard/HotelCard";
 import "./BookingHotel.scss";
+import Search from "../Search/Search";
 function BookingHotel() {
   return (
     <>
       <div className="container my-5 bookingHotel">
-        <h2 className="h4 mb-3">Đặt phòng</h2>
         <div className="row">
-          <div className="col-lg-5">
+          <div className="col-lg-5 d-flex flex-column bookingHotel-search">
             <div className="card shadow-sm">
+              <div class="card-body">
+                <Search />
+              </div>
+            </div>
+            {/* <div className="card shadow-sm">
               <div className="card-body">
-                <h5 className="card-title">Thông tin đặt</h5>
+                <h2 className="h4 mb-3">Đặt phòng</h2>
                 <div className="row g-2">
+                  <h5 className="card-title">Thông tin đặt</h5>
                   <div className="col-6">
                     <label className="form-label">Nhận phòng</label>
                     <input
@@ -54,7 +60,7 @@ function BookingHotel() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="col-lg-7">
             <div className="card shadow-sm">
