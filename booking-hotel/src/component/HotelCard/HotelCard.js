@@ -111,13 +111,13 @@ function HotelCard() {
                       <GeoAlt size={14} />
                       {hotelItem.addressHotel}
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="fw-semibold">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="fw-semibold">
                         {hotelItem.price.toLocaleString("vi-VN")} ₫/đêm
                       </span>
                       <a
                         href="booking.html"
-                        class="booking btn btn-sm btn-primary d-flex align-items-center">
+                        className="booking btn btn-sm btn-primary d-flex align-items-center">
                         Xem chi tiết
                       </a>
                     </div>
@@ -132,4 +132,5 @@ function HotelCard() {
   );
 }
 
-export { HotelCard, hotelCard };
+export default HotelCard ;
+export { hotelCard };

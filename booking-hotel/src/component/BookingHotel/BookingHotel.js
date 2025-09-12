@@ -1,5 +1,5 @@
 // import { Card, Form, Button, Row, Col } from "react-bootstrap";
-import { ArrowClockwise, StarFill } from "react-bootstrap-icons";
+import { ArrowClockwise, StarFill, Heart } from "react-bootstrap-icons";
 import { hotelCard } from "../HotelCard/HotelCard";
 import "./BookingHotel.scss";
 function BookingHotel() {
@@ -69,8 +69,8 @@ function BookingHotel() {
                 </h5>
                 <div className="row g-3" id="roomList">
                   {hotelCard.slice(0, 4).map((item, index) => (
-                    <div className="col-md-6">
-                      <div className="card h-100">
+                    <div key={index} className=" col-md-6">
+                      <div className="hotelCard card h-100">
                         <img
                           src={item.img}
                           className="card-img-top"
@@ -93,11 +93,16 @@ function BookingHotel() {
                             <span className="fw-semibold">
                               {item.price.toLocaleString("vi-VN")} ₫/đêm
                             </span>
-                            <button
-                              className="btn btn-primary btn-sm btnChooseRoom"
-                              data-id={item.id}>
-                              Chọn
-                            </button>
+                            <div className="btn-group d-flex align-items-center ">
+                              <button
+                                className="btn btn-primary btn-sm btnChooseRoom"
+                                data-id={item.id}>
+                                Chọn
+                              </button>
+                              <button className="btn btn-sm btn-outline-secondary btnAddFav">
+                                <Heart />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
