@@ -21,6 +21,7 @@ import Dashboard from "./admin/DashBoard/DashBoard";
 import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
+import UserManager from "./admin/UserManager/UserManager";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -121,7 +122,32 @@ function App() {
                   <ProtectedRoute requiredRole="Admin" user={user}>
                     <BookingManagement />
                   </ProtectedRoute>
-                }
+                } 
+              />
+              <Route 
+                path="/users" 
+                element={
+                  <ProtectedRoute requiredRole="Admin">
+                    <UserManager />
+                  </ProtectedRoute>  
+                } 
+              />
+              <Route 
+                path="/revenue" 
+                element={
+                  <ProtectedRoute requiredRole="Admin">
+                    <RoomManager />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/review" 
+                element={
+                  <ProtectedRoute requiredRole="Admin">
+                    <RoomManager />
+                  </ProtectedRoute>
+                } 
+
               />
               {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

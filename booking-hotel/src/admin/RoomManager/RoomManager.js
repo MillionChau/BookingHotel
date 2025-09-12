@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
+import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+
 
 export default function RoomManager() {
   const [rooms, setRooms] = useState([]);
@@ -114,8 +116,9 @@ export default function RoomManager() {
       </Form.Select>
 
       <Button variant="primary" onClick={() => handleShow()}>
-        + Thêm phòng
+        <FiPlus className="me-1" /> Thêm phòng
       </Button>
+
 
       <Table striped bordered hover responsive className="mt-3">
         <thead>
@@ -141,23 +144,23 @@ export default function RoomManager() {
                 <td>
                   <img src={room.imageUrl} alt={room.name} width="120" height="80" />
                 </td>
-                <td className="d-flex justify-content-center align-items-center">
+                <td className="d-flex justify-content-center align-items-center gap-2">
                   <Button
                     variant="warning"
                     size="sm"
-                    className="me-2"
                     onClick={() => handleShow(room)}
                   >
-                    Sửa
+                    <FiEdit />
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={() => handleDelete(room._id)}
                   >
-                    Xóa
+                    <FiTrash2 />
                   </Button>
                 </td>
+
               </tr>
             ))
           ) : (
