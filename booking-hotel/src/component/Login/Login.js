@@ -1,23 +1,61 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 
-function Login() {
+function Login({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (!email && !password) {
       setError("Please enter your Email and Password.");
+      return;
     } else if (!email) {
       setError("Please enter your Email.");
+      return;
     } else if (!password) {
       setError("Please enter your Password.");
-    } else {
-      setError("");
-      console.log("Logging in with:", { email, password });
+      return;
+    }
+
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:5360/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (typeof setUser === "function") {
+          setUser(data.user);
+        }
+
+        if (data.user.role === "Admin") {
+          navigate("/dashboard");
+          console.log("Redirecting Admin to /dashboard");
+        } else {
+          navigate("/");
+          console.log("Redirecting Customer to /");
+        }
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (err) {
+      setError("Network error. Please try again later.");
+      console.error("Login error:", err);
     }
   };
 
