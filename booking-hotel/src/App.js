@@ -1,7 +1,16 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import FeatureCard from "./component/FeatureCard/FeatureCard";
-import FavoriteList from "./component/Favorite/FavoriteList"; 
+import Banner from "./component/Banner/Banner";
+import HotelCard from "./component/HotelCard/HotelCard";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+
+import Header from "./component/Header/Header";
+import Footer from "./component/Footer/Footer";
+import FavoriteList from "./component/FavoriteCard/FavoriteCard";
+import BookingHotel from "./component/BookingHotel/BookingHotel";
+import Login from "./component/Login/Login";
+import Register from "./component/Register/Register";
 
 const MainLayout = () => {
   return (
@@ -36,23 +45,24 @@ const HeaderOnlyLayout = () => (
 
 function App() {
   return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="hotels" element={<HotelCard />} />
-          <Route path="favorites" element={<FavoriteList />} />
-        </Route>
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="hotels" element={<HotelCard />} />
+            <Route path="favorites" element={<FavoriteList />} />
+          </Route>
 
-        <Route path="/BookingHotel" element={<HeaderOnlyLayout />}>
+          <Route path="/BookingHotel" element={<HeaderOnlyLayout />}>
             <Route index element={<BookingHotel />} />
-        </Route>
+          </Route>
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </div>
-  </BrowserRouter>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

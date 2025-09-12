@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./Header.scss";
-export function Header() {
+import { Link } from 'react-router-dom';
+
+function Header() {
   // state lưu thông tin user
   // null = chưa đăng nhập,có = chứa thông tin user
   const [user, setUser] = useState(null);
@@ -100,3 +102,5 @@ export function Header() {
     </>
   );
 }
+
+export default Header
