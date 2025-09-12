@@ -1,5 +1,6 @@
 const Booking = require('../models/booking')
 const bookingMiddleware = require('../middlewares/bookingMiddleware')
+const revenueService = require('../services/revenueService')
 
 class BookingController {
     constructor() {
@@ -33,7 +34,9 @@ class BookingController {
 
             await booking.save()
 
-            await bookingMiddleware.updateRevenueOnPayment(booking)
+            if (booking.paymentStatus === 'Paid') {
+                await revenueService.updateRevenue(booking)
+            }
 
             res.status(201).json({
                 message: 'Đăng ký khách sạn thành công!',
@@ -63,7 +66,9 @@ class BookingController {
 
             await booking.save()
 
-            await bookingMiddleware.updateRevenueOnPayment(booking)
+            if (paymentStatus === 'Paid' && previousPaymentStatus !== 'Paid') {
+                await revenueService.updateRevenue(booking)
+            }
 
             res.status(200).json({
                 message: 'Cập nhật trạng thái thanh toán thành công!',
