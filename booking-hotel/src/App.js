@@ -20,6 +20,7 @@ import Dashboard from "./admin/DashBoard/DashBoard";
 import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
+import UserManager from "./admin/UserManager/UserManager";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -129,8 +130,8 @@ function App() {
                 path="/users" 
                 element={
                   <ProtectedRoute requiredRole="Admin">
-                    <RoomManager />
-                  </ProtectedRoute>
+                    <UserManager />
+                  </ProtectedRoute>  
                 } 
               />
               <Route 

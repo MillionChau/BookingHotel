@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
-// THAY ĐỔI: Bỏ icon FiKey vì không còn dùng
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserManager.css';
 
@@ -11,8 +10,6 @@ export default function UserManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
-  // ĐÃ BỎ: State cho modal mật khẩu
-  // const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({
@@ -119,7 +116,7 @@ export default function UserManager() {
       </div>
 
       <div className="table-wrapper">
-        <Table striped bordered hover responsive>
+        <Table bordered hover responsive>
           <thead>
             <tr>
               <th>UserId</th>
@@ -151,14 +148,16 @@ export default function UserManager() {
                   <td>{user.address}</td>
                   <td>{user.role}</td>
                   <td>{new Date(user.createAt).toLocaleString()}</td>
-                  <td className="action-buttons">
-                    <Button variant="outline-warning" size="sm" onClick={() => handleEditUser(user)}>
-                      <FiEdit />
-                    </Button>
-                    {/* ĐÃ BỎ: Nút Đổi mật khẩu */}
-                    <Button variant="outline-danger" size="sm" onClick={() => handleDeleteUser(user.userId)}>
-                      <FiTrash2 />
-                    </Button>
+                  <td>
+                    <div className="d-flex justify-content-center align-items-center gap-2 h-100">
+                      <Button variant="outline-warning" size="sm" onClick={() => handleEditUser(user)}>
+                        <FiEdit />
+                      </Button>
+                      <Button variant="outline-danger" size="sm" onClick={() => handleDeleteUser(user.userId)}>
+                        <FiTrash2 />
+                      </Button>
+                      
+                    </div>
                   </td>
                 </tr>
               ))
@@ -203,8 +202,6 @@ export default function UserManager() {
           <Button variant="primary" onClick={handleSaveUser}>Lưu</Button>
         </Modal.Footer>
       </Modal>
-
-      {/* ĐÃ BỎ: Modal đổi mật khẩu */}
 
        {/* Modal Tạo người dùng */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} centered>

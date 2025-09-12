@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import axios from "axios";
+import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+
 
 export default function HotelManagement() {
   const [hotels, setHotels] = useState([]);
@@ -90,8 +92,9 @@ export default function HotelManagement() {
     <div className="container mt-4">
       <h2 className="mb-4">Quản lý khách sạn</h2>
       <Button variant="primary" onClick={() => handleShow()}>
-        + Thêm khách sạn
+        <FiPlus className="me-1" /> Thêm khách sạn
       </Button>
+
 
       <Table striped bordered hover responsive className="mt-3">
       <thead>
@@ -120,24 +123,23 @@ export default function HotelManagement() {
               <img src={hotel.imageUrl} alt={hotel.name} width="80" height="60" />
             </td>
             <td>{hotel.createdAt ? new Date(hotel.createdAt).toLocaleString("vi-VN") : "N/A"}</td> {/* 👈 hiển thị */}
-            <td className="d-flex justify-content-center align-items-center" >
-              
+            <td className="d-flex justify-content-center align-items-center gap-2">
               <Button
                 variant="warning"
                 size="sm"
-                className="me-2"
                 onClick={() => handleShow(hotel)}
               >
-                Sửa
+                <FiEdit />
               </Button>
               <Button
                 variant="danger"
                 size="sm"
                 onClick={() => handleDelete(hotel.hotelId)}
               >
-                Xóa
+                <FiTrash2 />
               </Button>
             </td>
+
           </tr>
         ))}
       </tbody>
