@@ -1,12 +1,12 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
-import HotelCard from "../HotelCard/HotelCard"; 
+import "./SearchPage.css";
+import HotelCard from "../HotelCard/HotelCard";
 
 function SearchPage() {
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 search-page">
       {/* Thanh tìm kiếm */}
       <div className="row mb-4">
         <div className="col-md-3">
@@ -18,7 +18,11 @@ function SearchPage() {
           />
         </div>
         <div className="col-md-3">
-          <input type="date" className="form-control" placeholder="Nhận phòng" />
+          <input
+            type="date"
+            className="form-control"
+            placeholder="Nhận phòng"
+          />
         </div>
         <div className="col-md-3">
           <input type="date" className="form-control" placeholder="Trả phòng" />
