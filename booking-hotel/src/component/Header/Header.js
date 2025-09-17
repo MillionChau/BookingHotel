@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Logo from "../../assets/Logo.png";
+import Logo2 from "../../assets/Logo2.png";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
 
 function Header() {
+  const location = useLocation();
   const [user, setUser] = useState(null);
-
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  // Nếu không phải trang chủ thì coi như đã scroll
+  const isNotHome = location.pathname !== "/";
+  const headerClass = `header ${
+    scrolled || isNotHome ? "header-scrolled" : ""
+  }`;
   const handleLogin = () => {
     setUser({ username: "demo" });
   };
@@ -15,12 +34,16 @@ function Header() {
   };
 
   return (
-    <div className="header">
+    <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
           {/* logo */}
           <Navbar.Brand as={NavLink} to="/" className="fw-bold">
-            <i className="bi bi-building me-2"></i> BookingHotel
+            <img
+              src={scrolled || isNotHome ? Logo2 : Logo}
+              alt="Logo travel"
+              className="header-img"
+            />
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -43,14 +66,14 @@ function Header() {
 
             {/* menu phải */}
             <Nav>
-              <Nav.Link as={NavLink} to="/danh-gia">
+              <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
                 <i className="bi bi-star me-1"></i> Đánh giá
               </Nav.Link>
 
               {!user && (
                 <NavDropdown
                   title={
-                    <span>
+                    <span className="account">
                       <i className="bi bi-person-circle me-1"></i> Tài khoản
                     </span>
                   }

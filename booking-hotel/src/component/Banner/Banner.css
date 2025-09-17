@@ -1,0 +1,8 @@
+.banner {
+  position: relative;
+  top: -80px;
+  background-image: url("https://ik.imagekit.io/tvlk/image/imageResource/2025/01/05/1736039153373-64c979a852c7ec9063c6f2104bcf58dd.png?tr=dpr-2,q-75");
+  background-size: cover;
+  margin-top: 80px;
+  padding: 180px 0;
+}
