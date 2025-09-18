@@ -14,6 +14,7 @@ import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
+import Loading from "./component/Loading/Loading";
 
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
@@ -49,7 +50,7 @@ function App() {
     setUser(null);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -122,32 +123,31 @@ function App() {
                   <ProtectedRoute requiredRole="Admin" user={user}>
                     <BookingManagement />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="/users" 
+              <Route
+                path="/users"
                 element={
                   <ProtectedRoute requiredRole="Admin">
                     <UserManager />
-                  </ProtectedRoute>  
-                } 
+                  </ProtectedRoute>
+                }
               />
-              <Route 
-                path="/revenue" 
+              <Route
+                path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin">
                     <RoomManager />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="/review" 
+              <Route
+                path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin">
                     <RoomManager />
                   </ProtectedRoute>
-                } 
-
+                }
               />
               {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -158,12 +158,29 @@ function App() {
 
       {/* Layout Guest */}
       {!user && (
-        <div className="App">
+              <div className="App">
           <Header user={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/hotel/:id" element={<HotelDetail />} />
+            <Route path="/BookingHotel" element={<SearchPage />} />
+            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/BookingList"
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <BookingHistory />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
