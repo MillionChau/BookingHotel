@@ -2,6 +2,22 @@ const Room = require('../models/room')
 const Booking = require('../models/booking')
 
 class roomController {
+    async getAllRoom(req, res) {
+        try {
+            const rooms = Room.find({})
+
+            if (!rooms || users.length === 0)
+                return res.status(404).json({ message: 'Không có dữ liệu phòng.'})
+
+            res.status(200).json({
+                message: 'Lấy dữ liệu phòng thành công!',
+                rooms: rooms
+            })
+        } catch (err) {
+            res.status(500).json({ message: err.message })
+        }
+    }
+
     async createRoom(req, res) {
         const { hotelId, name, type, price, imageUrl, status } = req.body
         try {

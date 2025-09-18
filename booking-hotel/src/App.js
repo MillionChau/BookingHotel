@@ -23,6 +23,7 @@ import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
+import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -63,6 +64,8 @@ function App() {
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
+
             <Route
               path="/profile"
               element={
@@ -128,7 +131,7 @@ function App() {
               <Route
                 path="/users"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
+                  <ProtectedRoute requiredRole="Admin" user={user}>
                     <UserManager />
                   </ProtectedRoute>
                 }
@@ -136,7 +139,7 @@ function App() {
               <Route
                 path="/revenue"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
+                  <ProtectedRoute requiredRole="Admin" user={user}>
                     <RoomManager />
                   </ProtectedRoute>
                 }
@@ -144,8 +147,8 @@ function App() {
               <Route
                 path="/review"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
-                    <RoomManager />
+                  <ProtectedRoute requiredRole="Admin" user={user}>
+                    <ReviewManager />
                   </ProtectedRoute>
                 }
               />
@@ -162,6 +165,9 @@ function App() {
           <Header user={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/hotel/:id" element={<HotelDetail />} />
+            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteCard" element={<FavoriteCard />} />
