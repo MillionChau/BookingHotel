@@ -1,10 +1,10 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Banner.scss";
+import "./Banner.css";
 function Banner() {
   return (
-    <div className="bg-primary banner text-white  text-center">
+    <div className="bg-primary banner text-white  text-center banner">
       <Container>
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng, minh bạch
