@@ -59,7 +59,7 @@ class hotelController {
 
             const sequenceNumber = (hotelCount + 1).toString().padStart(4, '0');
 
-            const hotelId = `${provinceInit + nameInit}-${currentYear}-${sequenceNumber}`;
+            const {hotelId} = `${provinceInit + nameInit}-${currentYear}-${sequenceNumber}`;
 
             const newHotel = new Hotel({
                 hotelId: hotelId,
@@ -86,7 +86,7 @@ class hotelController {
         }
     }
     async updateHotel(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
         const { name, address, description, manager, imageUrl } = req.body
 
         try {
@@ -126,7 +126,7 @@ class hotelController {
     }
 
     async getHotelById(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
         try {
             const hotel = await Hotel.findOne(hotelId)
 
@@ -143,7 +143,7 @@ class hotelController {
     }
 
     async deleteHotel(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
 
         try {
             const deleteHotel = await Hotel.find({ hotelId })
