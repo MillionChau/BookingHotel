@@ -64,6 +64,8 @@ function App() {
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
+
             <Route
               path="/profile"
               element={
@@ -137,8 +139,8 @@ function App() {
               <Route
                 path="/revenue"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
-                    <UserManager />
+                  <ProtectedRoute requiredRole="Admin" user={user}>
+                    <RoomManager />
                   </ProtectedRoute>
                 }
               />
@@ -163,6 +165,9 @@ function App() {
           <Header user={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/hotel/:id" element={<HotelDetail />} />
+            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteCard" element={<FavoriteCard />} />
