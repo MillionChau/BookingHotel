@@ -5,10 +5,18 @@ const authRoutes = require('./authRoute')
 const userRoutes = require('./userRoute')
 const hotelRoutes = require('./hotelRoute')
 const bookingRoutes = require('./bookingRoute')
+const reviewRoutes = require('./reviewRoute')
+const favoriteRoutes = require('./favoriteRoute')
+const roomRoutes = require('./roomRoute')
+const revenueRoutes = require('./revenueRoute')
 
 router.use('/auth', authRoutes)
 router.use('/user', userRoutes)
 router.use('/hotel', hotelRoutes)
 router.use('/booking', bookingRoutes)
+router.use('/review', reviewRoutes)
+router.use('/favorite', favoriteRoutes)
+router.use('/room', roomRoutes)
+router.use('/api/revenue', revenueRoutes)
 
 module.exports = router
