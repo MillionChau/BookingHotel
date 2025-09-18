@@ -2,9 +2,8 @@ import React from 'react';
 import './Footer.scss';
 
 function Footer() {
-  // Hàm xử lý accordion cho mobile
   const handleAccordion = (event) => {
-    // Chỉ áp dụng cho các cột có class 'footer-column'
+
     const column = event.currentTarget.parentElement;
     if (window.innerWidth <= 768 && column.classList.contains('footer-column')) {
       column.classList.toggle('open');
@@ -14,7 +13,6 @@ function Footer() {
   return (
     <footer className="footer-container">
       <div className="footer-content-wrapper">
-        {/* 5 cột nội dung chính */}
         <div className="footer-column">
           <h3 onClick={handleAccordion}>Về chúng tôi</h3>
           <ul>
@@ -55,7 +53,7 @@ function Footer() {
           </ul>
         </div>
         
-        {/* Cột mạng xã hội cũng được đưa vào chung layout */}
+      
         <div className="footer-social">
           <h3 onClick={handleAccordion}>Theo dõi chúng tôi</h3>
           <ul>
@@ -66,7 +64,6 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Phần bản quyền */}
         <div className="footer-legal">
           <p>Copyright © 2024–2025 BookingHotel.com™. Bảo lưu mọi quyền.</p>
           <p>Booking Hotel là thành viên của Booking Hotel Inc., tập đoàn hàng đầu thế giới về du lịch trực tuyến và các dịch vụ liên quan.</p>
