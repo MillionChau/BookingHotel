@@ -1,133 +1,75 @@
 import React from 'react';
-import './Footer.scss'; 
+import './Footer.scss';
 
 function Footer() {
+  // Hàm xử lý accordion cho mobile
+  const handleAccordion = (event) => {
+    // Chỉ áp dụng cho các cột có class 'footer-column'
+    const column = event.currentTarget.parentElement;
+    if (window.innerWidth <= 768 && column.classList.contains('footer-column')) {
+      column.classList.toggle('open');
+    }
+  };
+
   return (
     <footer className="footer-container">
-      <div className="footer-links-grid">
+      <div className="footer-content-wrapper">
+        {/* 5 cột nội dung chính */}
         <div className="footer-column">
-          <h3>Hỗ trợ</h3>
+          <h3 onClick={handleAccordion}>Về chúng tôi</h3>
           <ul>
-            <li>
-              <a href="#">Các câu hỏi thường gặp về virus corona (COVID-19)</a>
-            </li>
-            <li>
-              <a href="#">Quản lí các chuyến đi của bạn</a>
-            </li>
-            <li>
-              <a href="#">Liên hệ Dịch vụ Khách hàng</a>
-            </li>
-            <li>
-              <a href="#">Trợ giúp đối tác</a>
-            </li>
-            <li>
-              <a href="#">Trung tâm thông tin bảo mật</a>
-            </li>
+            <li><a href="#"><i className="bi bi-info-circle"></i> Về Booking Hotel</a></li>
+            <li><a href="#"><i className="bi bi-briefcase"></i> Cơ hội việc làm</a></li>
+            <li><a href="#"><i className="bi bi-newspaper"></i> Truyền thông</a></li>
+            <li><a href="#"><i className="bi bi-tree"></i> Du lịch bền vững</a></li>
           </ul>
         </div>
 
         <div className="footer-column">
-          <h3>Khám phá</h3>
+          <h3 onClick={handleAccordion}>Sản phẩm</h3>
           <ul>
-            <li>
-              <a href="#">Địa điểm</a>
-            </li>
-            <li>
-              <a href="#">Các loại chỗ nghỉ</a>
-            </li>
-            <li>
-              <a href="#">Đánh giá</a>
-            </li>
-            <li>
-              <a href="#">Ưu đãi theo mùa và dịp lễ</a>
-            </li>
-            <li>
-              <a href="#">Bài viết về du lịch</a>
-            </li>
-            <li>
-              <a href="#">BookingHotel.com dành cho Doanh Nghiệp</a>
-            </li>
-            <li>
-              <a href="#">Traveller Review Awards</a>
-            </li>
+            <li><a href="#"><i className="bi bi-building"></i> Khách sạn</a></li>
+            <li><a href="#"><i className="bi bi-airplane"></i> Vé máy bay</a></li>
+            <li><a href="#"><i className="bi bi-car-front-fill"></i> Cho thuê xe</a></li>
+            <li><a href="#"><i className="bi bi-controller"></i> Hoạt động & Vui chơi</a></li>
           </ul>
         </div>
 
         <div className="footer-column">
-          <h3>Điều khoản & Quyền riêng tư</h3>
+          <h3 onClick={handleAccordion}>Hỗ trợ</h3>
           <ul>
-            <li>
-              <a href="#">Bảo mật & Cookie</a>
-            </li>
-            <li>
-              <a href="#">Điều khoản và điều kiện</a>
-            </li>
-            <li>
-              <a href="#">Chính sách về Khả năng tiếp cận</a>
-            </li>
-            <li>
-              <a href="#">Tranh chấp đối tác</a>
-            </li>
-            <li>
-              <a href="#">Chính sách chống Nô lệ Hiện đại</a>
-            </li>
-            <li>
-              <a href="#">Chính sách về Quyền con người</a>
-            </li>
+            <li><a href="#"><i className="bi bi-question-circle"></i> Trung tâm trợ giúp</a></li>
+            <li><a href="#"><i className="bi bi-headset"></i> Liên hệ chúng tôi</a></li>
+            <li><a href="#"><i className="bi bi-gear"></i> Quản lý đặt chỗ</a></li>
+            <li><a href="#"><i className="bi bi-people"></i> Trợ giúp đối tác</a></li>
           </ul>
         </div>
 
         <div className="footer-column">
-          <h3>Đối tác</h3>
+          <h3 onClick={handleAccordion}>Khác</h3>
           <ul>
-            <li>
-              <a href="#">Đăng nhập vào trang Extranet</a>
-            </li>
-            <li>
-              <a href="#">Đăng ký chỗ nghỉ của Quý vị</a>
-            </li>
-            <li>
-              <a href="#">Trở thành đối tác phân phối</a>
-            </li>
-            <li>
-              <a href="#">Liên hệ công ty</a>
-            </li>
+            <li><a href="#"><i className="bi bi-share"></i> BookingHotel Affiliate</a></li>
+            <li><a href="#"><i className="bi bi-book"></i> Blog du lịch</a></li>
+            <li><a href="#"><i className="bi bi-file-text"></i> Điều khoản & Điều kiện</a></li>
+            <li><a href="#"><i className="bi bi-shield-check"></i> Chính sách Quyền riêng tư</a></li>
+          </ul>
+        </div>
+        
+        {/* Cột mạng xã hội cũng được đưa vào chung layout */}
+        <div className="footer-social">
+          <h3 onClick={handleAccordion}>Theo dõi chúng tôi</h3>
+          <ul>
+            <li><a href="#"><i className="bi bi-facebook"></i> Facebook</a></li>
+            <li><a href="#"><i className="bi bi-instagram"></i> Instagram</a></li>
+            <li><a href="#"><i className="bi bi-tiktok"></i> TikTok</a></li>
+            <li><a href="#"><i className="bi bi-youtube"></i> Youtube</a></li>
           </ul>
         </div>
 
-        <div className="footer-column">
-          <h3>Về chúng tôi</h3>
-          <ul>
-            <li>
-              <a href="#">Về Booking.com</a>
-            </li>
-            <li>
-              <a href="#">Chúng tôi hoạt động như thế nào</a>
-            </li>
-            <li>
-              <a href="#">Du lịch bền vững</a>
-            </li>
-            <li>
-              <a href="#">Truyền thông</a>
-            </li>
-            <li>
-              <a href="#">Cơ hội việc làm</a>
-            </li>
-            <li>
-              <a href="#">Quan hệ cổ đông</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="footer-legal-info">
-        <p>Copyright © 2004–2025 BookingHotel.com™. Bảo lưu mọi quyền.</p>
-        <p>
-          Booking.com là một phần của Booking Hotel Inc., tập đoàn đứng đầu thế
-          giới về du lịch trực tuyến và các dịch vụ liên quan.
-        </p>
-        <div className="footer-holding-logos">
-          <i className="bi bi-building"></i> BookingHotel
+        {/* Phần bản quyền */}
+        <div className="footer-legal">
+          <p>Copyright © 2024–2025 BookingHotel.com™. Bảo lưu mọi quyền.</p>
+          <p>Booking Hotel là thành viên của Booking Hotel Inc., tập đoàn hàng đầu thế giới về du lịch trực tuyến và các dịch vụ liên quan.</p>
         </div>
       </div>
     </footer>
