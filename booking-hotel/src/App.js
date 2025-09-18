@@ -23,6 +23,7 @@ import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
+import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -128,7 +129,7 @@ function App() {
               <Route
                 path="/users"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
+                  <ProtectedRoute requiredRole="Admin" user={user}>
                     <UserManager />
                   </ProtectedRoute>
                 }
@@ -137,15 +138,15 @@ function App() {
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin">
-                    <RoomManager />
+                    <UserManager />
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/review"
                 element={
-                  <ProtectedRoute requiredRole="Admin">
-                    <RoomManager />
+                  <ProtectedRoute requiredRole="Admin" user={user}>
+                    <ReviewManager />
                   </ProtectedRoute>
                 }
               />

@@ -4,7 +4,6 @@ import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserManager.css';
 
-
 export default function UserManager() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +24,16 @@ export default function UserManager() {
     address: "",
     password: "",
   });
+
+  const formatUserId = (userId) => {
+    if (!userId) return "N/A";
+    
+    const firstTwoChars = userId.substring(0, 2);
+    
+    const lastThreeChars = userId.substring(userId.length - 3);
+    
+    return `${firstTwoChars}***${lastThreeChars}`;
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -119,7 +128,7 @@ export default function UserManager() {
         <Table bordered hover responsive>
           <thead>
             <tr>
-              <th>UserId</th>
+              <th>User ID</th>
               <th>Họ và tên</th>
               <th>Email</th>
               <th>Điện thoại</th>
@@ -141,7 +150,7 @@ export default function UserManager() {
             ) : filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <tr key={user.userId}>
-                  <td>{user.userId}</td>
+                  <td title={user.userId}>{formatUserId(user.userId)}</td>
                   <td>{user.fullname}</td>
                   <td>{user.email}</td>
                   <td>{user.phone}</td>
@@ -156,7 +165,6 @@ export default function UserManager() {
                       <Button variant="outline-danger" size="sm" onClick={() => handleDeleteUser(user.userId)}>
                         <FiTrash2 />
                       </Button>
-                      
                     </div>
                   </td>
                 </tr>
@@ -203,7 +211,7 @@ export default function UserManager() {
         </Modal.Footer>
       </Modal>
 
-       {/* Modal Tạo người dùng */}
+      {/* Modal Tạo người dùng */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Tạo người dùng mới</Modal.Title>
