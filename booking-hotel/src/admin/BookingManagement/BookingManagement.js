@@ -1,107 +1,119 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
 
 const BookingManagement = () => {
-  const bookings = [
-    {
-      bookingId: "B001",
-      userId: "KH101",
-      hotelName: "Khách sạn Biển Xanh",
-      roomId: "P12",
-      checkinDate: "2025-09-01",
-      checkoutDate: "2025-09-05",
-      status: "Đã xác nhận",
-      paymentMethod: "MoMo",
-      paymentStatus: "Đã thanh toán",
-      unitPrice: 500000,
-      totalPrice: 2000000,
-      paymentDay: "2025-09-01",
-    },
-    {
-      bookingId: "B002",
-      userId: "KH102",
-      hotelName: "Khách sạn Ánh Dương",
-      roomId: "P14",
-      checkinDate: "2025-08-28",
-      checkoutDate: "2025-09-02",
-      status: "Đã hoàn thành",
-      paymentMethod: "VNPay",
-      paymentStatus: "Đã thanh toán",
-      unitPrice: 600000,
-      totalPrice: 3000000,
-      paymentDay: "2025-08-28",
-    },
-    {
-      bookingId: "B003",
-      userId: "KH103",
-      hotelName: "Khách sạn Hoàng Gia",
-      roomId: "P08",
-      checkinDate: "2025-09-10",
-      checkoutDate: "2025-09-12",
-      status: "Đã xác nhận",
-      paymentMethod: "ZaloPay",
-      paymentStatus: "Đã thanh toán",
-      unitPrice: 800000,
-      totalPrice: 1600000,
-      paymentDay: "2025-09-05",
-    },
-    {
-      bookingId: "B004",
-      userId: "KH104",
-      hotelName: "Khách sạn Sông Hồng",
-      roomId: "P20",
-      checkinDate: "2025-09-03",
-      checkoutDate: "2025-09-06",
-      status: "Đã hủy",
-      paymentMethod: "MoMo",
-      paymentStatus: "Đã thanh toán",
-      unitPrice: 450000,
-      totalPrice: 1350000,
-      paymentDay: "2025-09-03",
-    },
-    {
-      bookingId: "B005",
-      userId: "KH105",
-      hotelName: "Khách sạn Golden Bay",
-      roomId: "P01",
-      checkinDate: "2025-09-07",
-      checkoutDate: "2025-09-09",
-      status: "Đã xác nhận",
-      paymentMethod: "Thẻ quốc tế",
-      paymentStatus: "Đã thanh toán",
-      unitPrice: 1000000,
-      totalPrice: 2000000,
-      paymentDay: "2025-09-07",
-    },
-  ];
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // API base URL - adjust according to your backend
+  const API_BASE_URL = "http://localhost:5360/booking";
+
+  // Fetch all bookings from backend
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(API_BASE_URL);
+      setBookings(response.data.bookings);
+      setError(null);
+    } catch (err) {
+      setError("Không thể tải danh sách đơn đặt. Vui lòng thử lại sau.");
+      console.error("Error fetching bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch bookings on component mount
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   // Badge màu trạng thái đơn
   const renderStatusBadge = (status) => {
     switch (status) {
+      case "Booked":
       case "Đã xác nhận":
         return <span className="badge bg-success">{status}</span>;
+      case "Completed":
       case "Đã hoàn thành":
         return <span className="badge bg-primary">{status}</span>;
+      case "Cancelled":
       case "Đã hủy":
         return <span className="badge bg-danger">{status}</span>;
       default:
-        return status;
+        return <span className="badge bg-secondary">{status}</span>;
     }
   };
+
+  // Badge màu trạng thái thanh toán
+  const renderPaymentBadge = (status) => {
+    switch (status) {
+      case "Paid":
+      case "Đã thanh toán":
+        return <span className="badge bg-success">{status}</span>;
+      case "Pending":
+      case "Chờ thanh toán":
+        return <span className="badge bg-warning text-dark">{status}</span>;
+      case "Failed":
+      case "Thất bại":
+        return <span className="badge bg-danger">{status}</span>;
+      default:
+        return <span className="badge bg-secondary">{status}</span>;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="container mt-4">
+        <div className="d-flex justify-content-center">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mt-4">
+        <div className="alert alert-danger" role="alert">
+          {error}
+          <button 
+            className="btn btn-sm btn-outline-danger ms-3"
+            onClick={fetchBookings}
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-4">
       <h4 className="mb-3">Quản lý đơn đặt phòng</h4>
 
+      {/* Refresh button */}
+      <div className="mb-3">
+        <button 
+          className="btn btn-outline-primary btn-sm"
+          onClick={fetchBookings}
+        >
+          🔄 Làm mới
+        </button>
+      </div>
+
       {/* Bảng hiển thị */}
       <div className="table-responsive">
-        <table className="table align-middle table-bordered">
+        <table className="table align-middle table-bordered table-hover">
           <thead className="table-light">
             <tr>
               <th>Mã đơn</th>
               <th>Mã khách</th>
-              <th>Tên khách sạn</th>
-              <th>Mã phòng</th>
+              <th>Mã khách sạn</th>
               <th>Ngày nhận</th>
               <th>Ngày trả</th>
               <th>Trạng thái đơn</th>
@@ -113,24 +125,34 @@ const BookingManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {bookings.map((b) => (
-              <tr key={b.bookingId}>
-                <td>{b.bookingId}</td>
-                <td>{b.userId}</td>
-                <td>{b.hotelName}</td>
-                <td>{b.roomId}</td>
-                <td>{b.checkinDate}</td>
-                <td>{b.checkoutDate}</td>
-                <td>{renderStatusBadge(b.status)}</td>
-                <td>{b.paymentMethod}</td>
-                <td>
-                  <span className="badge bg-success">{b.paymentStatus}</span>
+            {bookings.length === 0 ? (
+              <tr>
+                <td colSpan="12" className="text-center text-muted py-4">
+                  Không có đơn đặt nào
                 </td>
-                <td>{b.unitPrice.toLocaleString()}</td>
-                <td>{b.totalPrice.toLocaleString()}</td>
-                <td>{b.paymentDay}</td>
               </tr>
-            ))}
+            ) : (
+              bookings.map((booking) => (
+                <tr key={booking.bookingId}>
+                  <td>{booking.bookingId}</td>
+                  <td>{booking.userId}</td>
+                  <td>{booking.hotelId}</td>
+                  <td>{new Date(booking.checkinDate).toLocaleDateString('vi-VN')}</td>
+                  <td>{new Date(booking.checkOutDate).toLocaleDateString('vi-VN')}</td>
+                  <td>{renderStatusBadge(booking.status)}</td>
+                  <td>{booking.paymentMethod || "Chưa xác định"}</td>
+                  <td>{renderPaymentBadge(booking.paymentStatus)}</td>
+                  <td>{booking.unitPrice?.toLocaleString() || "0"}</td>
+                  <td>{booking.totalPrice?.toLocaleString() || "0"}</td>
+                  <td>
+                    {booking.paymentDay 
+                      ? new Date(booking.paymentDay).toLocaleDateString('vi-VN')
+                      : "Chưa thanh toán"
+                    }
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
