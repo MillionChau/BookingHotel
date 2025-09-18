@@ -1,0 +1,82 @@
+Tổng thể container
+.user-manager-container {
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e9ecef;
+}
+
+/* Tiêu đề */
+.title {
+  font-weight: 600;
+  margin-bottom: 2rem !important;
+}
+
+/* Ô tìm kiếm */
+.search-input {
+  max-width: 400px;
+  border-radius: 8px;
+}
+
+/* Nút tạo người dùng */
+.create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+/* Bọc ngoài bảng để bo góc và đổ bóng */
+.table-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+}
+
+/* Tùy chỉnh bảng */
+.table {
+  margin-bottom: 0; /* Bỏ margin cuối của table bootstrap */
+  vertical-align: middle; /* Căn giữa nội dung trong ô */
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.table th, .table td {
+  padding: 12px 15px;
+}
+
+/* Khu vực các nút hành động */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Tùy chỉnh chung cho các nút */
+.btn {
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.action-buttons .btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* Tùy chỉnh chung cho các ô input */
+.form-control {
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #86b7fe;
+}

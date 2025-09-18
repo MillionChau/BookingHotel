@@ -1,4 +1,5 @@
 const Room = require('../models/room')
+const Booking = require('../models/booking')
 
 class roomController {
     async createRoom(req, res) {
@@ -14,6 +15,7 @@ class roomController {
             res.status(500).json({ message: err.message })
         }
     }
+
     async updateRoom(req, res) {
         const { id } = req.params
         const { name, type, price, imageUrl, status } = req.body
@@ -51,6 +53,7 @@ class roomController {
             res.status(500).json({ message: err.message })
         }
     }
+
     async getRoomById(req, res) {
         const { id } = req.params
         try {
@@ -65,6 +68,7 @@ class roomController {
             res.status(500).json({ message: err.message })
         }
     }
+
     async deleteRoom(req, res) {
         const { id } = req.params
         try {
@@ -76,24 +80,74 @@ class roomController {
             res.status(500).json({ message: err.message })
         }
     }
-    async occupancyRoom(req, res) {
+
+    async getHotelOccupany(req, res) {
+        const { hotelId } = req.params
+
         try {
-            const totalRooms = await Room.countDocuments({})
-            const activeBookings = await Booking.countDocuments({
+            const allRooms = await Room.find({ hotelId })
+            const totalRooms = allRooms.length
+
+            if(totalRooms === 0) {
+                return res.status(404).json({
+                    message: 'Không tìm thấy phòng nào cho khách sạn này!'
+                })
+            }
+
+            const occupiedRooms = await Room.countDocuments({
                 hotelId,
-                status: 'Booked',
-                checkinDate: { $lte: today },
-                checkOutDate: { $gte: today }
+                status: 'occupied'
             })
 
-            const occupancyRate = totalRooms > 0
-                ? (activeBookings / totalRooms) * 100
+            const availableRooms = await Room.countDocuments({
+                hotelId,
+                status: 'available'
+            })
+
+            const occupiedRate = totalRooms > 0
+                ? ((occupiedRooms / totalRooms) * 100).toFixed(2)
                 : 0
 
+            const activeBookings = await Booking.find({
+                hotelId,
+                status: 'CheckIn'
+            }).populate('roomId', 'name type')
+
             res.status(200).json({
-                totalRooms,
-                occupiedRooms: activeBookings,
-                occupancyRate: occupancyRate.toFixed(2) + '%'
+                hotelId,
+                occupancy: {
+                    totalRooms,
+                    occupiedRooms,
+                    availableRooms,
+                    occupancyRate: parseFloat(occupancyRate),
+                    maintenanceRooms: totalRooms - occupiedRooms - availableRooms
+                },
+                activeBookings: activeBookings.map(booking => ({
+                    bookingId: booking.bookingId,
+                    room: booking.roomId,
+                    checkinDate: booking.checkinDate,
+                    checkOutDate: booking.checkOutDate
+                })),
+                message: 'Lấy thông tin occupancy thành công!'
+            })
+        } catch(err) {
+            return res.status(500).json({ message: err.message })
+        }
+    }
+
+     async getOccupiedRoomCount(req, res) {
+        const { hotelId } = req.params
+        
+        try {
+            const occupiedCount = await Room.countDocuments({ 
+                hotelId, 
+                status: 'occupied' 
+            })
+
+            res.status(200).json({
+                hotelId,
+                occupiedRoomCount: occupiedCount,
+                message: 'Lấy số phòng occupied thành công!'
             })
         } catch (err) {
             res.status(500).json({ message: err.message })

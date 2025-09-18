@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-//có db thì sửa 
+import "./HotelDetail.scss";
+//có db thì sửa
 function HotelDetail() {
   const rooms = [
     {
@@ -96,7 +97,7 @@ function HotelDetail() {
   const total = selectedRoom ? selectedRoom.price * calculateDays() : 0;
 
   return (
-    <div className="container mt-4">
+    <div className="hotelDetail container mt-5 ">
       {/* Banner khách sạn */}
       <div className="card mb-4 shadow-sm">
         <img
@@ -157,8 +158,7 @@ function HotelDetail() {
                                 : "btn-outline-primary"
                             }`}
                             disabled={isBooked}
-                            onClick={() => handleSelect(room, number)}
-                          >
+                            onClick={() => handleSelect(room, number)}>
                             {number}
                           </button>
                         );
@@ -193,7 +193,6 @@ function HotelDetail() {
                 onChange={(e) => setCheckOut(e.target.value)}
               />
             </div>
-            
 
             {/* Thông tin phòng đã chọn */}
             {selectedRoom && selectedNumber && (
@@ -202,8 +201,8 @@ function HotelDetail() {
                   <strong>Phòng:</strong> {selectedRoom.name} ({selectedNumber})
                 </p>
                 <p className="mb-1">
-                  <strong>Giá:</strong>{" "}
-                  {selectedRoom.price.toLocaleString()} VND/đêm
+                  <strong>Giá:</strong> {selectedRoom.price.toLocaleString()}{" "}
+                  VND/đêm
                 </p>
                 <p className="mb-1">
                   <strong>Số đêm:</strong> {calculateDays()}
@@ -218,8 +217,7 @@ function HotelDetail() {
 
             <button
               className="btn btn-primary w-100"
-              onClick={() => validateBooking()}
-            >
+              onClick={() => validateBooking()}>
               Đặt phòng
             </button>
           </div>

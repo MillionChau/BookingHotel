@@ -4,6 +4,7 @@ const bookingSchema = new mongoose.Schema({
   bookingId: String,
   userId: String,
   hotelId: String,
+  roomId: String,
   checkinDate: Date,
   checkOutDate: Date,
   status: String,

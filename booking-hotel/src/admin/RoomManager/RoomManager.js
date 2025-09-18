@@ -1,82 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
+import axios from "axios";
+import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 
-function RoomManager() {
-  const [rooms, setRooms] = useState([
-    {
-      roomId: "R001",
-      hotelId: "H001",
-      roomNumber: "101",
-      type: "Deluxe",
-      price: 800000,
-      status: "Trống",
-      imageUrl: "https://source.unsplash.com/120x80/?hotel-room",
-    },
-    {
-      roomId: "R002",
-      hotelId: "H001",
-      roomNumber: "102",
-      type: "Suite",
-      price: 1200000,
-      status: "Đang đặt",
-      imageUrl: "https://source.unsplash.com/120x80/?bedroom",
-    },
-    {
-      roomId: "R003",
-      hotelId: "H002",
-      roomNumber: "201",
-      type: "Standard",
-      price: 500000,
-      status: "Trống",
-      imageUrl: "https://source.unsplash.com/120x80/?apartment",
-    },
-  ]);
 
-  const [selectedHotel, setSelectedHotel] = useState("H001");
+export default function RoomManager() {
+  const [rooms, setRooms] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [selectedHotel, setSelectedHotel] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     roomId: "",
-    hotelId: "",
-    roomNumber: "",
+    name: "",
     type: "",
     price: "",
-    status: "Trống",
     imageUrl: "",
+    status: "Trống",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
 
-  const filteredRooms = rooms.filter((room) => room.hotelId === selectedHotel);
+  // Lấy danh sách khách sạn
+  useEffect(() => {
+    axios
+      .get("http://localhost:5360/hotel/all")
+      .then((res) => {
+        const hotelList = res.data.HotelList || [];
+        setHotels(hotelList);
+        if (hotelList.length > 0) setSelectedHotel(hotelList[0].hotelId);
+      })
+      .catch(console.error);
+  }, []);
+
+  // Lấy danh sách phòng khi chọn khách sạn
+  useEffect(() => {
+    if (selectedHotel) fetchRooms(selectedHotel);
+  }, [selectedHotel]);
+
+  const fetchRooms = async (hotelId) => {
+    try {
+      const res = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+      setRooms(res.data.rooms || []);
+    } catch (err) {
+      console.error(err.response?.data || err);
+      setRooms([]);
+    }
+  };
 
   const handleShow = (room = null) => {
     if (room) {
-      setFormData(room);
+      setFormData({
+        roomId: room.roomId,
+        name: room.name,
+        type: room.type,
+        price: room.price,
+        imageUrl: room.imageUrl,
+        status: room.status,
+      });
+      setCurrentId(room._id); // dùng _id MongoDB cho API update/delete
       setIsEditing(true);
     } else {
       setFormData({
         roomId: "",
-        hotelId: selectedHotel,
-        roomNumber: "",
+        name: "",
         type: "",
         price: "",
-        status: "Trống",
         imageUrl: "",
+        status: "Trống",
       });
+      setCurrentId(null);
       setIsEditing(false);
     }
     setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (isEditing) {
-      setRooms(rooms.map((r) => (r.roomId === formData.roomId ? formData : r)));
-    } else {
-      setRooms([...rooms, formData]);
+  const handleSave = async () => {
+    try {
+      if (!selectedHotel) return alert("Chọn khách sạn trước!");
+      const payload = { ...formData, hotelId: selectedHotel };
+      if (isEditing) {
+        await axios.put(`http://localhost:5360/room/${currentId}`, payload);
+      } else {
+        await axios.post("http://localhost:5360/room/create", payload);
+      }
+      fetchRooms(selectedHotel);
+      setShowModal(false);
+    } catch (err) {
+      console.error(err.response?.data || err);
     }
-    setShowModal(false);
   };
 
-  const handleDelete = (id) => {
-    setRooms(rooms.filter((r) => r.roomId !== id));
+  const handleDelete = async (_id) => {
+    try {
+      await axios.delete(`http://localhost:5360/room/${_id}`);
+      fetchRooms(selectedHotel);
+    } catch (err) {
+      console.error(err.response?.data || err);
+    }
   };
 
   return (
@@ -88,66 +108,65 @@ function RoomManager() {
         value={selectedHotel}
         onChange={(e) => setSelectedHotel(e.target.value)}
       >
-        <option value="H001">Khách sạn H001 - Hà Nội Center</option>
-        <option value="H002">Khách sạn H002 - Đà Nẵng Beach</option>
+        {hotels.map((h) => (
+          <option key={h.hotelId} value={h.hotelId}>
+            {h.name}
+          </option>
+        ))}
       </Form.Select>
 
       <Button variant="primary" onClick={() => handleShow()}>
-        + Thêm phòng
+        <FiPlus className="me-1" /> Thêm phòng
       </Button>
+
 
       <Table striped bordered hover responsive className="mt-3">
         <thead>
           <tr>
             <th>Mã phòng</th>
-            <th>Số phòng</th>
+            <th>Tên phòng</th>
             <th>Loại</th>
-            <th>Giá (VNĐ/đêm)</th>
+            <th>Giá</th>
             <th>Trạng thái</th>
             <th>Ảnh</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {filteredRooms.length > 0 ? (
-            filteredRooms.map((room) => (
-              <tr key={room.roomId}>
+          {rooms.length > 0 ? (
+            rooms.map((room) => (
+              <tr key={room._id}>
                 <td>{room.roomId}</td>
-                <td>{room.roomNumber}</td>
+                <td>{room.name}</td>
                 <td>{room.type}</td>
                 <td>{room.price.toLocaleString("vi-VN")} ₫</td>
                 <td>{room.status}</td>
                 <td>
-                  <img
-                    src={room.imageUrl}
-                    alt={room.roomNumber}
-                    width="120"
-                    height="80"
-                  />
+                  <img src={room.imageUrl} alt={room.name} width="120" height="80" />
                 </td>
-                <td>
+                <td className="d-flex justify-content-center align-items-center gap-2">
                   <Button
                     variant="warning"
                     size="sm"
-                    className="me-2"
                     onClick={() => handleShow(room)}
                   >
-                    Sửa
+                    <FiEdit />
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(room.roomId)}
+                    onClick={() => handleDelete(room._id)}
                   >
-                    Xóa
+                    <FiTrash2 />
                   </Button>
                 </td>
+
               </tr>
             ))
           ) : (
             <tr>
               <td colSpan="7" className="text-center">
-                Chưa có phòng nào trong khách sạn này
+                Chưa có phòng nào
               </td>
             </tr>
           )}
@@ -160,54 +179,45 @@ function RoomManager() {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {!isEditing && (
+              <Form.Group className="mb-2">
+                <Form.Label>Mã phòng</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={formData.roomId}
+                  onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                />
+              </Form.Group>
+            )}
             <Form.Group className="mb-2">
-              <Form.Label>Mã phòng</Form.Label>
+              <Form.Label>Tên phòng</Form.Label>
               <Form.Control
                 type="text"
-                value={formData.roomId}
-                onChange={(e) =>
-                  setFormData({ ...formData, roomId: e.target.value })
-                }
-                disabled={isEditing}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
-              <Form.Label>Số phòng</Form.Label>
-              <Form.Control
-                type="text"
-                value={formData.roomNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, roomNumber: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Loại phòng</Form.Label>
+              <Form.Label>Loại</Form.Label>
               <Form.Control
                 type="text"
                 value={formData.type}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
-              <Form.Label>Giá (VNĐ/đêm)</Form.Label>
+              <Form.Label>Giá</Form.Label>
               <Form.Control
                 type="number"
                 value={formData.price}
-                onChange={(e) =>
-                  setFormData({ ...formData, price: parseInt(e.target.value) })
-                }
+                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Trạng thái</Form.Label>
               <Form.Select
                 value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
                 <option value="Trống">Trống</option>
                 <option value="Đang đặt">Đang đặt</option>
@@ -219,9 +229,7 @@ function RoomManager() {
               <Form.Control
                 type="text"
                 value={formData.imageUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, imageUrl: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
               />
             </Form.Group>
           </Form>
@@ -238,5 +246,3 @@ function RoomManager() {
     </div>
   );
 }
-
-export default RoomManager;

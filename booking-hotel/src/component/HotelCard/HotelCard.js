@@ -1,6 +1,6 @@
 import "./HotelCard.scss";
 import { GeoAlt, StarFill } from "react-bootstrap-icons";
-const hotelCard = [
+export const hotelCard = [
   {
     id: 1,
     img: "https://fastly.picsum.photos/id/436/600/400.jpg?hmac=6veY95w-1BubK3-QT9BHXUkrpYvfzURjRgNimYhmcmU",
@@ -132,4 +132,4 @@ function HotelCard() {
   );
 }
 
-export { HotelCard, hotelCard };
+export default HotelCard;

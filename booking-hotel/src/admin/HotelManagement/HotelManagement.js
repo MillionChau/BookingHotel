@@ -1,48 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
+import axios from "axios";
+import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 
-export default function HotelManager() {
-  const [hotels, setHotels] = useState([
-    {
-      hotelId: "H001",
-      name: "Khách sạn Hà Nội Center",
-      address: "123 Trần Hưng Đạo, Hà Nội",
-      description: "Khách sạn 4 sao nằm tại trung tâm Hà Nội",
-      manager: "Nguyễn Văn A",
-      rating: 4,
-      imageUrl: "https://via.placeholder.com/150",
-    },
-    {
-      hotelId: "H002",
-      name: "Khách sạn Đà Nẵng Beach",
-      address: "45 Nguyễn Văn Thoại, Đà Nẵng",
-      description: "Gần biển Mỹ Khê, view đẹp",
-      manager: "Trần Thị B",
-      rating: 0, 
-      imageUrl: "https://via.placeholder.com/150",
-    },
-  ]);
 
+export default function HotelManagement() {
+  const [hotels, setHotels] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    hotelId: "",
     name: "",
     address: "",
     description: "",
     manager: "",
-    rating: 0, 
+    rating: 0,
     imageUrl: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
 
-  // Mở modal để thêm/sửa
+  // Lấy danh sách khách sạn khi load trang
+  useEffect(() => {
+    fetchHotels();
+  }, []);
+
+  const fetchHotels = async () => {
+    try {
+      const res = await axios.get("http://localhost:5360/hotel/all");
+      setHotels(res.data.HotelList || []);
+    } catch (err) {
+      console.error("Lỗi khi tải khách sạn:", err);
+    }
+  };
+
+  // Mở modal thêm / sửa
   const handleShow = (hotel = null) => {
     if (hotel) {
-      setFormData(hotel);
+      setFormData({
+        name: hotel.name,
+        address: hotel.address,
+        description: hotel.description,
+        manager: hotel.manager,
+        rating: hotel.rating,
+        imageUrl: hotel.imageUrl,
+      });
+      setCurrentId(hotel.hotelId);
       setIsEditing(true);
     } else {
       setFormData({
-        hotelId: "",
         name: "",
         address: "",
         description: "",
@@ -50,113 +54,105 @@ export default function HotelManager() {
         rating: 0,
         imageUrl: "",
       });
+      setCurrentId(null);
       setIsEditing(false);
     }
     setShowModal(true);
   };
 
   // Lưu khách sạn
-  const handleSave = () => {
-    if (isEditing) {
-      setHotels(
-        hotels.map((h) =>
-          h.hotelId === formData.hotelId ? formData : h
-        )
-      );
-    } else {
-      setHotels([...hotels, { ...formData, rating: 0 }]);
+  const handleSave = async () => {
+    try {
+      if (isEditing) {
+        await axios.put(
+          `http://localhost:5360/hotel/update/${currentId}`,
+          formData
+        );
+      } else {
+        await axios.post("http://localhost:5360/hotel/create", formData);
+      }
+      fetchHotels();
+      setShowModal(false);
+    } catch (err) {
+      console.error("Lỗi khi lưu khách sạn:", err.response?.data || err);
     }
-    setShowModal(false);
   };
 
   // Xóa khách sạn
-  const handleDelete = (id) => {
-    setHotels(hotels.filter((h) => h.hotelId !== id));
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5360/hotel/delete/${id}`);
+      fetchHotels();
+    } catch (err) {
+      console.error("Lỗi khi xóa khách sạn:", err);
+    }
   };
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Quản lý khách sạn</h2>
       <Button variant="primary" onClick={() => handleShow()}>
-        + Thêm khách sạn
+        <FiPlus className="me-1" /> Thêm khách sạn
       </Button>
 
+
       <Table striped bordered hover responsive className="mt-3">
-        <thead>
-          <tr>
-            <th>Mã KS</th>
-            <th>Tên khách sạn</th>
-            <th>Địa chỉ</th>
-            <th>Mô tả</th>
-            <th>Quản lý</th>
-            <th>Đánh giá</th>
-            <th>Ảnh</th>
-            <th>Hành động</th>
+      <thead>
+        <tr>
+          <th>Mã KS</th>
+          <th>Tên khách sạn</th>
+          <th>Địa chỉ</th>
+          <th>Mô tả</th>
+          <th>Quản lý</th>
+          <th>Đánh giá</th>
+          <th>Ảnh</th>
+          <th>Ngày tạo</th> 
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {hotels.map((hotel) => (
+          <tr key={hotel.hotelId}>
+            <td>{hotel.hotelId}</td>
+            <td>{hotel.name}</td>
+            <td>{hotel.address}</td>
+            <td>{hotel.description}</td>
+            <td>{hotel.manager}</td>
+            <td>{hotel.rating > 0 ? `${hotel.rating} ⭐` : "Chưa có đánh giá"}</td>
+            <td>
+              <img src={hotel.imageUrl} alt={hotel.name} width="80" height="60" />
+            </td>
+            <td>{hotel.createdAt ? new Date(hotel.createdAt).toLocaleString("vi-VN") : "N/A"}</td> {/* 👈 hiển thị */}
+            <td className="d-flex justify-content-center align-items-center gap-2">
+              <Button
+                variant="warning"
+                size="sm"
+                onClick={() => handleShow(hotel)}
+              >
+                <FiEdit />
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => handleDelete(hotel.hotelId)}
+              >
+                <FiTrash2 />
+              </Button>
+            </td>
+
           </tr>
-        </thead>
-        <tbody>
-          {hotels.map((hotel) => (
-            <tr key={hotel.hotelId}>
-              <td>{hotel.hotelId}</td>
-              <td>{hotel.name}</td>
-              <td>{hotel.address}</td>
-              <td>{hotel.description}</td>
-              <td>{hotel.manager}</td>
-              <td>
-                {hotel.rating > 0
-                  ? `${hotel.rating} ⭐`
-                  : "Chưa có đánh giá"}
-              </td>
-              <td>
-                <img
-                  src={hotel.imageUrl}
-                  alt={hotel.name}
-                  width="80"
-                  height="60"
-                />
-              </td>
-              <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => handleShow(hotel)}
-                >
-                  Sửa
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDelete(hotel.hotelId)}
-                >
-                  Xóa
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        ))}
+      </tbody>
+
       </Table>
 
-      {/* Modal thêm/sửa */}
+      {/* thêm / sửa */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>
-            {isEditing ? "Sửa khách sạn" : "Thêm khách sạn"}
-          </Modal.Title>
+          <Modal.Title>{isEditing ? "Sửa khách sạn" : "Thêm khách sạn"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Mã khách sạn</Form.Label>
-              <Form.Control
-                type="text"
-                value={formData.hotelId}
-                onChange={(e) =>
-                  setFormData({ ...formData, hotelId: e.target.value })
-                }
-                disabled={isEditing}
-              />
-            </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Tên khách sạn</Form.Label>
               <Form.Control
@@ -184,10 +180,7 @@ export default function HotelManager() {
                 rows={2}
                 value={formData.description}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    description: e.target.value,
-                  })
+                  setFormData({ ...formData, description: e.target.value })
                 }
               />
             </Form.Group>
@@ -198,6 +191,18 @@ export default function HotelManager() {
                 value={formData.manager}
                 onChange={(e) =>
                   setFormData({ ...formData, manager: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Đánh giá</Form.Label>
+              <Form.Control
+                type="number"
+                min="0"
+                max="5"
+                value={formData.rating}
+                onChange={(e) =>
+                  setFormData({ ...formData, rating: e.target.value })
                 }
               />
             </Form.Group>
