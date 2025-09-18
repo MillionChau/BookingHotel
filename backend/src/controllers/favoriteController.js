@@ -2,9 +2,9 @@ const Favorite = require('../models/favorite')
 
 class favoriteController {
     async createFavorite(req, res) {
-        const { roomId, userId } = req.body
+        const { hotelId, userId } = req.body
         try {
-            const favorite = new Favorite({ userId, roomId })
+            const favorite = new Favorite({ userId, hotelId })
             await favorite.save()
             res.status(201).json({
                 favorite,
@@ -33,9 +33,9 @@ class favoriteController {
         }
     }
     async checkFavorite(req, res) {
-        const { userId, roomId } = req.query
+        const { userId, hotelId } = req.query
         try {
-            const favorite = await Favorite.findOne({ userId, roomId })
+            const favorite = await Favorite.findOne({ userId, hotelId })
             if (favorite) {
                 res.status(200).json({ isFavorite: true, favoriteId: favorite._id })
             } else {
