@@ -5,10 +5,10 @@ import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
 
-function Header() {
+function Header({ user, onLogout }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -20,24 +20,17 @@ function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  // Nếu không phải trang chủ thì coi như đã scroll
+
   const isNotHome = location.pathname !== "/";
   const headerClass = `header ${
     scrolled || isNotHome ? "header-scrolled" : ""
   }`;
-  const handleLogin = () => {
-    setUser({ username: "demo" });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
 
   return (
     <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
-          {/* logo */}
+          {/* Logo */}
           <Navbar.Brand as={NavLink} to="/" className="fw-bold">
             <img
               src={scrolled || isNotHome ? Logo2 : Logo}
@@ -46,9 +39,11 @@ function Header() {
             />
           </Navbar.Brand>
 
+          {/* Nút thu gọn menu cho mobile */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
           <Navbar.Collapse id="basic-navbar-nav">
-            {/* menu trái */}
+            {/* Menu điều hướng chính */}
             <Nav className="me-auto">
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
@@ -64,12 +59,13 @@ function Header() {
               </Nav.Link>
             </Nav>
 
-            {/* menu phải */}
+            {/* Menu người dùng */}
             <Nav>
               <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
                 <i className="bi bi-star me-1"></i> Đánh giá
               </Nav.Link>
 
+              {/* Khi chưa đăng nhập */}
               {!user && (
                 <NavDropdown
                   title={
@@ -78,7 +74,8 @@ function Header() {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end">
+                  align="end"
+                >
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>
@@ -88,17 +85,22 @@ function Header() {
                 </NavDropdown>
               )}
 
+              {/* Khi đã đăng nhập */}
               {user && (
                 <NavDropdown
                   title={
-                    <span>
-                      <i className="bi bi-person-circle me-1"></i>{" "}
-                      {user.username}
+                    <span className="user-greeting">
+                      <i className="bi bi-person-circle me-1"></i>
+                      Xin chào, {user.fullName || user.fullname || "..."}
                     </span>
                   }
                   id="user-nav-dropdown"
-                  align="end">
-                  <NavDropdown.Item onClick={handleLogout}>
+                  align="end"
+                >
+                  <NavDropdown.Item as={NavLink} to="/profile">
+                    Thông tin tài khoản
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={onLogout}>
                     Đăng xuất
                   </NavDropdown.Item>
                 </NavDropdown>

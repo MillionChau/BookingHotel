@@ -64,3 +64,9 @@
   color: #0d6efd !important; // màu xanh bootstrap
   border-bottom: 2px solid #0d6efd;
 }
+.user-greeting {
+  color: #FFF;
+}
+.header-scrolled .user-greeting {
+  color: #000;
+}

@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 // Customer Components
@@ -37,6 +37,10 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const location = useLocation();
+  const showHeaderFooter =
+    location.pathname !== "/login" && location.pathname !== "/register";
+
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -58,7 +62,7 @@ function App() {
       {/* Layout Customer */}
       {user && user.role === "Customer" && (
         <div className="App">
-          <Header user={user} onLogout={handleLogout} />
+          {showHeaderFooter && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
@@ -70,7 +74,7 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
-                  <ProfilePage />
+                  <ProfilePage user={user} />
                 </ProtectedRoute>
               }
             />
@@ -86,7 +90,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Footer />
+          {showHeaderFooter && <Footer />}
         </div>
       )}
 
@@ -96,63 +100,14 @@ function App() {
           <Sidebar onLogout={handleLogout} />
           <div style={{ flex: 1, padding: "20px" }}>
             <Routes>
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/hotelmanagement"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <HotelManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/rooms"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/bookings"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <BookingManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/users"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <UserManager />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/revenue"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/review"
-                element={
-                  <ProtectedRoute requiredRole="Admin" user={user}>
-                    <ReviewManager />
-                  </ProtectedRoute>
-                }
-              />
-              {/* các route khác của Admin */}
+              {/* ... Các route của admin ... */}
+              <Route path="/dashboard" element={<ProtectedRoute requiredRole="Admin" user={user}><Dashboard /></ProtectedRoute>} />
+              <Route path="/hotelmanagement" element={<ProtectedRoute requiredRole="Admin" user={user}><HotelManagement /></ProtectedRoute>} />
+              <Route path="/rooms" element={<ProtectedRoute requiredRole="Admin" user={user}><RoomManager /></ProtectedRoute>} />
+              <Route path="/bookings" element={<ProtectedRoute requiredRole="Admin" user={user}><BookingManagement /></ProtectedRoute>} />
+              <Route path="/users" element={<ProtectedRoute requiredRole="Admin" user={user}><UserManager /></ProtectedRoute>} />
+              <Route path="/revenue" element={<ProtectedRoute requiredRole="Admin" user={user}><RoomManager /></ProtectedRoute>} />
+              <Route path="/review" element={<ProtectedRoute requiredRole="Admin" user={user}><ReviewManager /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </div>
@@ -161,8 +116,8 @@ function App() {
 
       {/* Layout Guest */}
       {!user && (
-              <div className="App">
-          <Header user={user} onLogout={handleLogout} />
+        <div className="App">
+          {showHeaderFooter && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
@@ -175,7 +130,8 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
-                  <ProfilePage />
+                   {/* 4. Truyền 'user' prop vào ProfilePage */}
+                  <ProfilePage user={user} />
                 </ProtectedRoute>
               }
             />
@@ -191,7 +147,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Footer />
+          {showHeaderFooter && <Footer />}
         </div>
       )}
     </>
