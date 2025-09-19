@@ -59,7 +59,7 @@ class hotelController {
 
             const sequenceNumber = (hotelCount + 1).toString().padStart(4, '0');
 
-            const {hotelId} = `${provinceInit + nameInit}-${currentYear}-${sequenceNumber}`;
+            const hotelId = `${provinceInit + nameInit}-${currentYear}-${sequenceNumber}`;
 
             const newHotel = new Hotel({
                 hotelId: hotelId,
@@ -90,7 +90,7 @@ class hotelController {
         const { name, address, description, manager, imageUrl } = req.body
 
         try {
-            const editHotel = await Hotel.findOne(hotelId)
+            const editHotel = await Hotel.findOne({hotelId})
 
             if (!editHotel)
                 return res.status(404).json({ message: 'Khách sạn không tồn tại!' })
@@ -128,7 +128,7 @@ class hotelController {
     async getHotelById(req, res) {
         const {hotelId} = req.params
         try {
-            const hotel = await Hotel.findOne(hotelId)
+            const hotel = await Hotel.findOne({hotelId})
 
             if (!hotel)
                 res.status(404).json({ message: 'Không tìm thấy khách sạn!' })

@@ -26,7 +26,7 @@ class favoriteController {
     async getUserFavorites(req, res) {
         const { userId } = req.params
         try {
-            const favorites = await Favorite.find({ userId }).populate("roomId")
+            const favorites = await Favorite.find({ userId }).populate("hotelId")
             res.status(200).json(favorites)
         } catch (err) {
             res.status(500).json({ message: "Lỗi server", error: err })
