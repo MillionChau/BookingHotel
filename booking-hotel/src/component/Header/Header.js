@@ -4,12 +4,11 @@ import Logo2 from "../../assets/Logo2.png";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
-import Profile from "../Profile/Profile";
 
-function Header() {
+function Header({ user, onLogout }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -21,18 +20,12 @@ function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
   const headerClass = `header ${
     scrolled || isNotHome ? "header-scrolled" : ""
   }`;
-  const handleLogin = () => {
-    setUser({ username: "demo" });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
 
   return (
     <div className={headerClass}>
@@ -64,14 +57,14 @@ function Header() {
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
-
             {/* menu phải */}
             <Nav>
               <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
                 <i className="bi bi-star me-1"></i> Đánh giá
               </Nav.Link>
 
-              {!user && (
+              {!user ? (
+                // Chưa đăng nhập
                 <NavDropdown
                   title={
                     <span className="account">
@@ -86,21 +79,22 @@ function Header() {
                   <NavDropdown.Item as={NavLink} to="/register">
                     Đăng ký
                   </NavDropdown.Item>
-                  <Profile />
                 </NavDropdown>
-              )}
-
-              {user && (
+              ) : (
+                // Đã đăng nhập
                 <NavDropdown
                   title={
                     <span>
                       <i className="bi bi-person-circle me-1"></i>{" "}
-                      {user.username}
+                      {user.fullname}
                     </span>
                   }
                   id="user-nav-dropdown"
                   align="end">
-                  <NavDropdown.Item onClick={handleLogout}>
+                  <NavDropdown.Item as={NavLink} to="/profile">
+                    Thông tin tài khoản
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={onLogout}>
                     Đăng xuất
                   </NavDropdown.Item>
                 </NavDropdown>

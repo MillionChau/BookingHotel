@@ -9,7 +9,7 @@ import Footer from "./component/Footer/Footer";
 import HotelDetail from "./component/HotelDetail/HotelDetail";
 import SearchPage from "./component/SearchPage/SearchPage";
 import ProfilePage from "./component/Profile/Profile";
-import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
+// import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
 import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
@@ -34,7 +34,11 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   //if ở login, regester thì ẩn footer và header
@@ -154,6 +158,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
               {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
@@ -173,7 +178,7 @@ function App() {
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
-            <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            {/* <Route path="/FavoriteCard" element={<FavoriteCard />} /> */}
             <Route
               path="/profile"
               element={
