@@ -23,7 +23,7 @@ function FavoriteList() {
     fetchFavorites();
   }, [userId]);
 
-  if (loading) return <Spinner animation="border" />;
+  // if (loading) return <Spinner animation="border" />;
   if (favorites.length === 0) return <div className="text-center mt-4">Bạn chưa có khách sạn yêu thích nào.</div>;
 
   return (
