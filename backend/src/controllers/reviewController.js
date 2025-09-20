@@ -28,7 +28,7 @@ class ReviewController {
                 })
             }
 
-            const booking = await Booking.findOne({ 
+            const  {booking} = await Booking.findOne({ 
                 bookingId: bookingId, 
                 userId: userId 
             })
@@ -48,7 +48,7 @@ class ReviewController {
                 })
             }
 
-            const reviewId = await this.generateReviewId(roomId)
+            const { reviewId }  = await this.generateReviewId(roomId)
 
             const review = new Review({
                 reviewId,
