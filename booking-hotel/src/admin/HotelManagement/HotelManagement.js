@@ -96,7 +96,7 @@ export default function HotelManagement() {
       </Button>
 
 
-      <Table striped bordered hover responsive className="mt-3">
+      <Table bordered hover responsive className="mt-3">
       <thead>
         <tr>
           <th>Mã KS</th>
@@ -123,21 +123,24 @@ export default function HotelManagement() {
               <img src={hotel.imageUrl} alt={hotel.name} width="80" height="60" />
             </td>
             <td>{hotel.createdAt ? new Date(hotel.createdAt).toLocaleString("vi-VN") : "N/A"}</td> {/* 👈 hiển thị */}
-            <td className="d-flex justify-content-center align-items-center gap-2">
-              <Button
-                variant="warning"
-                size="sm"
-                onClick={() => handleShow(hotel)}
-              >
-                <FiEdit />
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => handleDelete(hotel.hotelId)}
-              >
-                <FiTrash2 />
-              </Button>
+            <td>
+              <div className="d-flex justify-content-center align-items-center gap-2 h-100">
+
+                <Button
+                  variant="warning"
+                  size="sm"
+                  onClick={() => handleShow(hotel)}
+                >
+                  <FiEdit />
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDelete(hotel.hotelId)}
+                >
+                  <FiTrash2 />
+                </Button>
+              </div>
             </td>
 
           </tr>

@@ -15,7 +15,7 @@ import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
 import Loading from "./component/Loading/Loading";
-
+import FavoriteList from "./component/Favorite/FavoriteList";
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
 import Dashboard from "./admin/DashBoard/DashBoard";
@@ -33,7 +33,11 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,7 +66,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
-            <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
 
             <Route
@@ -151,6 +155,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              
               {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

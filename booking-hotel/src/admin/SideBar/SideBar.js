@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaDoorOpen,
@@ -7,10 +7,18 @@ import {
   FaChartBar,
   FaComments,
   FaArrowLeft,
-  FaHotel
+  FaHotel,
 } from "react-icons/fa";
-import "./SideBar.scss"
-function Sidebar() {
+import "./SideBar.scss";
+
+function Sidebar({ onLogout }) {
+  const navigate = useNavigate();
+
+  const handleBackToUser = () => {
+    onLogout();      // Xóa user + token
+    navigate("/");   // Điều hướng về trang chủ ngay
+  };
+
   const menuItems = [
     { path: "/dashboard", label: "Tổng quan", icon: <FaHome /> },
     { path: "/hotelmanagement", label: "Quản lý khách sạn", icon: <FaHotel /> },
@@ -19,13 +27,10 @@ function Sidebar() {
     { path: "/users", label: "Người dùng", icon: <FaUsers /> },
     { path: "/revenue", label: "Doanh thu", icon: <FaChartBar /> },
     { path: "/review", label: "Đánh giá", icon: <FaComments /> },
-    { path: "/", label: "Về trang người dùng", icon: <FaArrowLeft /> },
   ];
 
   return (
-    <div
-      className="Sidebar"
-    >
+    <div className="Sidebar">
       <h5 className="px-2 mb-3">Admin Dashboard</h5>
       <nav className="d-flex flex-column">
         {menuItems.map((item, index) => (
@@ -47,6 +52,24 @@ function Sidebar() {
             {item.label}
           </NavLink>
         ))}
+
+        {/* Nút về trang người dùng */}
+        <button
+          onClick={handleBackToUser}
+          className="d-flex align-items-center mb-3 btn btn-link p-0"
+          style={{
+            textDecoration: "none",
+            fontSize: "15px",
+            fontWeight: "400",
+            color: "#333",
+            gap: "8px",
+          }}
+        >
+          <span style={{ fontSize: "18px", marginRight: "8px" }}>
+            <FaArrowLeft />
+          </span>
+          Về trang người dùng
+        </button>
       </nav>
     </div>
   );

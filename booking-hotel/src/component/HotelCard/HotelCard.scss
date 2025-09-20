@@ -7,3 +7,17 @@
 .card-text {
   gap: 5px;
 }
+.hotel-card .favorite-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  opacity: 0; /* ẩn mặc định */
+  transition: opacity 0.3s ease;
+}
+
+.hotel-card:hover .favorite-icon {
+  opacity: 1; /* hover card -> hiện icon */
+}

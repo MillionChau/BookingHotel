@@ -144,21 +144,24 @@ export default function RoomManager() {
                 <td>
                   <img src={room.imageUrl} alt={room.name} width="120" height="80" />
                 </td>
-                <td className="d-flex justify-content-center align-items-center gap-2">
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    onClick={() => handleShow(room)}
-                  >
-                    <FiEdit />
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(room._id)}
-                  >
-                    <FiTrash2 />
-                  </Button>
+                <td>
+                  <div className="d-flex justify-content-center align-items-center gap-2 h-100">
+
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => handleShow(room)}
+                    >
+                      <FiEdit />
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(room._id)}
+                    >
+                      <FiTrash2 />
+                    </Button>
+                  </div>
                 </td>
 
               </tr>
