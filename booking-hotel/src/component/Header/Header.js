@@ -4,6 +4,7 @@ import Logo2 from "../../assets/Logo2.png";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
+import Profile from "../Profile/Profile";
 
 function Header() {
   const location = useLocation();
@@ -53,13 +54,13 @@ function Header() {
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingHotel">
+              <Nav.Link as={NavLink} to="/bookingHotel">
                 Đặt phòng
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/FavoriteList">
+              <Nav.Link as={NavLink} to="/favoriteList">
                 Yêu thích
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingList">
+              <Nav.Link as={NavLink} to="/bookingList">
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
@@ -85,6 +86,7 @@ function Header() {
                   <NavDropdown.Item as={NavLink} to="/register">
                     Đăng ký
                   </NavDropdown.Item>
+                  <Profile />
                 </NavDropdown>
               )}
 

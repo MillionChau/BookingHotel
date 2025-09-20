@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 // Customer Components
@@ -25,7 +25,6 @@ import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
 import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
-
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
   if (!user) return <Navigate to="/login" replace />;
@@ -37,6 +36,9 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  //if ở login, regester thì ẩn footer và header
+  const hideLayout = ["/login", "/register"].includes(location.pathname);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -59,14 +61,13 @@ function App() {
       {/* Layout Customer */}
       {user && user.role === "Customer" && (
         <div className="App">
-          <Header user={user} onLogout={handleLogout} />
+          {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
-
             <Route
               path="/profile"
               element={
@@ -87,7 +88,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Footer />
+          {!hideLayout && <Footer />}
         </div>
       )}
 
@@ -162,8 +163,9 @@ function App() {
 
       {/* Layout Guest */}
       {!user && (
-              <div className="App">
-          <Header user={user} onLogout={handleLogout} />
+        <div className="App">
+          {!hideLayout && <Header user={user} onLogout={handleLogout} />}
+
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
@@ -192,7 +194,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <Footer />
+          {!hideLayout && <Footer />}
         </div>
       )}
     </>

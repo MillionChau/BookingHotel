@@ -6,7 +6,7 @@ import HotelCard from "../HotelCard/HotelCard";
 
 function SearchPage() {
   return (
-    <div className="container mt-4 search-page">
+    <div className="container my-5 search-page">
       {/* Thanh tìm kiếm */}
       <div className="row mb-4">
         <div className="col-md-3">
