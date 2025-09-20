@@ -12,7 +12,7 @@ function Home() {
   const [hotelIds, setHotelIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
-
+  const userId = localStorage.getItem("user");
   useEffect(() => {
     const fetchHotelIds = async () => {
       try {
@@ -87,9 +87,10 @@ function Home() {
         >
           {hotelIds.map((id) => (
             <div style={{ flex: "0 0 auto" }} key={id}>
-              <HotelCard hotelId={id} />
+              <HotelCard hotelId={id} userId={userId} />
             </div>
           ))}
+
         </div>
 
         {/* Nút phải */}

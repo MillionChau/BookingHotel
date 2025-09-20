@@ -51,7 +51,7 @@ function Header({ user, onLogout }) {
               <Nav.Link as={NavLink} to="/BookingHotel">
                 Đặt phòng
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/FavoriteCard">
+              <Nav.Link as={NavLink} to="/FavoriteList">
                 Yêu thích
               </Nav.Link>
               <Nav.Link as={NavLink} to="/BookingList">

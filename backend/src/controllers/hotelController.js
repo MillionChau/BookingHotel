@@ -86,11 +86,11 @@ class hotelController {
         }
     }
     async updateHotel(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
         const { name, address, description, manager, imageUrl } = req.body
 
         try {
-            const editHotel = await Hotel.findOne(hotelId)
+            const editHotel = await Hotel.findOne({hotelId})
 
             if (!editHotel)
                 return res.status(404).json({ message: 'Khách sạn không tồn tại!' })
@@ -126,9 +126,9 @@ class hotelController {
     }
 
     async getHotelById(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
         try {
-            const hotel = await Hotel.findOne(hotelId)
+            const hotel = await Hotel.findOne({hotelId})
 
             if (!hotel)
                 res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
@@ -143,7 +143,7 @@ class hotelController {
     }
 
     async deleteHotel(req, res) {
-        const hotelId = req.params
+        const {hotelId} = req.params
 
         try {
             const deleteHotel = await Hotel.find({ hotelId })
