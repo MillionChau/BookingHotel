@@ -9,7 +9,7 @@ import Footer from "./component/Footer/Footer";
 import HotelDetail from "./component/HotelDetail/HotelDetail";
 import SearchPage from "./component/SearchPage/SearchPage";
 import ProfilePage from "./component/Profile/Profile";
-import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
+// import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
 import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
