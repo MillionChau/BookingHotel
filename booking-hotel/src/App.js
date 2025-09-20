@@ -15,7 +15,7 @@ import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
 import Loading from "./component/Loading/Loading";
-
+import FavoriteList from "./component/Favorite/FavoriteList";
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
 import Dashboard from "./admin/DashBoard/DashBoard";
@@ -24,6 +24,7 @@ import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
 import ReviewManager from "./admin/ReviewManager/ReviewManager";
+
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -63,7 +64,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
-            <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
 
             <Route

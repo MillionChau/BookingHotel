@@ -3,28 +3,68 @@ import { Card, Button, Spinner } from "react-bootstrap";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import "./HotelCard.scss";
 
-const HotelCard = ({ hotelId }) => {
+const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [favorite, setFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
 
   useEffect(() => {
     if (!hotelId) return;
 
-    const fetchHotel = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
-        if (res.data && res.data.hotel) setHotel(res.data.hotel);
+        // lấy thông tin khách sạn
+        const resHotel = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
+        if (resHotel.data && resHotel.data.hotel) setHotel(resHotel.data.hotel);
+
+        // check có trong danh sách yêu thích không
+        if (userId) {
+          const resFav = await axios.get(`http://localhost:5360/favorite/check`, {
+            params: { userId, hotelId }
+          });
+          if (resFav.data.isFavorite) {
+            setFavorite(true);
+            setFavoriteId(resFav.data.favoriteId);
+          }
+        }
       } catch (err) {
-        console.error("Lỗi khi lấy thông tin khách sạn:", err);
+        console.error("Lỗi khi load dữ liệu:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHotel();
-  }, [hotelId]);
+    fetchData();
+  }, [hotelId, userId]);
+
+  const toggleFavorite = async () => {
+    try {
+      if (!userId) {
+        alert("Bạn cần đăng nhập để thêm yêu thích");
+        return;
+      }
+
+      if (favorite) {
+        // xóa yêu thích
+        await axios.delete(`http://localhost:5360/favorite/${favoriteId}`);
+        setFavorite(false);
+        setFavoriteId(null);
+      } else {
+        // thêm yêu thích
+        const res = await axios.post(`http://localhost:5360/favorite/create`, {
+          userId,
+          hotelId
+        });
+        setFavorite(true);
+        setFavoriteId(res.data.favorite._id);
+      }
+    } catch (err) {
+      console.error("Lỗi khi toggle favorite:", err);
+    }
+  };
 
   if (loading) return <Spinner animation="border" />;
   if (!hotel) return <div>Khách sạn không tồn tại</div>;
@@ -32,20 +72,12 @@ const HotelCard = ({ hotelId }) => {
   return (
     <Card
       style={{ maxWidth: "220px", margin: "0 auto" }}
-      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative"
+      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card"
     >
       {/* Icon yêu thích */}
       <div
-        onClick={() => setFavorite(!favorite)}
-        className="position-absolute top-2 end-2 m-2 d-flex justify-content-center align-items-center"
-        style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(255,255,255,0.8)",
-          cursor: "pointer",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-        }}
+        onClick={toggleFavorite}
+        className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center"
       >
         <FaHeart
           style={{ color: favorite ? "#ff4d6d" : "#999", fontSize: "18px" }}
@@ -71,15 +103,6 @@ const HotelCard = ({ hotelId }) => {
             <span className="text-muted">Chưa có đánh giá</span>
           )}
         </div>
-
-        {/* {hotel.minPrice && (
-          <div className="mb-2">
-            <div className="text-muted small">Giá chỉ từ</div>
-            <div className="fw-bold text-danger" style={{ fontSize: "1rem" }}>
-              {hotel.minPrice.toLocaleString("vi-VN")} ₫
-            </div>
-          </div>
-        )} */}
 
         <Link to={`/HotelDetail/${hotel.hotelId}`} className="mt-auto w-100">
           <Button
