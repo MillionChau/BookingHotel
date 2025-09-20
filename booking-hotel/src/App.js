@@ -165,14 +165,32 @@ function App() {
 
       {/* Layout Guest */}
       {!user && (
-        <div className="App">
+              <div className="App">
           <Header user={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/hotel/:id" element={<HotelDetail />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
-
+            <Route path="/BookingHotel" element={<SearchPage />} />
+            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/FavoriteCard" element={<FavoriteCard />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/BookingList"
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <BookingHistory />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />

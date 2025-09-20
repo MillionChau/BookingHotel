@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Banner.scss";
+import "./Banner.css";
 function Banner() {
   return (
     <div className="bg-primary banner text-white  text-center banner">

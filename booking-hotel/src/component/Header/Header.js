@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Logo2 from "../../assets/Logo2.png";
@@ -26,6 +27,7 @@ function Header({ user, onLogout }) {
   const headerClass = `header ${scrolled || isNotHome ? "header-scrolled" : ""}`;
 
   return (
+
     <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
@@ -55,7 +57,6 @@ function Header({ user, onLogout }) {
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
-
             {/* menu phải */}
             <Nav>
               <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
@@ -109,3 +110,4 @@ function Header({ user, onLogout }) {
 }
 
 export default Header;
+
