@@ -96,7 +96,7 @@ export default function HotelManagement() {
       </Button>
 
 
-      <Table striped bordered hover responsive className="mt-3">
+      <Table bordered hover responsive className="mt-3">
       <thead>
         <tr>
           <th>Mã KS</th>

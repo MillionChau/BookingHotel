@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Logo2 from "../../assets/Logo2.png";
@@ -5,10 +6,10 @@ import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
 
-function Header() {
+function Header({ user, onLogout }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -20,20 +21,13 @@ function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
-  const headerClass = `header ${
-    scrolled || isNotHome ? "header-scrolled" : ""
-  }`;
-  const handleLogin = () => {
-    setUser({ username: "demo" });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
+  const headerClass = `header ${scrolled || isNotHome ? "header-scrolled" : ""}`;
 
   return (
+
     <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
@@ -63,14 +57,14 @@ function Header() {
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
-
             {/* menu phải */}
             <Nav>
               <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
                 <i className="bi bi-star me-1"></i> Đánh giá
               </Nav.Link>
 
-              {!user && (
+              {!user ? (
+                // Chưa đăng nhập
                 <NavDropdown
                   title={
                     <span className="account">
@@ -78,7 +72,8 @@ function Header() {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end">
+                  align="end"
+                >
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>
@@ -86,19 +81,22 @@ function Header() {
                     Đăng ký
                   </NavDropdown.Item>
                 </NavDropdown>
-              )}
-
-              {user && (
+              ) : (
+                // Đã đăng nhập
                 <NavDropdown
                   title={
                     <span>
                       <i className="bi bi-person-circle me-1"></i>{" "}
-                      {user.username}
+                      {user.fullname}
                     </span>
                   }
                   id="user-nav-dropdown"
-                  align="end">
-                  <NavDropdown.Item onClick={handleLogout}>
+                  align="end"
+                >
+                  <NavDropdown.Item as={NavLink} to="/profile">
+                    Thông tin tài khoản
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={onLogout}>
                     Đăng xuất
                   </NavDropdown.Item>
                 </NavDropdown>
@@ -112,3 +110,4 @@ function Header() {
 }
 
 export default Header;
+

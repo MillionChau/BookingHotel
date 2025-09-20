@@ -35,7 +35,11 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -153,6 +157,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              
               {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
