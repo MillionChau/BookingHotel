@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaUserFriends, FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaUserFriends,
+  FaStar,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import { Carousel, Modal } from "react-bootstrap";
+import "./HotelDetail.scss";
 import axios from "axios";
+import Loading from "../Loading/Loading";
 
 const HotelDetail = () => {
   const { hotelId } = useParams();
@@ -58,10 +65,14 @@ const HotelDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const hotelRes = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
+        const hotelRes = await axios.get(
+          `http://localhost:5360/hotel/${hotelId}`
+        );
         if (hotelRes.data && hotelRes.data.hotel) setHotel(hotelRes.data.hotel);
 
-        const roomRes = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+        const roomRes = await axios.get(
+          `http://localhost:5360/room/hotel/${hotelId}`
+        );
         const rooms = roomRes.data.rooms || [];
 
         const grouped = Object.values(
@@ -75,7 +86,10 @@ const HotelDetail = () => {
               };
             }
             acc[room.type].images.push(room.imageUrl);
-            acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
+            acc[room.type].minPrice = Math.min(
+              acc[room.type].minPrice,
+              room.price
+            );
             if (room.status === "Trống") acc[room.type].availableCount += 1;
             return acc;
           }, {})
@@ -97,10 +111,13 @@ const HotelDetail = () => {
     fetchData();
   }, [hotelId]);
 
-  if (!hotel) return <div>Đang tải dữ liệu...</div>;
+  if (!hotel) return <Loading />;
 
   // Gom ảnh từ hotel + roomTypes
-  const allImages = [hotel.imageUrl, ...roomTypes.flatMap((r) => r.images)].filter(Boolean);
+  const allImages = [
+    hotel.imageUrl,
+    ...roomTypes.flatMap((r) => r.images),
+  ].filter(Boolean);
   const mainImage = allImages[0];
   const thumbnails = allImages.slice(1, 6);
   const moreImages = allImages.length - 6;
@@ -141,11 +158,16 @@ const HotelDetail = () => {
 
       {/* --- Tiêu đề khách sạn --- */}
       <div className="mb-3">
-        <h3 className="fw-bold" style={{ marginTop: "20px" }}>{hotel.name}</h3>
+        <h3 className="fw-bold" style={{ marginTop: "20px" }}>
+          {hotel.name}
+        </h3>
         <div className="d-flex align-items-center mb-2">
           <FaStar className="text-warning me-1" />
           <span className="fw-semibold me-3">
-            {hotel.rating && hotel.rating > 0 ? hotel.rating.toFixed(1) : "Chưa có đánh giá"} / 5
+            {hotel.rating && hotel.rating > 0
+              ? hotel.rating.toFixed(1)
+              : "Chưa có đánh giá"}{" "}
+            / 5
           </span>
           <span className="text-muted">
             <FaMapMarkerAlt className="me-2 text-danger" />
@@ -175,8 +197,7 @@ const HotelDetail = () => {
                   <div
                     className="position-relative"
                     onClick={() => setShowGallery(true)}
-                    style={{ cursor: "pointer" }}
-                  >
+                    style={{ cursor: "pointer" }}>
                     <img
                       src={img}
                       alt={`thumb-${idx}`}
@@ -202,7 +223,11 @@ const HotelDetail = () => {
       </div>
 
       {/* Modal hiển thị tất cả ảnh */}
-      <Modal show={showGallery} onHide={() => setShowGallery(false)} size="lg" centered>
+      <Modal
+        show={showGallery}
+        onHide={() => setShowGallery(false)}
+        size="lg"
+        centered>
         <Modal.Header closeButton>
           <Modal.Title>Tất cả hình ảnh</Modal.Title>
         </Modal.Header>
@@ -290,8 +315,9 @@ const HotelDetail = () => {
               </div>
               <button
                 className="btn btn-primary btn-sm mt-2"
-                onClick={() => navigate(`/booking/${hotelId}?roomType=${room.type}`)}
-              >
+                onClick={() =>
+                  navigate(`/booking/${hotelId}?roomType=${room.type}`)
+                }>
                 Chọn
               </button>
               <div className="small text-danger mt-1">{room.status}</div>

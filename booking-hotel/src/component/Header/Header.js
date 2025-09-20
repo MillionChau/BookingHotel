@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Logo2 from "../../assets/Logo2.png";
@@ -24,10 +23,11 @@ function Header({ user, onLogout }) {
 
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
-  const headerClass = `header ${scrolled || isNotHome ? "header-scrolled" : ""}`;
+  const headerClass = `header ${
+    scrolled || isNotHome ? "header-scrolled" : ""
+  }`;
 
   return (
-
     <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
@@ -47,13 +47,13 @@ function Header({ user, onLogout }) {
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingHotel">
+              <Nav.Link as={NavLink} to="/bookingHotel">
                 Đặt phòng
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/FavoriteList">
+              <Nav.Link as={NavLink} to="/favoriteList">
                 Yêu thích
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingList">
+              <Nav.Link as={NavLink} to="/bookingList">
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
@@ -72,8 +72,7 @@ function Header({ user, onLogout }) {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end"
-                >
+                  align="end">
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>
@@ -91,8 +90,7 @@ function Header({ user, onLogout }) {
                     </span>
                   }
                   id="user-nav-dropdown"
-                  align="end"
-                >
+                  align="end">
                   <NavDropdown.Item as={NavLink} to="/profile">
                     Thông tin tài khoản
                   </NavDropdown.Item>
@@ -110,4 +108,3 @@ function Header({ user, onLogout }) {
 }
 
 export default Header;
-

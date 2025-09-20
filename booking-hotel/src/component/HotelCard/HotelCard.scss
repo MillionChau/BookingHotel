@@ -1,11 +1,10 @@
-.hotelCard:hover {
-  transform: translateY(-2px);
-  transition: 0.2s;
-}
-.badge,
-.booking,
-.card-text {
-  gap: 5px;
+.hotel-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .hotel-card .favorite-icon {
   width: 36px;

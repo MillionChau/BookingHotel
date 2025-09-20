@@ -3,11 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Header } from "../component/Header/Header";
 import Footer from "../component/Footer/Footer";
 import Banner from "../component/Banner/Banner";
-<<<<<<< HEAD
-import  HotelCard  from "../component/HotelCard/HotelCard";
-=======
 import HotelCard from "../component/HotelCard/HotelCard";
->>>>>>> 08b699788c608a60af90695e92c069e31a85097e
 import FeatureCard from "../component/FeatureCard/FeatureCard";
 // Lazy load các trang khác
 const Login = lazy(() => import("../component/Login/Login"));

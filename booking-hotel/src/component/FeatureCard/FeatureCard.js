@@ -27,7 +27,7 @@ const FeatureCard = () => {
 
   return (
     <div className="container feature-slider mt-4">
-      <h2 class="fw-bold text-center text-uppercase section-title pb-2 mb-4 ">
+      <h2 className="fw-bold text-center text-uppercase section-title pb-2 mb-4 ">
         Lý do bạn đến với chúng tôi
       </h2>
       <Carousel fade interval={4000} pause="hover">
