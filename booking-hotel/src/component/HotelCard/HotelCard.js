@@ -48,7 +48,7 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
   const toggleFavorite = async () => {
     try {
       if (!userId) {
-        alert("Bạn cần đăng nhập để thêm yêu thích");
+        alert("Bạn cần đăng nhập để thêm yêu thích");
         return;
       }
 
@@ -99,18 +99,18 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
       <Card.Img
         src={hotel.imageUrl}
         alt={hotel.name}
-        style={{ height: "140px", objectFit: "cover" }}
+        style={{ height: "200px", objectFit: "cover", width: "100%" }}
       />
 
       <Card.Body className="d-flex flex-column p-2">
-        <Card.Title className="fw-bold fs-6 mb-1 hotel-title">
+        <Card.Title className="fw-bold fs-6 my-1 hotel-title">
           {hotel.name}
         </Card.Title>
-        <Card.Text className="text-muted small hotel-title mb-1">
+        <Card.Text className="text-muted small hotel-title my-1">
           {hotel.address}
         </Card.Text>
 
-        <div className="d-flex align-items-center mb-1">
+        <div className="d-flex align-items-center my-1">
           <FaStar className="text-warning me-2" />
           {hotel.rating && hotel.rating > 0 ? (
             <span>{hotel.rating.toFixed(1)} / 5</span>
@@ -122,7 +122,7 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
         <Link to={`/HotelDetail/${hotel.hotelId}`} className="mt-auto w-100">
           <Button
             variant="primary"
-            className="w-100"
+            className="w-100 mt-2"
             style={{ borderRadius: "0.5rem", padding: "0.25rem 0" }}>
             Xem chi tiết
           </Button>

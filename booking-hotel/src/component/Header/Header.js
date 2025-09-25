@@ -84,7 +84,7 @@ function Header({ user, onLogout }) {
                 // Đã đăng nhập
                 <NavDropdown
                   title={
-                    <span>
+                    <span style={{ color: "#fff" }}>
                       <i className="bi bi-person-circle me-1"></i>{" "}
                       {user.fullname}
                     </span>

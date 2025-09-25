@@ -70,7 +70,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
-            <Route path="/FavoriteList" element={<FavoriteList />} />
+            <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route
               path="/profile"
@@ -178,7 +178,7 @@ function App() {
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
-            {/* <Route path="/FavoriteCard" element={<FavoriteCard />} /> */}
+            <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route
               path="/profile"
               element={
