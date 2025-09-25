@@ -21,9 +21,9 @@ function Banner() {
               <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
             </Link>
           </Button>
-          <Button variant="outline-light" className="fw-semibold">
+          {/* <Button variant="outline-light" className="fw-semibold">
             <i className="bi bi-search me-1"></i> Khám phá
-          </Button>
+          </Button> */}
         </div>
       </Container>
     </div>

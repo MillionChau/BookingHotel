@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./Home.scss";
 import Banner from "../Banner/Banner";
 import FeatureCard from "../FeatureCard/FeatureCard";
 import HotelCard from "../HotelCard/HotelCard";
@@ -79,9 +80,12 @@ function Home() {
         {/* Hiển thị 4 item */}
         <div
           className="d-flex justify-content-center gap-3"
-          style={{ width: "100%", maxWidth: "1100px" }}>
+          style={{ width: "100%", maxWidth: "1320px" }}>
           {currentItems.map((id) => (
-            <div key={id} style={{ flex: "1 1 25%", maxWidth: "25%" }}>
+            <div
+              key={id}
+              style={{ flex: "1 1 25%", maxWidth: "25%" }}
+              className="col-12 col-sm-6 col-lg-3 homeItem">
               <HotelCard hotelId={id} userId={userId} />
             </div>
           ))}

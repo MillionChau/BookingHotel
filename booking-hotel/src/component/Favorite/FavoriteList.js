@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Spinner, Row, Col } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
+import Loading from "../Loading/Loading";
 import "./FavoriteList.scss";
 
 function FavoriteList() {
@@ -26,7 +27,7 @@ function FavoriteList() {
     fetchFavorites();
   }, [userId]);
 
-  // if (loading) return <Spinner animation="border" />;
+  if (loading) return <Loading />;
   if (favorites.length === 0)
     return (
       <div className="text-center favoriteList my-4">
