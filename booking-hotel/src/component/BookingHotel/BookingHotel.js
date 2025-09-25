@@ -1,127 +1,91 @@
-// import { Card, Form, Button, Row, Col } from "react-bootstrap";
-import { ArrowClockwise, StarFill, Heart } from "react-bootstrap-icons";
-import { hotelCard } from "../HotelCard/HotelCard";
-import "./BookingHotel.scss";
-import Search from "../Search/Search";
-function BookingHotel() {
-  return (
-    <>
-      <div className="container my-5 bookingHotel">
-        <div className="row">
-          <div className="col-lg-5 d-flex flex-column bookingHotel-search">
-            <div className="card shadow-sm">
-              <div class="card-body">
-                <Search />
-              </div>
-            </div>
-            {/* <div className="card shadow-sm">
-              <div className="card-body">
-                <h2 className="h4 mb-3">Đặt phòng</h2>
-                <div className="row g-2">
-                  <h5 className="card-title">Thông tin đặt</h5>
-                  <div className="col-6">
-                    <label className="form-label">Nhận phòng</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      id="bkCheckin"
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label className="form-label">Trả phòng</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      id="bkCheckout"
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label">Số khách</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      id="bkGuests"
-                      min="1"
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label">Phương thức thanh toán</label>
-                    <select className="form-select" id="bkPayment">
-                      <option>Thanh toán khi nhận phòng</option>
-                      <option>Thẻ nội địa</option>
-                      <option>Visa/MasterCard</option>
-                      <option>Ví điện tử</option>
-                    </select>
-                  </div>
-                  <div className="col-12 d-grid mt-2">
-                    <button className="btn btn-primary" id="btnPlaceBooking">
-                      <i className="bi bi-bag-check me-2"></i>Xác nhận đặt phòng
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-          </div>
-          <div className="col-lg-7">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title d-flex justify-content-between align-items-center">
-                  Chọn phòng
-                  <button
-                    className="btn btn-sm btn-outline-secondary  d-flex align-items-center"
-                    id="btnReloadRooms">
-                    <ArrowClockwise /> Tải lại
-                  </button>
-                </h5>
-                <div className="row g-3" id="roomList">
-                  {hotelCard.slice(0, 4).map((item, index) => (
-                    <div key={index} className=" col-md-6">
-                      <div className="hotelCard card h-100">
-                        <img
-                          src={item.img}
-                          className="card-img-top"
-                          alt={item.name}
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title d-flex align-items-center">
-                            {item.nameHotel}
-                            <span className="d-flex align-items-center badge text-bg-warning ms-2">
-                              <StarFill />
-                              {item.iconStar}
-                            </span>
-                          </h5>
-                          <div className="small text-muted mb-2">
-                            <i className="bi bi-geo-alt me-1"></i>
-                            {item.addressHotel} • Phòng {item.room} •{" "}
-                            {item.type}
-                          </div>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="fw-semibold">
-                              {item.price.toLocaleString("vi-VN")} ₫/đêm
-                            </span>
-                            <div className="btn-group d-flex align-items-center ">
-                              <button
-                                className="btn btn-primary btn-sm btnChooseRoom"
-                                data-id={item.id}>
-                                Chọn
-                              </button>
-                              <button className="btn btn-sm btn-outline-secondary btnAddFav">
-                                <Heart />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+import React, { useState, useCallback } from "react";
+import axios from "axios";
+import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
+import SearchForm from "../SearchForm/SearchForm"; // Đảm bảo đường dẫn này đúng
+import HotelCard from "../HotelCard/HotelCard"; // Đảm bảo đường dẫn này đúng
+
+function SearchPage() {
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(false); // State để biết đã tìm kiếm hay chưa
+
+  // Lấy userId từ localStorage để truyền cho HotelCard
+  const getUserId = () => {
+    try {
+      const userString = localStorage.getItem("user");
+      return userString ? JSON.parse(userString).id : null;
+    } catch (e) {
+      console.error("Lỗi khi đọc user từ localStorage", e);
+      return null;
+    }
+  };
+  const userId = getUserId();
+
+  // Hàm gọi API tìm kiếm
+  const handleSearch = useCallback(async (searchParams) => {
+    setLoading(true);
+    setError(null);
+    setSearched(true); // Đánh dấu là đã thực hiện tìm kiếm
+    try {
+      // Xây dựng query string từ các tham số
+      const query = new URLSearchParams(searchParams).toString();
+      // THAY THẾ bằng endpoint API của bạn
+      const res = await axios.get(`/api/hotels/search?${query}`);
+      setHotels(res.data);
+    } catch (err) {
+      console.error("Lỗi khi tìm kiếm khách sạn:", err);
+      setError("Không thể tìm thấy khách sạn phù hợp. Vui lòng thử lại.");
+      setHotels([]); // Xóa kết quả cũ nếu có lỗi
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Hàm render nội dung kết quả
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="text-center my-5">
+          <Spinner animation="border" role="status" />
+          <p className="mt-2">Đang tìm kiếm khách sạn...</p>
         </div>
-      </div>
-    </>
+      );
+    }
+
+    if (error) {
+      return <Alert variant="danger">{error}</Alert>;
+    }
+    
+    if (!searched) {
+         return <Alert variant="info">Vui lòng nhập thông tin và nhấn tìm kiếm để xem kết quả.</Alert>;
+    }
+
+    if (hotels.length === 0) {
+      return <Alert variant="warning">Không tìm thấy khách sạn nào phù hợp với tiêu chí của bạn.</Alert>;
+    }
+
+    return (
+      <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+        {hotels.map((hotel) => (
+          <Col key={hotel._id}>
+            {/* Giả định hotel._id là hotelId */}
+            <HotelCard hotelId={hotel._id} userId={userId} />
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
+  return (
+    <Container className="mt-5 pt-4">
+      <h3 className="fw-bold mb-3">Tìm kiếm khách sạn</h3>
+      <SearchForm onSearch={handleSearch} loading={loading} />
+      <hr />
+      <h4 className="fw-bold mb-4">Kết quả tìm kiếm</h4>
+      {renderContent()}
+    </Container>
   );
 }
 
-export default BookingHotel;
+export default SearchPage;
