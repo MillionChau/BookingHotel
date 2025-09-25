@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
 import {
   Container,
@@ -11,26 +11,23 @@ import {
   InputGroup,
   Card,
 } from "react-bootstrap";
-import HotelCard from "../HotelCard/HotelCard"; // Đảm bảo đường dẫn này đúng
+import HotelCard from "../HotelCard/HotelCard"; 
 import { FaStar } from "react-icons/fa";
-import "./SearchPage.css"; // Import file CSS
+import "./SearchPage.css"; 
 
 function SearchPage() {
-  // === STATE CHO FORM VÀ BỘ LỌC ===
+  
   const [destination, setDestination] = useState("");
-  const [checkinDate, setCheckinDate] = useState("");
-  const [checkoutDate, setCheckoutDate] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [rating, setRating] = useState(0); // 0 có nghĩa là không lọc theo sao
+  const [rating, setRating] = useState(0);
 
-  // === STATE QUẢN LÝ KẾT QUẢ VÀ TRẠNG THÁI ===
+ 
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false); // Theo dõi xem người dùng đã tìm kiếm ít nhất một lần chưa
+  const [searched, setSearched] = useState(false);
 
-  // Lấy userId từ localStorage
   const getUserId = () => {
     try {
       const userString = localStorage.getItem("user");
@@ -42,16 +39,13 @@ function SearchPage() {
   };
   const userId = getUserId();
 
-  // === HÀM XỬ LÝ LOGIC ===
 
-  // Hàm gọi API tìm kiếm, được bọc trong useCallback để tối ưu hóa
   const executeSearch = useCallback(async (searchParams) => {
     setLoading(true);
     setError(null);
-    setSearched(true); // Đánh dấu đã thực hiện tìm kiếm
+    setSearched(true);
 
     try {
-      // Lọc ra các tham số không hợp lệ (rỗng, null, hoặc 0) để không gửi lên server
       const filteredParams = {};
       for (const key in searchParams) {
         if (searchParams[key] !== "" && searchParams[key] !== null && searchParams[key] !== 0) {
@@ -60,30 +54,21 @@ function SearchPage() {
       }
 
       const query = new URLSearchParams(filteredParams).toString();
-      // Sử dụng endpoint từ SearchPage.js, bạn có thể thay đổi nếu cần
       const res = await axios.get(`http://localhost:5360/hotel/search?${query}`);
       setHotels(res.data);
     } catch (err) {
       console.error("Lỗi khi tìm kiếm khách sạn:", err);
       setError("Không thể tìm thấy khách sạn phù hợp. Vui lòng thử lại sau.");
-      setHotels([]); // Xóa kết quả cũ khi có lỗi
+      setHotels([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Xử lý khi người dùng nhấn nút tìm kiếm hoặc áp dụng bộ lọc
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Kiểm tra ngày checkout phải sau ngày checkin
-    if (checkinDate && checkoutDate && new Date(checkoutDate) <= new Date(checkinDate)) {
-      alert("Ngày trả phòng phải sau ngày nhận phòng.");
-      return;
-    }
     const searchParams = {
       destination,
-      checkinDate,
-      checkoutDate,
       minPrice,
       maxPrice,
       rating,
@@ -91,13 +76,10 @@ function SearchPage() {
     executeSearch(searchParams);
   };
 
-  // Xử lý khi người dùng click vào ngôi sao để lọc
   const handleRatingClick = (newRating) => {
-    // Nếu click lại vào sao đã chọn thì bỏ chọn (đặt lại là 0)
     setRating(rating === newRating ? 0 : newRating);
   };
 
-  // === HÀM RENDER KẾT QUẢ ===
   const renderContent = () => {
     if (loading) {
       return (
@@ -132,7 +114,6 @@ function SearchPage() {
       <Row xs={1} sm={1} md={2} lg={3} className="g-4">
         {hotels.map((hotel) => (
           <Col key={hotel._id}>
-            {/* Truyền hotelId và userId cho HotelCard */}
             <HotelCard hotelId={hotel._id} userId={userId} />
           </Col>
         ))}
@@ -142,13 +123,13 @@ function SearchPage() {
 
   return (
     <Container className="search-page mt-5 pt-4">
-      {/* FORM TÌM KIẾM CHÍNH */}
+      {/* FORM TÌM KIẾM CHÍNH (ĐÃ BỎ TRƯỜNG NGÀY) */}
       <Form
         onSubmit={handleSubmit}
         className="p-3 mb-4 bg-light rounded shadow-sm"
       >
         <Row className="g-3 align-items-end">
-          <Col md={6} lg={7}>
+          <Col md={10}>
             <Form.Group controlId="formDestination">
               <Form.Label><strong>Điểm đến</strong></Form.Label>
               <Form.Control
@@ -160,23 +141,7 @@ function SearchPage() {
               />
             </Form.Group>
           </Col>
-          <Col md={6} lg={3}>
-            <Form.Label><strong>Ngày nhận - trả phòng</strong></Form.Label>
-            <InputGroup>
-              <Form.Control
-                type="date"
-                value={checkinDate}
-                onChange={(e) => setCheckinDate(e.target.value)}
-              />
-              <Form.Control
-                type="date"
-                value={checkoutDate}
-                onChange={(e) => setCheckoutDate(e.target.value)}
-                className="ms-2"
-              />
-            </InputGroup>
-          </Col>
-          <Col md={12} lg={2}>
+          <Col md={2}>
             <Button variant="primary" type="submit" className="w-100" disabled={loading}>
               {loading ? <Spinner as="span" animation="border" size="sm" /> : "Tìm Kiếm"}
             </Button>
