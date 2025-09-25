@@ -93,19 +93,3 @@
     }
   }
 }
-
-@media (min-width: 992px) {
-  .favorite-page-container .favorite-card-wrapper {
-    .card {
-      width: calc(33.333% - 14px);
-    }
-  }
-}
-
-@media (min-width: 1200px) {
-  .favorite-page-container .favorite-card-wrapper {
-    .card {
-      width: calc(25% - 15px);
-    }
-  }
-}

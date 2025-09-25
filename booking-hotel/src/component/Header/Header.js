@@ -31,7 +31,7 @@ function Header({ user, onLogout }) {
     <div className={headerClass}>
       <Navbar expand="lg" className="shadow-sm">
         <Container>
-          {/* logo */}
+          {/* Logo */}
           <Navbar.Brand as={NavLink} to="/" className="fw-bold">
             <img
               src={scrolled || isNotHome ? Logo2 : Logo}
@@ -40,9 +40,11 @@ function Header({ user, onLogout }) {
             />
           </Navbar.Brand>
 
+          {/* Nút thu gọn menu cho mobile */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
           <Navbar.Collapse id="basic-navbar-nav">
-            {/* menu trái */}
+            {/* Menu điều hướng chính */}
             <Nav className="me-auto">
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
@@ -72,7 +74,8 @@ function Header({ user, onLogout }) {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end">
+                  align="end"
+                >
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>
