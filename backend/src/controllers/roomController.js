@@ -1,15 +1,43 @@
 const Room = require('../models/room')
 const Booking = require('../models/booking')
+const Hotel = require('../models/hotel')
 
 class roomController {
+    async getAllRoom(req, res) {
+        try {
+            const rooms = await Room.find({})
+
+            if (!rooms || rooms.length === 0)
+                return res.status(404).json({ message: 'Không có dữ liệu phòng.'})
+
+            res.status(200).json({
+                message: 'Lấy dữ liệu phòng thành công!',
+                rooms: rooms
+            })
+        } catch (err) {
+            return res.status(500).json({ message: err.message })
+        }
+    }
+
     async createRoom(req, res) {
         const { hotelId, name, type, price, imageUrl, status } = req.body
         try {
-            const room = new Room({ hotelId, name, type, price, imageUrl, status })
+            if(!hotelId || !name || !price)
+                return res.status(400).json({message: 'Thiếu trường dữ liệu!'})
+
+            const hotel = await Hotel.findOne({ hotelId })
+
+            if(!hotel)
+                return res.status(404).json({ message: 'Khách sạn không tồn tại!' })
+
+            const roomId = `${hotelId}-${name}`
+
+            const room = new Room({ roomId, hotelId, name, type, price, imageUrl, status })
+
             await room.save()
             res.status(201).json({
                 room,
-                message: 'Tạo phòng thành công!'
+                message: 'Thêm phòng thành công!'
             })
         } catch (err) {
             res.status(500).json({ message: err.message })
@@ -55,9 +83,9 @@ class roomController {
     }
 
     async getRoomById(req, res) {
-        const { id } = req.params
+        const { roomId } = req.params
         try {
-            const room = await Room.findById(id)
+            const room = await Room.findOne({ roomId })
             if (!room) return res.status(404).json({ message: 'Không tìm thấy phòng!' })
 
             res.status(200).json({
@@ -70,10 +98,12 @@ class roomController {
     }
 
     async deleteRoom(req, res) {
-        const { id } = req.params
+        const { roomId } = req.params
         try {
-            const room = await Room.findByIdAndDelete(id)
+            const room = await Room.findOne({ roomId })
             if (!room) return res.status(404).json({ message: 'Không tìm thấy phòng!' })
+
+            await Room.deleteOne(room)
 
             res.status(200).json({ message: 'Xóa phòng thành công!' })
         } catch (err) {

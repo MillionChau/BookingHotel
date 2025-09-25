@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./HotelCard.scss";
 
-const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
+const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [favorite, setFavorite] = useState(false);
@@ -17,14 +17,19 @@ const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
     const fetchData = async () => {
       try {
         // lấy thông tin khách sạn
-        const resHotel = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
+        const resHotel = await axios.get(
+          `http://localhost:5360/hotel/${hotelId}`
+        );
         if (resHotel.data && resHotel.data.hotel) setHotel(resHotel.data.hotel);
 
         // check có trong danh sách yêu thích không
         if (userId) {
-          const resFav = await axios.get(`http://localhost:5360/favorite/check`, {
-            params: { userId, hotelId }
-          });
+          const resFav = await axios.get(
+            `http://localhost:5360/favorite/check`,
+            {
+              params: { userId, hotelId },
+            }
+          );
           if (resFav.data.isFavorite) {
             setFavorite(true);
             setFavoriteId(resFav.data.favoriteId);
@@ -56,7 +61,7 @@ const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
         // thêm yêu thích
         const res = await axios.post(`http://localhost:5360/favorite/create`, {
           userId,
-          hotelId
+          hotelId,
         });
         setFavorite(true);
         setFavoriteId(res.data.favorite._id);
@@ -71,14 +76,20 @@ const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
 
   return (
     <Card
-      style={{ maxWidth: "220px", margin: "0 auto" }}
-      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card"
-    >
+      style={{ width: "100%", margin: "0 auto" }}
+      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative">
       {/* Icon yêu thích */}
       <div
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255,255,255,0.8)",
+          cursor: "pointer",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+        }}
         onClick={toggleFavorite}
-        className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center"
-      >
+        className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center">
         <FaHeart
           style={{ color: favorite ? "#ff4d6d" : "#999", fontSize: "18px" }}
         />
@@ -92,8 +103,12 @@ const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
       />
 
       <Card.Body className="d-flex flex-column p-2">
-        <Card.Title className="fw-bold fs-6 mb-1">{hotel.name}</Card.Title>
-        <Card.Text className="text-muted small mb-1">{hotel.address}</Card.Text>
+        <Card.Title className="fw-bold fs-6 mb-1 hotel-title">
+          {hotel.name}
+        </Card.Title>
+        <Card.Text className="text-muted small hotel-title mb-1">
+          {hotel.address}
+        </Card.Text>
 
         <div className="d-flex align-items-center mb-1">
           <FaStar className="text-warning me-2" />
@@ -108,8 +123,7 @@ const HotelCard = ({ hotelId, userId,isFavoriteDefault = false }) => {
           <Button
             variant="primary"
             className="w-100"
-            style={{ borderRadius: "0.5rem", padding: "0.25rem 0" }}
-          >
+            style={{ borderRadius: "0.5rem", padding: "0.25rem 0" }}>
             Xem chi tiết
           </Button>
         </Link>
