@@ -21,6 +21,7 @@ function Header({ user, onLogout }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
   const headerClass = `header ${
     scrolled || isNotHome ? "header-scrolled" : ""
@@ -48,25 +49,24 @@ function Header({ user, onLogout }) {
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingHotel">
+              <Nav.Link as={NavLink} to="/bookingHotel">
                 Đặt phòng
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/FavoriteList">
+              <Nav.Link as={NavLink} to="/favoriteList">
                 Yêu thích
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/BookingList">
+              <Nav.Link as={NavLink} to="/bookingList">
                 Phòng đã đặt
               </Nav.Link>
             </Nav>
-
-            {/* Menu người dùng */}
+            {/* menu phải */}
             <Nav>
               <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
                 <i className="bi bi-star me-1"></i> Đánh giá
               </Nav.Link>
 
-              {/* Khi chưa đăng nhập */}
-              {!user && (
+              {!user ? (
+                // Chưa đăng nhập
                 <NavDropdown
                   title={
                     <span className="account">
@@ -83,20 +83,17 @@ function Header({ user, onLogout }) {
                     Đăng ký
                   </NavDropdown.Item>
                 </NavDropdown>
-              )}
-
-              {/* Khi đã đăng nhập */}
-              {user && (
+              ) : (
+                // Đã đăng nhập
                 <NavDropdown
                   title={
-                    <span className="user-greeting">
-                      <i className="bi bi-person-circle me-1"></i>
-                      Xin chào, {user.fullName || user.fullname || "..."}
+                    <span>
+                      <i className="bi bi-person-circle me-1"></i>{" "}
+                      {user.fullname}
                     </span>
                   }
                   id="user-nav-dropdown"
-                  align="end"
-                >
+                  align="end">
                   <NavDropdown.Item as={NavLink} to="/profile">
                     Thông tin tài khoản
                   </NavDropdown.Item>
