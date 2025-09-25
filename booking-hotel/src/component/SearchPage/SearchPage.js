@@ -11,18 +11,16 @@ import {
   InputGroup,
   Card,
 } from "react-bootstrap";
-import HotelCard from "../HotelCard/HotelCard"; 
+import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
-import "./SearchPage.css"; 
+import "./SearchPage.css";
 
 function SearchPage() {
-  
   const [destination, setDestination] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [rating, setRating] = useState(0);
 
- 
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -39,7 +37,6 @@ function SearchPage() {
   };
   const userId = getUserId();
 
-
   const executeSearch = useCallback(async (searchParams) => {
     setLoading(true);
     setError(null);
@@ -48,15 +45,22 @@ function SearchPage() {
     try {
       const filteredParams = {};
       for (const key in searchParams) {
-        if (searchParams[key] !== "" && searchParams[key] !== null && searchParams[key] !== 0) {
+        if (
+          searchParams[key] !== "" &&
+          searchParams[key] !== null &&
+          searchParams[key] !== 0
+        ) {
           filteredParams[key] = searchParams[key];
         }
       }
 
       const query = new URLSearchParams(filteredParams).toString();
-      const res = await axios.get(`http://localhost:5360/hotel/search?${query}`);
+      const res = await axios.get(
+        `http://localhost:5360/hotel/search?${query}`
+      );
       setHotels(res.data);
-    } catch (err) {
+    } catch (err)
+      {
       console.error("Lỗi khi tìm kiếm khách sạn:", err);
       setError("Không thể tìm thấy khách sạn phù hợp. Vui lòng thử lại sau.");
       setHotels([]);
@@ -123,7 +127,6 @@ function SearchPage() {
 
   return (
     <Container className="search-page mt-5 pt-4">
-      {/* FORM TÌM KIẾM CHÍNH (ĐÃ BỎ TRƯỜNG NGÀY) */}
       <Form
         onSubmit={handleSubmit}
         className="p-3 mb-4 bg-light rounded shadow-sm"
@@ -131,10 +134,12 @@ function SearchPage() {
         <Row className="g-3 align-items-end">
           <Col md={10}>
             <Form.Group controlId="formDestination">
-              <Form.Label><strong>Điểm đến</strong></Form.Label>
+              <Form.Label>
+                <strong>Địa chỉ / Điểm đến</strong>
+              </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ví dụ: Hà Nội, Vũng Tàu, Quận 1..."
+                placeholder="Ví dụ: Tây Hồ, An Dương Vương, Hà Nội..."
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 required
@@ -142,22 +147,30 @@ function SearchPage() {
             </Form.Group>
           </Col>
           <Col md={2}>
-            <Button variant="primary" type="submit" className="w-100" disabled={loading}>
-              {loading ? <Spinner as="span" animation="border" size="sm" /> : "Tìm Kiếm"}
+            <Button
+              variant="primary"
+              type="submit"
+              className="w-100"
+              disabled={loading}
+            >
+              {loading ? (
+                <Spinner as="span" animation="border" size="sm" />
+              ) : (
+                "Tìm Kiếm"
+              )}
             </Button>
           </Col>
         </Row>
       </Form>
       <hr />
 
-      {/* BỘ LỌC VÀ KẾT QUẢ */}
       <Row>
-        {/* CỘT BỘ LỌC */}
         <Col md={4} lg={3}>
-          <Card className="p-3 shadow-sm position-sticky" style={{ top: '80px' }}>
-            <Card.Title as="h5" className="fw-bold mb-4">Bộ lọc</Card.Title>
-            
-            {/* Lọc theo giá */}
+          <Card className="p-3 shadow-sm position-sticky" style={{ top: "80px" }}>
+            <Card.Title as="h5" className="fw-bold mb-4">
+              Bộ lọc
+            </Card.Title>
+
             <div className="mb-4">
               <h6 className="fw-bold mb-3">Khoảng giá (VNĐ)</h6>
               <InputGroup className="mb-2">
@@ -182,7 +195,6 @@ function SearchPage() {
               </InputGroup>
             </div>
 
-            {/* Lọc theo sao */}
             <div className="mb-4">
               <h6 className="fw-bold mb-3">Hạng sao</h6>
               <div className="d-flex justify-content-center">
@@ -197,13 +209,17 @@ function SearchPage() {
               </div>
             </div>
 
-            <Button variant="outline-primary" className="w-100" onClick={handleSubmit} disabled={loading}>
+            <Button
+              variant="outline-primary"
+              className="w-100"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
               Áp dụng bộ lọc
             </Button>
           </Card>
         </Col>
 
-        {/* CỘT KẾT QUẢ TÌM KIẾM */}
         <Col md={8} lg={9}>
           <h4 className="fw-bold mb-4">Kết quả tìm kiếm</h4>
           {renderContent()}
@@ -214,3 +230,4 @@ function SearchPage() {
 }
 
 export default SearchPage;
+
