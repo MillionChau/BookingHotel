@@ -1,3 +1,21 @@
+/* Style cho toàn bộ trang */
 .search-page {
   margin-top: 100px !important;
+}
+
+/* Style cho bộ lọc sao */
+.star-filter {
+  font-size: 24px;
+  color: #ccc;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: color 0.2s;
+}
+
+.star-filter:hover {
+  color: #ffc107;
+}
+
+.star-filter.active {
+  color: #ffc107;
 }
