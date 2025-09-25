@@ -23,6 +23,7 @@ import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
+import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -68,7 +69,7 @@ function App() {
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
-
+            <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route
               path="/profile"
               element={
