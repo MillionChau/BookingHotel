@@ -16,6 +16,9 @@ class BookingController {
             paymentStatus, paymentMethod, unitPrice, paymentDay, totalPrice } = req.body
 
         try {
+            if(!userId || hotelId) 
+                return res.status(400).json({ message: 'Thiếu mã người dùng hoặc mã khách sạn' })
+
             const bookingId = await this.generateBookingId()
 
             const booking = new Booking({
@@ -141,7 +144,7 @@ class BookingController {
         }
     }
 
-    // PUT /bookings/:id/cancel
+    // PATCH /bookings/:id/cancel
     async cancelBooking(req, res) {
         const { bookingId } = req.params
         
