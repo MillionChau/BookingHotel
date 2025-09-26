@@ -8,7 +8,7 @@ const hotelSchema = new mongoose.Schema({
   manager: String,
   rating: Number,
   imageUrl: String,
-  createAt: {type: Date, default: Date.now}
+  createdAt: {type: Date, default: Date.now}
 })
 
 module.exports = mongoose.model('Hotel', hotelSchema)

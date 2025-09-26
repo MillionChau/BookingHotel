@@ -6,7 +6,7 @@ const allRoutes = require('./src/routes/index')
 const db = require('./src/config/db')
 const app = express()
 require('./src/services/roomScheduler')
-
+const momoRoutes = require('./src/routes/momoRoutes');
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -40,6 +40,7 @@ app.use((err, req, res, next) => {
 })
 
 app.use('', allRoutes)
+app.use('/api/momo', momoRoutes);
 
 const port = process.env.PORT || 5000
 const server = process.env.NODE_ENV !== 'test' 

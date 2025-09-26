@@ -23,6 +23,7 @@ import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
+import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
 import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
 // Protected Route (Giữ nguyên)
@@ -61,8 +62,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
-            <Route path="/FavoriteList" element={<FavoriteList />} />
+            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            {/* <Route path="/SearchPage" element={<SearchPage />} /> */}
             <Route
               path="/profile"
               element={
@@ -162,10 +166,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
-            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
-            {/* Các route dưới đây yêu cầu đăng nhập, ProtectedRoute sẽ tự động
-              chuyển hướng đến trang /login. Giữ nguyên logic này là đúng.
-            */}
+            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route
               path="/profile"
               element={

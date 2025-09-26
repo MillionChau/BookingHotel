@@ -145,6 +145,11 @@
   margin-bottom: 15px;
 }
 
+/* .header-scrolled,
+.footer-container {
+  display: none;
+} */
+
 /* --- RESPONSIVE DESIGN --- */
 
 /* For Tablets */
@@ -196,4 +201,3 @@
     padding: 30px;
   }
 }
-
