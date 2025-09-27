@@ -155,7 +155,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <ReviewManager />
+                    {/* <ReviewManager /> */}
                   </ProtectedRoute>
                 }
               />

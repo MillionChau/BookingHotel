@@ -17,18 +17,17 @@ import "./SearchPage.css";
 
 function SearchPage() {
   const [destination, setDestination] = useState("");
-  const [checkinDate, setCheckinDate] = useState("");
-  const [checkoutDate, setCheckoutDate] = useState("");
-
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [rating, setRating] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6);
 
-  const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
 
+  //  Lấy userId từ localStorage
   const getUserId = () => {
     try {
       const userString = localStorage.getItem("user");
@@ -39,95 +38,142 @@ function SearchPage() {
   };
   const userId = getUserId();
 
-  const handleSearch = useCallback(async (params) => {
+  //  Hàm tìm kiếm khách sạn
+  const handleSearch = useCallback(async () => {
     setLoading(true);
     setError(null);
     setSearched(true);
 
     try {
-      const filteredParams = {};
-      for (const key in params) {
-        if (params[key] !== "" && params[key] !== null && params[key] !== 0) {
-          filteredParams[key] = params[key];
-        }
+      const res = await axios.get("http://localhost:5360/hotel/all");
+      let data = res.data.HotelList || [];
+
+      // Lọc theo điểm đến
+      if (destination.trim() !== "") {
+        data = data.filter((item) =>
+          item.address.toLowerCase().includes(destination.toLowerCase())
+        );
       }
-      const query = new URLSearchParams(filteredParams).toString();
-      const res = await axios.get(
-        `http://localhost:5360/hotel/search?${query}`
-      );
-      setHotels(res.data);
+
+      // Lọc theo giá
+      if (minPrice !== "") {
+        data = data.filter((hotel) => hotel.price >= Number(minPrice));
+      }
+      if (maxPrice !== "") {
+        data = data.filter((hotel) => hotel.price <= Number(maxPrice));
+      }
+
+      // Lọc theo rating
+      if (rating > 0) {
+        data = data.filter((hotel) => Math.floor(hotel.rating) === rating);
+      }
+
+      setSearchResults(data);
     } catch (err) {
-      setError("Không thể tìm thấy khách sạn phù hợp. Vui lòng thử lại.");
-      setHotels([]);
+      console.error(err);
+      setError("Không thể tải danh sách khách sạn. Vui lòng thử lại.");
+      setSearchResults([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [destination, minPrice, maxPrice, rating]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      checkinDate &&
-      checkoutDate &&
-      new Date(checkoutDate) <= new Date(checkinDate)
-    ) {
-      alert("Ngày trả phòng phải sau ngày nhận phòng.");
-      return;
-    }
-    const searchParams = {
-      destination,
-      checkinDate,
-      checkoutDate,
-      minPrice,
-      maxPrice,
-      rating,
-    };
-    handleSearch(searchParams);
+    handleSearch();
+    setSearched(true);
   };
 
   const handleRatingClick = (newRating) => {
     setRating(rating === newRating ? 0 : newRating);
   };
 
-  // === HÀM RENDER KẾT QUẢ ===
+  //  Toggle yêu thích
+  const handleToggleFavorite = async (hotelId) => {
+    try {
+      await axios.post("http://localhost:5360/favorite/toggle", {
+        userId,
+        hotelId,
+      });
+
+      // cập nhật lại state searchResults
+      setSearchResults((prev) =>
+        prev.map((hotel) =>
+          hotel.hotelId === hotelId
+            ? { ...hotel, isFavorite: !hotel.isFavorite }
+            : hotel
+        )
+      );
+    } catch (err) {
+      console.error("Lỗi khi cập nhật yêu thích:", err);
+    }
+  };
+
+  //  Render kết quả
   const renderContent = () => {
+    if (!searched) {
+      return (
+        <Alert variant="info">
+          Vui lòng nhập thông tin và nhấn nút tìm kiếm.
+        </Alert>
+      );
+    }
+
     if (loading) {
       return (
         <div className="text-center my-5">
           <Spinner animation="border" />
-          <p className="mt-2">Đang tìm kiếm...</p>
+          <p className="mt-2">Đang tìm kiếm... </p>
         </div>
       );
     }
+
     if (error) return <Alert variant="danger">{error}</Alert>;
-    if (!searched)
+
+    const visibleResults = searchResults.slice(0, visibleCount);
+
+    if (searchResults.length > 0) {
       return (
-        <Alert variant="info">
-          Vui lòng nhập thông tin và nhấn tìm kiếm để xem kết quả.
+        <>
+          <Row xs={1} md={3} className="g-4">
+            {visibleResults.map((s) => (
+              <Col key={s.hotelId}>
+                <HotelCard
+                  hotelId={s.hotelId}
+                  userId={userId}
+                  isFavoriteDefault={s.isFavorite || false}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              </Col>
+            ))}
+          </Row>
+
+          {visibleCount < searchResults.length && (
+            <div className="text-center mt-4">
+              <Button
+                variant="outline-primary"
+                onClick={() => setVisibleCount(visibleCount + 6)}>
+                Xem thêm
+              </Button>
+            </div>
+          )}
+        </>
+      );
+    } else {
+      return (
+        <Alert variant="warning">
+          Không tìm thấy kết quả <strong>{destination}</strong>.
         </Alert>
       );
-    if (hotels.length === 0)
-      return (
-        <Alert variant="warning">Không tìm thấy khách sạn nào phù hợp.</Alert>
-      );
-
-    return (
-      <Row xs={1} sm={1} md={2} lg={3} className="g-4">
-        {hotels.map((hotel) => (
-          <Col key={hotel._id}>
-            <HotelCard hotelId={hotel._id} userId={userId} />
-          </Col>
-        ))}
-      </Row>
-    );
+    }
   };
 
   return (
-    <Container className="search-page mt-5 pt-4">
+    <Container className="search-page my-5 pt-4">
+      {/* --- FORM TÌM KIẾM --- */}
       <Form
         onSubmit={handleSubmit}
         className="p-3 mb-4 bg-light rounded shadow-sm">
-        {/* --- FORM TÌM KIẾM --- */}
         <Row className="g-3 align-items-end">
           <Col md={6}>
             <Form.Group controlId="formDestination">
@@ -139,19 +185,9 @@ function SearchPage() {
                 placeholder="Ví dụ: Hà Nội, Vũng Tàu..."
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                required
               />
             </Form.Group>
           </Col>
-          {/* <Col md={4}>
-            <Form.Label>
-              <strong>Ngày nhận - trả phòng</strong>
-            </Form.Label>
-            <InputGroup>
-              <Form.Control type="date" value={checkinDate} onChange={(e) => setCheckinDate(e.target.value)} />
-              <Form.Control type="date" value={checkoutDate} onChange={(e) => setCheckoutDate(e.target.value)} className="ms-2" />
-            </InputGroup>
-          </Col> */}
           <Col md={2}>
             <Button
               variant="primary"
@@ -199,11 +235,11 @@ function SearchPage() {
                 />
               </InputGroup>
             </div>
-            {/* ============================================== */}
+
             <div className="mb-4">
               <h6 className="fw-bold mb-3">Hạng sao</h6>
               <div className="d-flex justify-content-center">
-                {[5, 4, 3, 2, 1].map((star) => (
+                {[1, 2, 3, 4, 5].map((star) => (
                   <FaStar
                     key={star}
                     className={`star-filter ${rating >= star ? "active" : ""}`}
@@ -220,7 +256,9 @@ function SearchPage() {
 
         {/* --- KẾT QUẢ TÌM KIẾM --- */}
         <Col md={8} lg={9}>
-          <h4 className="fw-bold mb-4">Kết quả tìm kiếm</h4>
+          <h4 className="fw-bold mb-4">
+            Kết quả tìm kiếm <strong>{destination}</strong>
+          </h4>
           {renderContent()}
         </Col>
       </Row>
