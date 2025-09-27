@@ -24,6 +24,7 @@ import RoomManager from "./admin/RoomManager/RoomManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
+import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {

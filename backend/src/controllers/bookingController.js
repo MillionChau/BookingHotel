@@ -179,34 +179,35 @@ class BookingController {
             return res.status(500).json({ message: err.message })
         }
     }
-    async createBookingFromPayment(data) {
-        try {
-            const booking = new Booking({
-                bookingId: data.bookingId,
-                userId: data.userId,
-                hotelId: data.hotelId,
-                roomId: data.roomId,
-                checkinDate: new Date(data.checkinDate),
-                checkOutDate: new Date(data.checkOutDate),
-                status: "Booked",
-                paymentStatus: "Paid",
-                paymentMethod: data.paymentMethod || "MoMo",
-                unitPrice: data.unitPrice,
-                paymentDay: new Date(),
-                totalPrice: data.totalPrice
-            });
+    // async createBookingFromPayment(data) {
+    //     //xử lý type -> room trống random
+    //     try {
+    //         const booking = new Booking({
+    //             bookingId: data.bookingId,
+    //             userId: data.userId,
+    //             hotelId: data.hotelId,
+    //             roomId: data.roomId,
+    //             checkinDate: new Date(data.checkinDate),
+    //             checkOutDate: new Date(data.checkOutDate),
+    //             status: "Booked",
+    //             paymentStatus: "Paid",
+    //             paymentMethod: data.paymentMethod || "MoMo",
+    //             unitPrice: data.unitPrice,
+    //             paymentDay: new Date(),
+    //             totalPrice: data.totalPrice
+    //         });
     
-            await booking.save();
+    //         await booking.save();
     
-            // update doanh thu luôn nếu Paid
-            await revenueService.updateRevenue(booking);
+    //         // update doanh thu luôn nếu Paid
+    //         await revenueService.updateRevenue(booking);
     
-            return booking;
-        } catch (err) {
-            console.error("createBookingFromPayment error:", err.message);
-            throw err;
-        }
-    }
+    //         return booking;
+    //     } catch (err) {
+    //         console.error("createBookingFromPayment error:", err.message);
+    //         throw err;
+    //     }
+    // }
     
 }
 
