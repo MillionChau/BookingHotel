@@ -118,9 +118,9 @@ const HotelDetail = () => {
       }
 
       const bookingData = {
-        userId: userId?._id,
-        hotelId: hotel._id,
-        roomId: selectedRoom.id || selectedRoom.type,
+        userId: userId?.userId,
+        hotelId: hotel.hotelId,
+        roomId: selectedRoom.roomId || selectedRoom.type,
         checkinDate: startDate,
         checkOutDate: endDate,
         unitPrice: selectedRoom.minPrice,

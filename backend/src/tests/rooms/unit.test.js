@@ -144,4 +144,52 @@ describe('Room Controller - Unit Test', () => {
             message: expect.any(String)
         }))
     })
+
+    it('TC-22: should return 404 if delete room not found', async () => {
+        req = { params: { roomId: 'NOT-FOUND' } }
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        }
+
+        Room.findOne.mockResolvedValue(null)
+
+        await roomController.deleteRoom(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({ message: 'Không tìm thấy phòng!' })
+    })
+
+    it('TC-23: should update room successfully', async () => {
+        const mockRoom = {
+            roomId: 'H1-R101',
+            name: 'Deluxe',
+            type: 'Double',
+            price: 100,
+            status: 'available',
+            imageUrl: 'img.jpg',
+            save: jest.fn()
+        }
+
+        req = {
+            params: { roomId: 'H1-R101' },
+            body: { name: 'Deluxe Update', type: 'Triple' }
+        }
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        }
+
+        Room.findOne = jest.fn().mockResolvedValue(mockRoom)
+
+        await roomController.updateRoom(req, res)
+
+        expect(Room.findOne).toHaveBeenCalledWith({ roomId: 'H1-R101' })
+        expect(mockRoom.save).toHaveBeenCalled()
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            room: mockRoom,
+            message: 'Cập nhật thông tin phòng thành công!'
+        })
+    })
 })

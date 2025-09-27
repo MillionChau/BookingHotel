@@ -1,4 +1,3 @@
-// tests/hotelController.int.test.js
 const mongoose = require('mongoose')
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const supertest = require('supertest')
@@ -77,8 +76,16 @@ describe('Hotel Controller - Integration Test', () => {
     expect(res.body.hotel.hotelId).toBe('HT-2025-0001')
   })
 
-  // TC-10: Chỉnh sửa khách sạn
-  it('TC-10: should update hotel successfully', async () => {
+  // TC-10: Lấy khách sạn không tồn tại
+  it('TC-10: should return 404 if hotel not found for deleting', async () => {
+    const res = await request.get('/hotel/NOT-FOUND')
+
+    expect(res.statusCode).toBe(404)
+    expect(res.body.message).toBe('Không tìm thấy khách sạn!')
+  })
+
+  // TC-11: Chỉnh sửa khách sạn
+  it('TC-11: should update hotel successfully', async () => {
     await Hotel.create({ hotelId: 'HT-2025-0001', name: 'H1', address: '1-A-HN' })
 
     const res = await request.put('/hotel/update/HT-2025-0001').send({
