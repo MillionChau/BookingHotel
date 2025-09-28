@@ -12,8 +12,8 @@ export default function ReviewManager() {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [stats, setStats] = useState({ averageRating: 0, totalReviews: 0 });
 
-  const reviewBaseUrl = "http://localhost:5360/api/reviews";
-  const roomBaseurl = "http://localhost:5360/api/room"
+  const reviewBaseUrl = "http://localhost:5360/review";
+  const roomBaseurl = "http://localhost:5360/room"
 
   const fetchRooms = async () => {
     try {
