@@ -45,10 +45,10 @@ class roomController {
     }
 
     async updateRoom(req, res) {
-        const { id } = req.params
+        const { roomId } = req.params
         const { name, type, price, imageUrl, status } = req.body
         try {
-            const room = await Room.findById(id)
+            const room = await Room.findOne({ roomId })
             if (!room) return res.status(404).json({ message: 'Không tìm thấy phòng!' })
 
             room.name = name || room.name
@@ -105,7 +105,7 @@ class roomController {
 
             await Room.deleteOne(room)
 
-            res.status(200).json({ message: 'Xóa phòng thành công!' })
+            res.status(200).json({ message: 'Xoá phòng thành công!' })
         } catch (err) {
             res.status(500).json({ message: err.message })
         }
@@ -149,7 +149,7 @@ class roomController {
                     totalRooms,
                     occupiedRooms,
                     availableRooms,
-                    occupancyRate: parseFloat(occupancyRate),
+                    occupancyRate: parseFloat(occupiedRate),
                     maintenanceRooms: totalRooms - occupiedRooms - availableRooms
                 },
                 activeBookings: activeBookings.map(booking => ({

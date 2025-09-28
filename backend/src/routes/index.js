@@ -17,6 +17,6 @@ router.use('/booking', bookingRoutes)
 router.use('/review', reviewRoutes)
 router.use('/favorite', favoriteRoutes)
 router.use('/room', roomRoutes)
-router.use('/api/revenue', revenueRoutes)
+router.use('/revenue', revenueRoutes)
 
 module.exports = router

@@ -12,23 +12,28 @@ class BookingController {
     }
 
     async createBooking(req, res) {
-        const { userId, hotelId, checkinDate, checkOutDate, status,
+        const { userId, hotelId, roomId, checkinDate, checkOutDate, status,
             paymentStatus, paymentMethod, unitPrice, paymentDay, totalPrice } = req.body
 
         try {
+            if (!userId || !hotelId || !roomId)
+                return res.status(400).json({ message: 'Thiếu mã người dùng hoặc mã khách sạn' })
+
+
             const bookingId = await this.generateBookingId()
 
             const booking = new Booking({
-                bookingId, 
-                userId, 
+                bookingId,
+                roomId,
+                userId,
                 hotelId,
-                checkinDate: new Date(checkinDate), 
-                checkOutDate: new Date(checkOutDate), 
+                checkinDate: new Date(checkinDate),
+                checkOutDate: new Date(checkOutDate),
                 status: 'Booked',
-                paymentStatus, 
-                paymentMethod, 
-                unitPrice, 
-                paymentDay: paymentDay ? new Date(paymentDay) : null, 
+                paymentStatus,
+                paymentMethod,
+                unitPrice,
+                paymentDay: paymentDay ? new Date(paymentDay) : null,
                 totalPrice
             })
 
@@ -51,15 +56,15 @@ class BookingController {
     async updatePaymentStatus(req, res) {
         const { bookingId } = req.params
         const { paymentStatus, paymentMethod, paymentDay } = req.body
-        
-        try {  
+
+        try {
             const booking = await Booking.findOne({ bookingId })
 
             if (!booking)
                 return res.status(404).json({ message: 'Không tìm thấy đơn đặt!' })
 
             const previousPaymentStatus = booking.paymentStatus
-            
+
             booking.paymentStatus = paymentStatus
             booking.paymentMethod = paymentMethod || booking.paymentMethod
             booking.paymentDay = paymentDay ? new Date(paymentDay) : booking.paymentDay
@@ -129,10 +134,10 @@ class BookingController {
         try {
             const booking = await Booking.findOne({ bookingId })
 
-            if (!booking) 
+            if (!booking)
                 return res.status(404).json({ message: 'Không tìm thấy đơn đặt!' })
 
-            res.status(200).json({ 
+            res.status(200).json({
                 message: 'Lấy đơn đặt thành công!',
                 booking: booking
             })
@@ -141,11 +146,11 @@ class BookingController {
         }
     }
 
-    // PUT /bookings/:id/cancel
+    // PATCH /bookings/:id/cancel
     async cancelBooking(req, res) {
         const { bookingId } = req.params
-        
-        try {  
+
+        try {
             const booking = await Booking.findOne({ bookingId })
 
             if (!booking)
@@ -179,36 +184,34 @@ class BookingController {
             return res.status(500).json({ message: err.message })
         }
     }
-    // async createBookingFromPayment(data) {
-    //     //xử lý type -> room trống random
-    //     try {
-    //         const booking = new Booking({
-    //             bookingId: data.bookingId,
-    //             userId: data.userId,
-    //             hotelId: data.hotelId,
-    //             roomId: data.roomId,
-    //             checkinDate: new Date(data.checkinDate),
-    //             checkOutDate: new Date(data.checkOutDate),
-    //             status: "Booked",
-    //             paymentStatus: "Paid",
-    //             paymentMethod: data.paymentMethod || "MoMo",
-    //             unitPrice: data.unitPrice,
-    //             paymentDay: new Date(),
-    //             totalPrice: data.totalPrice
-    //         });
-    
-    //         await booking.save();
-    
-    //         // update doanh thu luôn nếu Paid
-    //         await revenueService.updateRevenue(booking);
-    
-    //         return booking;
-    //     } catch (err) {
-    //         console.error("createBookingFromPayment error:", err.message);
-    //         throw err;
-    //     }
-    // }
-    
+    async createBookingFromPayment(data) {
+        try {
+            const booking = new Booking({
+                bookingId: data.bookingId,
+                userId: data.userId,
+                hotelId: data.hotelId,
+                roomId: data.roomId,
+                checkinDate: new Date(data.checkinDate),
+                checkOutDate: new Date(data.checkOutDate),
+                status: "Booked",
+                paymentStatus: "Paid",
+                paymentMethod: data.paymentMethod || "MoMo",
+                unitPrice: data.unitPrice,
+                paymentDay: new Date(),
+                totalPrice: data.totalPrice
+            });
+
+            await booking.save();
+
+            // update doanh thu luôn nếu Paid
+            await revenueService.updateRevenue(booking);
+
+            return booking;
+        } catch (err) {
+            console.error("createBookingFromPayment error:", err.message);
+            throw err;
+        }
+    }
 }
 
 module.exports = new BookingController()
