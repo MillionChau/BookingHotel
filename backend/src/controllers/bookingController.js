@@ -212,7 +212,6 @@ class BookingController {
             throw err;
         }
     }
-
 }
 
 module.exports = new BookingController()
