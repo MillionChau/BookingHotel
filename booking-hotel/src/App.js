@@ -21,7 +21,9 @@ import Sidebar from "./admin/SideBar/SideBar";
 import Dashboard from "./admin/DashBoard/DashBoard";
 import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
+import ReviewManager from "./admin/ReviewManager/ReviewManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
+import RevenueManager from "./admin/RevenueManager/RevenueManager";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
 
@@ -147,7 +149,7 @@ function App() {
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager />
+                    <RevenueManager />
                   </ProtectedRoute>
                 }
               />
@@ -155,7 +157,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager />
+                    <ReviewManager />
                   </ProtectedRoute>
                 }
               />
