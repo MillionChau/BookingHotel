@@ -26,9 +26,8 @@ import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import RevenueManager from "./admin/RevenueManager/RevenueManager";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
-import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
-// Protected Route (Giữ nguyên)
+// Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
   if (!user) return <Navigate to="/login" replace />;
   if (requiredRole && user.role !== requiredRole)
@@ -139,11 +138,11 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route // Route này trỏ đến RoomManager trong code gốc của bạn
+              <Route
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager /> 
+                    <RevenueManager /> 
                   </ProtectedRoute>
                 }
               />

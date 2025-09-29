@@ -27,7 +27,7 @@ class revenueController {
         const { month, year } = req.query
 
         try {
-            const monthlyRevenue = await RevenueService.getMonthlyRevenue(month, year)
+            const monthlyRevenue = await revenueService.getMonthlyRevenue(month, year)
 
             res.status(200).json({
                 message: 'Lấy doanh thu theo tháng thành công!',
