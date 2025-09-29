@@ -1,0 +1,39 @@
+.revenue-dashboard {
+  h2 {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .stat-card {
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+    h3 {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  }
+
+  .filter-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    label {
+      font-weight: 500;
+    }
+  }
+
+  table {
+    th {
+      background-color: #f1f1f1;
+      text-align: center;
+    }
+    td {
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+}
