@@ -6,7 +6,7 @@ jest.mock('../../models/room')
 jest.mock('../../models/hotel')
 
 describe('Room Controller - Unit Test', () => {
-    let req, register
+    let req
     beforeEach(() => {
         req = { body: {}, params: {} }
         res = { status: jest.fn().mockReturnThis(), json: jest.fn() }
@@ -145,6 +145,7 @@ describe('Room Controller - Unit Test', () => {
         }))
     })
 
+    // TC-22: Xoá phòng không tồn tại
     it('TC-22: should return 404 if delete room not found', async () => {
         req = { params: { roomId: 'NOT-FOUND' } }
         res = {
@@ -160,6 +161,7 @@ describe('Room Controller - Unit Test', () => {
         expect(res.json).toHaveBeenCalledWith({ message: 'Không tìm thấy phòng!' })
     })
 
+    // TC-23: Chỉnh sửa phòng thành công
     it('TC-23: should update room successfully', async () => {
         const mockRoom = {
             roomId: 'H1-R101',
