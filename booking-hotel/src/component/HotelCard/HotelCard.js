@@ -5,30 +5,35 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./HotelCard.scss";
 
-const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
-  const [hotel, setHotel] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [favorite, setFavorite] = useState(false);
-  const [favoriteId, setFavoriteId] = useState(null);
+const HotelCard = ({
+  hotelId,
+  userId,
+  isFavoriteDefault = false,
+  favoriteIdDefault = null,
+  hotel,
+  onToggleFavorite,
+}) => {
+  const [hotelData, setHotelData] = useState(hotel || null);
+  const [loading, setLoading] = useState(!hotel);
+  const [favorite, setFavorite] = useState(isFavoriteDefault);
+  const [favoriteId, setFavoriteId] = useState(favoriteIdDefault);
 
   useEffect(() => {
+    if (hotel) return; // đã có dữ liệu từ props thì không fetch lại
+
     if (!hotelId) return;
 
-    const fetchData = async () => {
+    const fetchHotel = async () => {
       try {
-        // lấy thông tin khách sạn
-        const resHotel = await axios.get(
-          `http://localhost:5360/hotel/${hotelId}`
-        );
-        if (resHotel.data && resHotel.data.hotel) setHotel(resHotel.data.hotel);
+        const res = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
+        if (res.data && res.data.hotel) {
+          setHotelData(res.data.hotel);
+        }
 
-        // check có trong danh sách yêu thích không
         if (userId) {
           const resFav = await axios.get(
             `http://localhost:5360/favorite/check`,
-            {
-              params: { userId, hotelId },
-            }
+            { params: { userId, hotelId } }
           );
           if (resFav.data.isFavorite) {
             setFavorite(true);
@@ -36,14 +41,14 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
           }
         }
       } catch (err) {
-        console.error("Lỗi khi load dữ liệu:", err);
+        console.error("Lỗi khi load dữ liệu khách sạn:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [hotelId, userId]);
+    fetchHotel();
+  }, [hotelId, userId, hotel]);
 
   const toggleFavorite = async () => {
     try {
@@ -53,18 +58,24 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
       }
 
       if (favorite) {
-        // xóa yêu thích
+        // xóa khỏi yêu thích
         await axios.delete(`http://localhost:5360/favorite/${favoriteId}`);
         setFavorite(false);
         setFavoriteId(null);
+        if (onToggleFavorite) {
+          onToggleFavorite(hotelId, false, null);
+        }
       } else {
-        // thêm yêu thích
+        // thêm vào yêu thích
         const res = await axios.post(`http://localhost:5360/favorite/create`, {
           userId,
           hotelId,
         });
         setFavorite(true);
         setFavoriteId(res.data.favorite._id);
+        if (onToggleFavorite) {
+          onToggleFavorite(hotelId, true, res.data.favorite._id);
+        }
       }
     } catch (err) {
       console.error("Lỗi khi toggle favorite:", err);
@@ -72,7 +83,7 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
   };
 
   if (loading) return <Spinner animation="border" />;
-  if (!hotel) return <div>Khách sạn không tồn tại</div>;
+  if (!hotelData) return <div>Khách sạn không tồn tại</div>;
 
   return (
     <Card
@@ -97,29 +108,31 @@ const HotelCard = ({ hotelId, userId, isFavoriteDefault = false }) => {
 
       {/* Ảnh khách sạn */}
       <Card.Img
-        src={hotel.imageUrl}
-        alt={hotel.name}
+        src={hotelData.imageUrl}
+        alt={hotelData.name}
         style={{ height: "200px", objectFit: "cover", width: "100%" }}
       />
 
       <Card.Body className="d-flex flex-column p-2">
         <Card.Title className="fw-bold fs-6 my-1 hotel-title">
-          {hotel.name}
+          {hotelData.name}
         </Card.Title>
         <Card.Text className="text-muted small hotel-title my-1">
-          {hotel.address}
+          {hotelData.address}
         </Card.Text>
 
         <div className="d-flex align-items-center my-1">
           <FaStar className="text-warning me-2" />
-          {hotel.rating && hotel.rating > 0 ? (
-            <span>{hotel.rating.toFixed(1)} / 5</span>
+          {hotelData.rating && hotelData.rating > 0 ? (
+            <span>{hotelData.rating.toFixed(1)} / 5</span>
           ) : (
             <span className="text-muted">Chưa có đánh giá</span>
           )}
         </div>
 
-        <Link to={`/HotelDetail/${hotel.hotelId}`} className="mt-auto w-100">
+        <Link
+          to={`/HotelDetail/${hotelData.hotelId}`}
+          className="mt-auto w-100">
           <Button
             variant="primary"
             className="w-100 mt-2"

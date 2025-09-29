@@ -17,7 +17,7 @@ cron.schedule('* * * * *', async () => {
             await booking.save()
 
             if (booking.roomId) {
-                await Room.findByIdAndUpdate(booking.roomId, { status: 'occupied' })
+                await Room.findOneAndUpdate({ roomId: booking.roomId }, { status: 'occupied' })
             }
         }
 
@@ -31,14 +31,14 @@ cron.schedule('* * * * *', async () => {
             await booking.save()
 
             if (booking.roomId) {
-                await Room.findByIdAndUpdate(booking.roomId, { status: 'available' })
+                await Room.findOneAndUpdate({ roomId: booking.roomId }, { status: 'available' })
             }
         }
 
         if (checkInBookings.length > 0) {
             console.log(`Đã cập nhật ${checkInBookings.length} booking sang trạng thái CheckIn.`)
         }
-        
+
         if (expiredBookings.length > 0) {
             console.log(`Đã giải phóng ${expiredBookings.length} phòng hết hạn.`)
         }

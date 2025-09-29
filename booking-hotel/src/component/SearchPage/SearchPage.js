@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
-import "./SearchPage.css";
+import "./SearchPage.scss";
 
 function SearchPage() {
   const [destination, setDestination] = useState("");
@@ -27,7 +27,7 @@ function SearchPage() {
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
 
-  //  Lấy userId từ localStorage
+  // Lấy userId từ localStorage
   const getUserId = () => {
     try {
       const userString = localStorage.getItem("user");
@@ -38,13 +38,14 @@ function SearchPage() {
   };
   const userId = getUserId();
 
-  //  Hàm tìm kiếm khách sạn
+  // Hàm tìm kiếm khách sạn
   const handleSearch = useCallback(async () => {
     setLoading(true);
     setError(null);
     setSearched(true);
 
     try {
+      // Lấy danh sách khách sạn
       const res = await axios.get("http://localhost:5360/hotel/all");
       let data = res.data.HotelList || [];
 
@@ -68,7 +69,26 @@ function SearchPage() {
         data = data.filter((hotel) => Math.floor(hotel.rating) === rating);
       }
 
-      setSearchResults(data);
+      // Lấy danh sách yêu thích của user
+      let favoriteList = [];
+      if (userId) {
+        const resFav = await axios.get(
+          `http://localhost:5360/favorite/user/${userId}`
+        );
+        favoriteList = resFav.data || [];
+      }
+
+      // Map trạng thái isFavorite cho danh sách kết quả
+      const dataWithFavorite = data.map((hotel) => {
+        const fav = favoriteList.find((f) => f.hotelId === hotel.hotelId);
+        return {
+          ...hotel,
+          isFavorite: !!fav,
+          favoriteId: fav ? fav._id : null,
+        };
+      });
+
+      setSearchResults(dataWithFavorite);
     } catch (err) {
       console.error(err);
       setError("Không thể tải danh sách khách sạn. Vui lòng thử lại.");
@@ -76,7 +96,7 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [destination, minPrice, maxPrice, rating]);
+  }, [destination, minPrice, maxPrice, rating, userId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -88,28 +108,18 @@ function SearchPage() {
     setRating(rating === newRating ? 0 : newRating);
   };
 
-  //  Toggle yêu thích
-  const handleToggleFavorite = async (hotelId) => {
-    try {
-      await axios.post("http://localhost:5360/favorite/toggle", {
-        userId,
-        hotelId,
-      });
-
-      // cập nhật lại state searchResults
-      setSearchResults((prev) =>
-        prev.map((hotel) =>
-          hotel.hotelId === hotelId
-            ? { ...hotel, isFavorite: !hotel.isFavorite }
-            : hotel
-        )
-      );
-    } catch (err) {
-      console.error("Lỗi khi cập nhật yêu thích:", err);
-    }
+  // Cập nhật lại state khi HotelCard toggle favorite
+  const handleToggleFavorite = (hotelId, isFav, favId) => {
+    setSearchResults((prev) =>
+      prev.map((hotel) =>
+        hotel.hotelId === hotelId
+          ? { ...hotel, isFavorite: isFav, favoriteId: favId }
+          : hotel
+      )
+    );
   };
 
-  //  Render kết quả
+  // Render kết quả
   const renderContent = () => {
     if (!searched) {
       return (
@@ -141,7 +151,9 @@ function SearchPage() {
                 <HotelCard
                   hotelId={s.hotelId}
                   userId={userId}
-                  isFavoriteDefault={s.isFavorite || false}
+                  isFavoriteDefault={s.isFavorite}
+                  favoriteIdDefault={s.favoriteId}
+                  hotel={s}
                   onToggleFavorite={handleToggleFavorite}
                 />
               </Col>

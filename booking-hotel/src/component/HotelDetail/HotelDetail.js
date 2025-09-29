@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FaUserFriends, FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
-import { Carousel, Modal, Button , Form } from "react-bootstrap";
+import { Carousel, Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
+import "./HotelDetail.scss";
 
 const HotelDetail = () => {
   const { hotelId } = useParams();
   const [hotel, setHotel] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [showGallery, setShowGallery] = useState(false);
 
   const userId = JSON.parse(localStorage.getItem("user"));
 
-  // state modal
   const [showModal, setShowModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
-  // state chọn ngày
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -55,18 +55,15 @@ const HotelDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const hotelRes = await axios.get(
-          `http://localhost:5360/hotel/${hotelId}`
-        );
+        const hotelRes = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
         if (hotelRes.data && hotelRes.data.hotel) setHotel(hotelRes.data.hotel);
 
-        const roomRes = await axios.get(
-          `http://localhost:5360/room/hotel/${hotelId}`
-        );
-        const rooms = roomRes.data.rooms || [];
+        const roomRes = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+        const allRooms = roomRes.data.rooms || [];
+        setRooms(allRooms);
 
         const grouped = Object.values(
-          rooms.reduce((acc, room) => {
+          allRooms.reduce((acc, room) => {
             if (!acc[room.type]) {
               acc[room.type] = {
                 type: room.type,
@@ -76,10 +73,7 @@ const HotelDetail = () => {
               };
             }
             acc[room.type].images.push(room.imageUrl);
-            acc[room.type].minPrice = Math.min(
-              acc[room.type].minPrice,
-              room.price
-            );
+            acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
             if (room.status === "Trống") acc[room.type].availableCount += 1;
             return acc;
           }, {})
@@ -103,13 +97,11 @@ const HotelDetail = () => {
 
   if (!hotel) return <Loading />;
 
-  // ảnh
   const allImages = [hotel.imageUrl, ...roomTypes.flatMap((r) => r.images)].filter(Boolean);
   const mainImage = allImages[0];
-  const thumbnails = allImages.slice(1, 6);
-  const moreImages = allImages.length - 6;
+  const thumbnails = allImages.slice(1, 9);
+  const moreImages = allImages.length - 8;
 
-  // ngay trên return thêm hàm này
   const handleConfirmBooking = async () => {
     try {
       if (!selectedRoom || !nights) {
@@ -118,44 +110,43 @@ const HotelDetail = () => {
       }
 
       const bookingData = {
-        userId: userId?._id,
-        hotelId: hotel._id,
-        roomId: selectedRoom.id || selectedRoom.type,
+        userId: userId.id,
+        hotelId: hotelId,
+        roomId: selectedRoom.roomId,
         checkinDate: startDate,
         checkOutDate: endDate,
-        unitPrice: selectedRoom.minPrice,
-        totalPrice: selectedRoom.minPrice * nights
+        unitPrice: selectedRoom.price,
+        totalPrice: selectedRoom.price * nights,
       };
 
       const res = await axios.post("http://localhost:5360/api/momo/create", {
-        bookingData
+        bookingData,
       });
 
       if (res.data && res.data.payUrl) {
-        window.location.href = res.data.payUrl; // Redirect tới MoMo
+        window.location.href = res.data.payUrl;
       } else {
         alert("Không lấy được link thanh toán!");
       }
     } catch (err) {
       console.error("Axios error:", err.response?.data || err.message);
-      alert("Có lỗi khi tạo thanh toán: " + (err.response?.data?.message || err.message));
+      alert(
+        "Có lỗi khi tạo thanh toán: " +
+          (err.response?.data?.message || err.message)
+      );
     }
-};
-
-  
-
+  };
 
   return (
     <div className="container mt-5 pt-5">
       {/* phần khác giữ nguyên ... */}
-      <div className="bg-white rounded-3 shadow p-3 d-flex align-items-center gap-3 mb-4 border border-info">
+      <div className="bg-white rounded-3 shadow p-3 d-flex align-items-center gap-3 mb-4 border border-info position-fixed w-100 z-3" style={{ top: "80px", maxWidth: "86%" }}>
         {/* Hotel name */}
         <div className="d-flex align-items-center bg-info bg-opacity-25 rounded px-3 py-2 flex-grow-1">
           <FaMapMarkerAlt className="me-2 text-info" />
           <span className="fw-semibold text-dark">{hotel.name}</span>
         </div>
 
-        {/* Date range */}
         <div className="d-flex align-items-center gap-2">
           <FaCalendarAlt className="text-info" />
           <input
@@ -177,16 +168,14 @@ const HotelDetail = () => {
           />
         </div>
 
-        {/* Nights */}
         {nights > 0 && (
           <span className="badge bg-info text-white px-3 py-2">{nights} đêm</span>
         )}
       </div>
 
-
-      {/* --- Tiêu đề khách sạn --- */}
+      {/* Hotel info */}
       <div className="mb-3">
-        <h3 className="fw-bold" style={{ marginTop: "20px" }}>
+        <h3 className="fw-bold" style={{ marginTop: "100px" }}>
           {hotel.name}
         </h3>
         <div className="d-flex align-items-center mb-2">
@@ -204,19 +193,16 @@ const HotelDetail = () => {
         </div>
       </div>
 
-      {/* --- Gallery --- */}
+      {/* Gallery */}
       <div className="row g-2 mb-4">
-        {/* Ảnh chính */}
         <div className="col-md-8">
           <img
             src={mainImage}
             alt="main-hotel"
             className="img-fluid rounded w-100"
-            style={{ height: 400, objectFit: "cover" }}
+            style={{ height: 424, objectFit: "cover" }}
           />
         </div>
-
-        {/* Thumbnail bên phải */}
         <div className="col-md-4">
           <div className="row g-2">
             {thumbnails.map((img, idx) => (
@@ -225,7 +211,8 @@ const HotelDetail = () => {
                   <div
                     className="position-relative"
                     onClick={() => setShowGallery(true)}
-                    style={{ cursor: "pointer" }}>
+                    style={{ cursor: "pointer" }}
+                  >
                     <img
                       src={img}
                       alt={`thumb-${idx}`}
@@ -249,13 +236,13 @@ const HotelDetail = () => {
           </div>
         </div>
       </div>
-
       {/* Modal hiển thị tất cả ảnh */}
       <Modal
         show={showGallery}
         onHide={() => setShowGallery(false)}
         size="lg"
-        centered>
+        centered 
+        className="pt-5">
         <Modal.Header closeButton>
           <Modal.Title>Tất cả hình ảnh</Modal.Title>
         </Modal.Header>
@@ -275,154 +262,136 @@ const HotelDetail = () => {
         </Modal.Body>
       </Modal>
 
-      {/* --- Mô tả khách sạn --- */}
+      {/* Description */}
       {hotel.description && (
-        <div className="mb-4">
-          <h5 className="fw-bold">Mô tả khách sạn</h5>
-          <p className="text-muted">{hotel.description}</p>
+        <div className="mb-4 border rounded p-4 shadow-sm bg-light">
+          <h5 className="fw-bold border-bottom pb-2 mb-3">Mô tả khách sạn</h5>
+          <p className="text-muted lh-base">{hotel.description}</p>
         </div>
       )}
       {/* --- Loại phòng --- */}
-      {roomTypes.map((room) => (
-        <div key={room.type} className="card mb-4 shadow-sm border-0">
-          <div className="card-header bg-white border-0">
-            <h5 className="fw-bold mb-0">{room.type}</h5>
-          </div>
-          <div className="row g-0">
-            <div className="col-md-4 p-3 bg-light">
-              {room.images.length > 1 ? (
-                <Carousel interval={null}>
-                  {room.images.map((img, idx) => (
-                    <Carousel.Item key={idx}>
-                      <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100 rounded" />
-                    </Carousel.Item>
-                  ))}
-                </Carousel>
-              ) : (
-                room.images[0] && (
-                  <img src={room.images[0]} alt={room.type} className="img-fluid rounded" />
-                )
-              )}
-              <div className="mt-2 text-muted small">20 m² • Vòi tắm đứng • Tủ lạnh • Máy lạnh</div>
-              <a href="#" className="d-block mt-2 text-primary small fw-bold">
-                Xem chi tiết phòng
-              </a>
-            </div>
-            <div className="col-md-4 p-3 border-start">
-              <div className="fw-semibold mb-2">Lựa chọn phòng</div>
-              <div className="small text-muted">{room.type}</div>
-              <div className="mt-1">Không bao gồm bữa sáng</div>
-              <div className="text-success small mt-2">
-                Miễn phí huỷ phòng trước 02 Oct 12:59
-              </div>
-              <div className="text-success small">Không cần thanh toán trước cho đến ngày 01 Oct 2025</div>
-            </div>
-            <div className="col-md-2 p-3 border-start text-center">
-              <FaUserFriends size={20} />
-              <div className="small mt-1">2 khách</div>
-            </div>
-            <div className="col-md-2 p-3 border-start text-center d-flex flex-column justify-content-center">
-              <div className="fw-bold text-danger fs-5">
-                {room.minPrice.toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </div>
-              <button
-                className="btn btn-primary btn-sm mt-2"
-                onClick={() => {
-                  if (!startDate || !endDate) {
-                    alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
-                    return;
-                  }
-                  setSelectedRoom(room);
-                  setShowModal(true);
-                }}
-              >
-                Chọn
-              </button>
-              <div className="small text-danger mt-1">{room.status}</div>
-            </div>
-          </div>
-        </div>
-      ))}
+{/* --- Loại phòng --- */}
+{roomTypes.map((room) => (
+  <div key={room.type} className="card mb-3 shadow-sm border-0">
+    {/* Căn giữa tất cả các cột theo chiều dọc */}
+    <div className="row g-0 align-items-center">
 
-      {/* Modal khi chọn phòng */}
+      {/* CỘT 1: HÌNH ẢNH (4/12) */}
+      <div className="col-md-4 p-3">
+        <div className="rounded-3 overflow-hidden">
+          {/* Carousel Code (giữ nguyên không đổi) */}
+          {room.images.length > 1 ? (
+            <Carousel interval={null}>
+              {room.images.map((img, idx) => (
+                <Carousel.Item key={idx}>
+                  <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{minHeight: '200px', objectFit: 'cover'}} />
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          ) : (
+            room.images[0] && (
+              <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{minHeight: '200px', objectFit: 'cover'}} />
+            )
+          )}
+        </div>
+      </div>
+
+      {/* CỘT 2: THÔNG TIN PHÒNG (4/12) */}
+      <div className="col-md-4 p-3">
+        <h5 className="fw-bold">{room.type}</h5>
+        <ul className="list-unstyled small mt-2">
+          <li className="mb-2">
+            <i className="bi bi-people-fill me-2"></i>
+            Tối đa {room.details?.guests} khách
+          </li>
+          <li className="mb-2">
+            <i className="bi bi-check2-square me-2"></i>
+            Đầy đủ tiện nghi cơ bản
+          </li>
+          <li className="mb-2 text-success">
+            <i className="bi bi-credit-card me-2"></i>
+            Thanh toán tại khách sạn hoặc online
+          </li>
+        </ul>
+      </div>
+
+      {/* CỘT 3: GIÁ (2/12) */}
+      <div className="col-md-2 p-3 border-start text-center">
+        <div className="fw-bolder text-danger fs-5">
+          {room.minPrice.toLocaleString("vi-VN")} ₫
+        </div>
+        <div className="small text-muted">/ đêm</div>
+        <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
+          Đã gồm thuế, phí
+        </div>
+      </div>
+
+      {/* CỘT 4: NÚT BẤM (2/12) */}
+      <div className="col-md-2 p-3 border-start">
+        <div className="d-grid">
+          <button
+            className="btn btn-primary fw-semibold"
+            onClick={() => {
+              if (!startDate || !endDate) {
+                alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
+                return;
+              }
+              setSelectedRoom(room);
+              setShowModal(true);
+            }}
+          >
+            Chọn
+          </button>
+        </div>
+        <div className="small text-danger text-center mt-2">{room.status}</div>
+      </div>
+
+    </div>
+  </div>
+))}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
         <Modal.Header closeButton className="border-0">
-          <Modal.Title className="fw-bold text-primary">
-            Xác nhận đặt phòng
-          </Modal.Title>
+          <Modal.Title className="fw-bold text-primary">Xác nhận đặt phòng</Modal.Title>
         </Modal.Header>
-
         <Modal.Body className="bg-light">
           {selectedRoom && (
             <div className="row g-4">
-              {/* Thông tin khách hàng (dạng form) */}
               <div className="col-md-6">
                 <div className="p-4 bg-white rounded-4 shadow-sm h-100 border">
-                  <h6 className="fw-bold text-dark mb-3 border-bottom pb-2 d-flex align-items-center gap-2">
-                    <i className="bi bi-person-fill text-primary fs-5"></i>
+                  <h6 className="fw-bold text-dark mb-3 border-bottom pb-2">
                     Thông tin khách hàng
                   </h6>
                   <Form>
                     <Form.Group className="mb-3">
                       <Form.Label>Họ tên</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Nhập họ tên"
-                        defaultValue={userId?.fullname || ""}
-                      />
+                      <Form.Control type="text" defaultValue={userId?.fullname || ""} />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                       <Form.Label>Email</Form.Label>
-                      <Form.Control
-                        type="email"
-                        placeholder="Nhập email"
-                        defaultValue={userId?.email || ""}
-                      />
+                      <Form.Control type="email" defaultValue={userId?.email || ""} />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                       <Form.Label>Số điện thoại</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Nhập số điện thoại"
-                        defaultValue={userId?.phone || ""}
-                      />
+                      <Form.Control type="text" defaultValue={userId?.phone || ""} />
                     </Form.Group>
                   </Form>
                 </div>
               </div>
 
-              {/* Thông tin đặt phòng */}
               <div className="col-md-6">
                 <div className="p-4 bg-white rounded-4 shadow-sm h-100 border">
-                  <h6 className="fw-bold text-dark mb-3 border-bottom pb-2 d-flex align-items-center gap-2">
-                    <i className="bi bi-building text-success fs-5"></i>
+                  <h6 className="fw-bold text-dark mb-3 border-bottom pb-2">
                     Thông tin đặt phòng
                   </h6>
                   <ul className="list-unstyled mb-0 small">
-                    <li className="mb-2">
-                      <strong>Khách sạn:</strong> {hotel.name}
-                    </li>
-                    <li className="mb-2">
-                      <strong>Phòng:</strong> {selectedRoom.type}
-                    </li>
-                    <li className="mb-2">
-                      <strong>Ngày nhận:</strong> {startDate}
-                    </li>
-                    <li className="mb-2">
-                      <strong>Ngày trả:</strong> {endDate}
-                    </li>
-                    <li className="mb-2">
-                      <strong>Số đêm:</strong> {nights}
-                    </li>
+                    <li><strong>Khách sạn:</strong> {hotel.name}</li>
+                    <li><strong>Phòng:</strong> {selectedRoom.name} ({selectedRoom.type})</li>
+                    <li><strong>Ngày nhận:</strong> {startDate}</li>
+                    <li><strong>Ngày trả:</strong> {endDate}</li>
+                    <li><strong>Số đêm:</strong> {nights}</li>
                     <li className="mt-3">
                       <span className="fw-bold text-danger fs-5">
-                        Giá:{" "}
-                        {(selectedRoom.minPrice * nights).toLocaleString("vi-VN", {
+                        Giá: {(selectedRoom.price * nights).toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
                         })}
@@ -434,24 +403,15 @@ const HotelDetail = () => {
             </div>
           )}
         </Modal.Body>
-
         <Modal.Footer className="border-0">
           <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
             Huỷ
           </Button>
-          <Button 
-            variant="primary" 
-            className="px-4 fw-semibold"
-            onClick={handleConfirmBooking}
-          >
+          <Button variant="primary" className="px-4 fw-semibold" onClick={handleConfirmBooking}>
             Xác nhận
           </Button>
         </Modal.Footer>
       </Modal>
-
-
-
-
     </div>
   );
 };
