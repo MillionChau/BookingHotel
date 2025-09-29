@@ -1,84 +1,77 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "./SearchPage.css";
-import HotelCard from "../HotelCard/HotelCard";
+import React, { useState, useCallback } from "react";
+import axios from "axios";
+import { Container, Row, Col, Spinner, Alert, Form, Button } from "react-bootstrap";
+import HotelCard from "../HotelCard/HotelCard"; // Import component "thông minh"
+import "./SearchPage.scss";
 
 function SearchPage() {
+  // ... state của các bộ lọc (destination, minPrice, ...) giữ nguyên
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(false);
+  const userId = "USER_ID_CUA_BAN"; // Lấy userId từ localStorage hoặc context
+
+  const executeSearch = useCallback(async (searchParams) => {
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+    try {
+      // ... logic lọc params giữ nguyên
+
+      const query = new URLSearchParams(searchParams).toString();
+      
+      // 1. SearchPage gọi API tìm kiếm
+      const res = await axios.get(
+        `http://localhost:5360/hotel/search?${query}`
+      );
+      
+      // 2. SearchPage nhận về một danh sách khách sạn
+      // (API có thể chỉ cần trả về [{_id: '1'}, {_id: '2'}] để tối ưu)
+      setHotels(res.data);
+    } catch (err) {
+      setError("Không thể tìm thấy khách sạn phù hợp.");
+      setHotels([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const searchParams = { /* ... */ };
+    executeSearch(searchParams);
+  };
+  
+  const renderContent = () => {
+    if (loading) {
+      return <Spinner animation="border" />;
+    }
+    if (error) {
+      return <Alert variant="danger">{error}</Alert>;
+    }
+    // ... các trường hợp khác
+
+    return (
+      <Row xs={1} sm={1} md={2} lg={3} className="g-4">
+        {hotels.map((hotel) => (
+          <Col key={hotel._id}>
+            {/* 3. Chỉ truyền `hotelId`. HotelCard sẽ tự lo phần còn lại */}
+            <HotelCard hotelId={hotel._id} userId={userId} />
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
   return (
-    <div className="container my-5 search-page">
-      {/* Thanh tìm kiếm */}
-      <div className="row mb-4">
-        <div className="col-md-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Địa điểm"
-            defaultValue="Hà Nội"
-          />
-        </div>
-        <div className="col-md-3">
-          <input
-            type="date"
-            className="form-control"
-            placeholder="Nhận phòng"
-          />
-        </div>
-        <div className="col-md-3">
-          <input type="date" className="form-control" placeholder="Trả phòng" />
-        </div>
-        <div className="col-md-3 d-grid">
-          <button className="btn btn-primary">
-            <i className="bi bi-search me-2"></i> Tìm kiếm
-          </button>
-        </div>
+    <Container className="search-page mt-5 pt-4">
+      {/* ... Form tìm kiếm */}
+      <div className="mt-4">
+        <h4 className="fw-bold mb-4">Kết quả tìm kiếm</h4>
+        {renderContent()}
       </div>
-
-      <div className="row">
-        {/* Sidebar bộ lọc */}
-        <div className="col-md-3">
-          <div className="card p-3">
-            <h5 className="mb-3">Bộ lọc</h5>
-            <div className="mb-3">
-              <label className="form-label">Khoảng giá</label>
-              <input
-                type="range"
-                className="form-range"
-                min="200000"
-                max="5000000"
-              />
-              <div className="d-flex justify-content-between">
-                <small>200k</small>
-                <small>5tr</small>
-              </div>
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Loại phòng</label>
-              <select className="form-select">
-                <option>Tất cả</option>
-                <option>Phòng đơn</option>
-                <option>Phòng đôi</option>
-              </select>
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Số sao</label>
-              <select className="form-select">
-                <option>Tất cả</option>
-                <option>3 sao</option>
-                <option>4 sao</option>
-                <option>5 sao</option>
-              </select>
-            </div>
-            <button className="btn btn-outline-secondary">Xóa lọc</button>
-          </div>
-        </div>
-
-        {/* Danh sách khách sạn */}
-        <div className="col-md-9">
-          <HotelCard />
-        </div>
-      </div>
-    </div>
+    </Container>
   );
 }
 

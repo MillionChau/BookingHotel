@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // Customer Components
 import Header from "./component/Header/Header";
@@ -9,13 +9,13 @@ import Footer from "./component/Footer/Footer";
 import HotelDetail from "./component/HotelDetail/HotelDetail";
 import SearchPage from "./component/SearchPage/SearchPage";
 import ProfilePage from "./component/Profile/Profile";
-// import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
 import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
-import Loading from "./component/Loading/Loading";
 import FavoriteList from "./component/Favorite/FavoriteList";
+
+
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
 import Dashboard from "./admin/DashBoard/DashBoard";
@@ -28,7 +28,7 @@ import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
 import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
-// Protected Route
+// Protected Route (Giữ nguyên)
 const ProtectedRoute = ({ children, requiredRole, user }) => {
   if (!user) return <Navigate to="/login" replace />;
   if (requiredRole && user.role !== requiredRole)
@@ -37,35 +37,27 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
+  // Đọc user từ localStorage ngay khi khởi tạo state
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
-  //if ở login, regester thì ẩn footer và header
+  // Chỉ cần 1 biến để kiểm tra ẩn/hiện layout
   const hideLayout = ["/login", "/register"].includes(location.pathname);
-
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-    setLoading(false);
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
   };
-
-  if (loading) return <Loading />;
+  
+  // Không cần state loading và useEffect nữa vì việc đọc localStorage là đồng bộ
 
   return (
     <>
-      {/* Layout Customer */}
+      {/* ======================= Layout Customer ======================= */}
       {user && user.role === "Customer" && (
         <div className="App">
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
@@ -76,16 +68,17 @@ function App() {
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            {/* <Route path="/SearchPage" element={<SearchPage />} /> */}
             <Route
               path="/profile"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
-                  <ProfilePage />
+                  <ProfilePage user={user} />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/BookingList"
+              path="/BookingList" // Giữ lại route đúng cho BookingHistory
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <BookingHistory />
@@ -100,7 +93,7 @@ function App() {
         </div>
       )}
 
-      {/* Layout Admin */}
+      {/* ======================= Layout Admin ======================= */}
       {user && user.role === "Admin" && (
         <div style={{ display: "flex" }}>
           <Sidebar onLogout={handleLogout} />
@@ -146,11 +139,11 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
+              <Route // Route này trỏ đến RoomManager trong code gốc của bạn
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RevenueManager />
+                    <RoomManager /> 
                   </ProtectedRoute>
                 }
               />
@@ -162,24 +155,18 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
-              {/* các route khác của Admin */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </div>
         </div>
       )}
 
-      {/* Layout Guest */}
+      {/* ======================= Layout Guest ======================= */}
       {!user && (
         <div className="App">
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
-
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/hotel/:id" element={<HotelDetail />} />
-            <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
@@ -187,7 +174,7 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
-                  <ProfilePage />
+                  <ProfilePage user={user} />
                 </ProtectedRoute>
               }
             />

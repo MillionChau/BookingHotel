@@ -1,31 +1,26 @@
-/* --- General Variables --- */
+
 $dark-bg: #1a202c;
 $light-text: #e2e8f0;
 $medium-text: #a0aec0;
 $primary-color: #4299e1;
 $border-color: #2d3748;
 
-/* --- Main Container --- */
 .footer-container {
   background-color: $dark-bg;
   color: $light-text;
-  padding: 60px 40px 30px 40px; // Padding hai bên nhỏ lại
+  padding: 60px 40px 30px 40px; 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* --- Wrapper để giới hạn chiều rộng và căn giữa --- */
 .footer-content-wrapper {
-  max-width: 1320px; // Chiều rộng tối đa của nội dung
+  max-width: 1320px;
   width: 100%;
-  margin: 0 auto; // Tự động căn giữa
-
-  // Sử dụng GRID để chia layout cho 5 cột và phần legal
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); // Chia thành 5 cột bằng nhau
-  gap: 30px 20px; // Khoảng cách dòng và cột
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px 20px;
 }
 
-/* --- Styling chung cho các cột nội dung --- */
 .footer-column, .footer-social {
   h3 {
     font-size: 18px;
@@ -68,7 +63,7 @@ $border-color: #2d3748;
 
 /* --- Phần bản quyền --- */
 .footer-legal {
-  grid-column: 1 / -1; // Trải dài hết 5 cột
+  grid-column: 1 / -1;
   text-align: center;
   font-size: 13px;
   color: $medium-text;
@@ -90,12 +85,10 @@ $border-color: #2d3748;
 @media (max-width: 768px) {
   .footer-container { padding: 40px 20px; }
   .footer-content-wrapper {
-    // Trên mobile, hiển thị 1 cột
     grid-template-columns: 1fr;
     gap: 0;
   }
 
-  // Chỉ áp dụng accordion cho 4 cột đầu
   .footer-column {
     border-bottom: 1px solid $border-color;
     h3 {
