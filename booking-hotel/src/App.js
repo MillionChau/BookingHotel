@@ -9,12 +9,12 @@ import Footer from "./component/Footer/Footer";
 import HotelDetail from "./component/HotelDetail/HotelDetail";
 import SearchPage from "./component/SearchPage/SearchPage";
 import ProfilePage from "./component/Profile/Profile";
+// import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
 import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
 import FavoriteList from "./component/Favorite/FavoriteList";
-
 
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
@@ -51,7 +51,7 @@ function App() {
     localStorage.removeItem("token");
     setUser(null);
   };
-  
+
   // Không cần state loading và useEffect nữa vì việc đọc localStorage là đồng bộ
 
   return (
@@ -150,7 +150,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <ReviewManager />
+                    {/* <ReviewManager /> */}
                   </ProtectedRoute>
                 }
               />
