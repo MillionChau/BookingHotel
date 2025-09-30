@@ -5,10 +5,15 @@ import HotelCard from "../HotelCard/HotelCard";
 import Loading from "../Loading/Loading";
 import "./FavoriteList.scss";
 
-function FavoriteList() {
+function FavoriteList({ userId }) {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = localStorage.getItem("user");
+  const user = localStorage.getItem("user");
+
+  if(user) {
+    const userData = JSON.parse(user);
+    userId = userData.id;
+  }
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -16,6 +21,7 @@ function FavoriteList() {
         const res = await axios.get(
           `http://localhost:5360/favorite/user/${userId}`
         );
+        console.log(userId);
         setFavorites(res.data);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách yêu thích:", err);
