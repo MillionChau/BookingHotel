@@ -18,6 +18,12 @@ const HotelCard = ({
   const [favorite, setFavorite] = useState(isFavoriteDefault);
   const [favoriteId, setFavoriteId] = useState(favoriteIdDefault);
 
+  const user = localStorage.getItem('user');
+  if (user) {
+    const userData = JSON.parse(user);
+    userId = userData.id;
+  }
+
   useEffect(() => {
     if (hotel) return; // đã có dữ liệu từ props thì không fetch lại
 
