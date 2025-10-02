@@ -12,6 +12,8 @@ const userRoute = require('../../routes/userRoute')
 let app, mongoServer, request
 
 beforeAll(async () => {
+    jest.setTimeout(30000);
+
     mongoServer = await MongoMemoryServer.create()
     const uri = mongoServer.getUri()
     await mongoose.connect(uri)
@@ -21,7 +23,7 @@ beforeAll(async () => {
     app.use('/user', userRoute)
 
     request = supertest(app)
-})
+}, 30000)
 
 afterEach(async () => {
     await User.deleteMany({})
