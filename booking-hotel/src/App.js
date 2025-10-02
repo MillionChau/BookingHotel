@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-
 // Customer Components
 import Header from "./component/Header/Header";
 import Footer from "./component/Footer/Footer";
@@ -142,7 +141,7 @@ function App() {
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RevenueManager /> 
+                    <RevenueManager />
                   </ProtectedRoute>
                 }
               />
