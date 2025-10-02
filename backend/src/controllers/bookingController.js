@@ -127,7 +127,7 @@ class BookingController {
         }
     }
 
-    // GET /bookings/:id
+    // GET /booking/:id
     async getBookingById(req, res) {
         const { bookingId } = req.params
 
@@ -141,25 +141,6 @@ class BookingController {
                 message: 'Lấy đơn đặt thành công!',
                 booking: booking
             })
-        } catch (err) {
-            return res.status(500).json({ message: err.message })
-        }
-    }
-
-    // GET /booking/:userId
-    async getBookingByUser(req, res) {
-        const userId = req.params
-        try {
-            const bookings = Booking.find({ userId })
-            
-            if (!bookings)
-                return res.status(404).json({ message: 'Không tìm thấy đơn đặt!' })
-
-            res.status(200).json({
-                message: 'Lấy đơn đặt thành công!',
-                bookings: bookings
-            })
-
         } catch (err) {
             return res.status(500).json({ message: err.message })
         }
