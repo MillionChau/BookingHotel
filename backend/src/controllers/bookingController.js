@@ -146,6 +146,25 @@ class BookingController {
         }
     }
 
+    // GET /booking/:userId
+    async getBookingByUser(req, res) {
+        const userId = req.params
+        try {
+            const bookings = Booking.find({ userId })
+            
+            if (!bookings)
+                return res.status(404).json({ message: 'Không tìm thấy đơn đặt!' })
+
+            res.status(200).json({
+                message: 'Lấy đơn đặt thành công!',
+                bookings: bookings
+            })
+
+        } catch (err) {
+            return res.status(500).json({ message: err.message })
+        }
+    }
+
     // PATCH /bookings/:id/cancel
     async cancelBooking(req, res) {
         const { bookingId } = req.params
