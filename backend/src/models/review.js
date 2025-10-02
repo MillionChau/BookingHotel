@@ -6,7 +6,7 @@ const reviewSchema = new mongoose.Schema({
   userId: String,
   bookingId: String,
   content: String,
-  rating: String,
+  rating: Number,
   addedDate: Date,
 })
 

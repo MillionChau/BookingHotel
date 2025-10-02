@@ -28,15 +28,13 @@ class ReviewController {
                 })
             }
 
-            const  {booking} = await Booking.findOne({ 
+            const booking = await Booking.findOne({ 
                 bookingId: bookingId, 
                 userId: userId 
             })
 
-            console.log(booking)
-
             if (!booking) {
-                return res.status(404).json({ 
+                return res.status(403).json({ 
                     message: 'Bạn không có quyền đánh giá' 
                 })
             }

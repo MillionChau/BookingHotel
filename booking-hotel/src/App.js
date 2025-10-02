@@ -9,24 +9,25 @@ import Footer from "./component/Footer/Footer";
 import HotelDetail from "./component/HotelDetail/HotelDetail";
 import SearchPage from "./component/SearchPage/SearchPage";
 import ProfilePage from "./component/Profile/Profile";
+// import FavoriteCard from "./component/FavoriteCard/FavoriteCard";
 import BookingHistory from "./component/BookingHistory/BookingHistory";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import Home from "./component/Home/Home";
 import FavoriteList from "./component/Favorite/FavoriteList";
 
-
 // Admin Components
 import Sidebar from "./admin/SideBar/SideBar";
 import Dashboard from "./admin/DashBoard/DashBoard";
 import HotelManagement from "./admin/HotelManagement/HotelManagement";
 import RoomManager from "./admin/RoomManager/RoomManager";
+import ReviewManager from "./admin/ReviewManager/ReviewManager";
 import BookingManagement from "./admin/BookingManagement/BookingManagement";
+import RevenueManager from "./admin/RevenueManager/RevenueManager";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
-import ReviewManager from "./admin/ReviewManager/ReviewManager";
 
-// Protected Route (Giữ nguyên)
+// Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
   if (!user) return <Navigate to="/login" replace />;
   if (requiredRole && user.role !== requiredRole)
@@ -35,14 +36,12 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
-  // Đọc user từ localStorage ngay khi khởi tạo state
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
   const location = useLocation();
-  // Chỉ cần 1 biến để kiểm tra ẩn/hiện layout
   const hideLayout = ["/login", "/register"].includes(location.pathname);
 
   const handleLogout = () => {
@@ -50,8 +49,6 @@ function App() {
     localStorage.removeItem("token");
     setUser(null);
   };
-  
-  // Không cần state loading và useEffect nữa vì việc đọc localStorage là đồng bộ
 
   return (
     <>
@@ -61,12 +58,10 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/BookingHotel" element={<SearchPage />} />
-            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
-            {/* <Route path="/SearchPage" element={<SearchPage />} /> */}
             <Route
               path="/profile"
               element={
@@ -76,7 +71,7 @@ function App() {
               }
             />
             <Route
-              path="/BookingList" // Giữ lại route đúng cho BookingHistory
+              path="/BookingList"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <BookingHistory />
@@ -137,11 +132,11 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route // Route này trỏ đến RoomManager trong code gốc của bạn
+              <Route
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RoomManager /> 
+                    <RevenueManager /> 
                   </ProtectedRoute>
                 }
               />
@@ -149,7 +144,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <ReviewManager />
+                    {/* <ReviewManager /> */}
                   </ProtectedRoute>
                 }
               />
@@ -165,7 +160,8 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/BookingHotel" element={<SearchPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route

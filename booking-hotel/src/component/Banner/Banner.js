@@ -3,9 +3,10 @@ import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Banner.scss";
 import { Link } from "react-router-dom";
+
 function Banner() {
   return (
-    <div className="bg-primary banner text-white  text-center banner">
+    <div className="bg-primary banner text-white text-center banner">
       <Container>
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng, minh bạch
@@ -14,19 +15,18 @@ function Banner() {
           Tìm kiếm – Lọc – Đặt phòng – Quản lý mọi lúc, mọi nơi.
         </p>
         <div>
-          <Button variant="light" className="me-2 fw-semibold bg-transparent">
-            <Link
-              className="text-decoration-none text-white "
-              to="/bookingHotel">
-              <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
-            </Link>
+          <Button
+            as={Link}
+            to="/search"
+            variant="light"
+            className="me-2 fw-semibold bg-transparent text-white"
+          >
+            <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
           </Button>
-          {/* <Button variant="outline-light" className="fw-semibold">
-            <i className="bi bi-search me-1"></i> Khám phá
-          </Button> */}
         </div>
       </Container>
     </div>
   );
 }
+
 export default Banner;

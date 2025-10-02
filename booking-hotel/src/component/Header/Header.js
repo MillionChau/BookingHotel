@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Logo2 from "../../assets/Logo2.png";
+import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
@@ -8,6 +9,7 @@ import "./Header.scss";
 function Header({ user, onLogout }) {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +22,11 @@ function Header({ user, onLogout }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const logoutHandler = () => {
+    onLogout();
+    navigate('/login');
+  }
 
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
@@ -97,7 +104,7 @@ function Header({ user, onLogout }) {
                   <NavDropdown.Item as={NavLink} to="/profile">
                     Thông tin tài khoản
                   </NavDropdown.Item>
-                  <NavDropdown.Item onClick={onLogout}>
+                  <NavDropdown.Item onClick={logoutHandler}>
                     Đăng xuất
                   </NavDropdown.Item>
                 </NavDropdown>

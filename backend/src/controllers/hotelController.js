@@ -79,7 +79,7 @@ class hotelController {
             });
         } catch (err) {
             console.error('Error creating hotel:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 message: 'Lỗi server khi thêm khách sạn',
                 error: process.env.NODE_ENV === 'development' ? err.message : undefined
             });
@@ -105,7 +105,7 @@ class hotelController {
 
             res.status(200).json({ message: 'Chỉnh sửa thông tin khách sạn thành công!' })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
@@ -121,7 +121,7 @@ class hotelController {
                 HotelList: hotels
             })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
@@ -131,14 +131,14 @@ class hotelController {
             const hotel = await Hotel.findOne({ hotelId })
 
             if (!hotel)
-                res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
+                return res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
 
             res.status(200).json({
                 message: 'Lấy khách sạn thành công!',
                 hotel: hotel
             })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
@@ -156,7 +156,7 @@ class hotelController {
 
             res.status(200).json({ message: 'Xoá khách sạn thành công!' });
         } catch (err) {
-            res.status(500).json({ message: err.message });
+            return res.status(500).json({ message: err.message });
         }
     }
 }

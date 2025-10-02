@@ -5,3 +5,57 @@
 .homeItem:hover {
   transform: translateY(-3px);
 }
+
+.location-card {
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.location-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.location-card.large-card {
+  min-height: 250px;
+}
+
+.location-card.small-card {
+  min-height: 180px;
+}
+
+.location-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.section-title {
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%); 
+  width: 80px;  
+  height: 4px; 
+  background-color: #0d6efd;
+  border-radius: 2px;
+}
+
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid #e9ecef;
+  margin-top: 3.5rem;
+}
