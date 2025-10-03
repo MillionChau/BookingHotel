@@ -11,6 +11,68 @@ class ReviewController {
         this.getRoomAverageRating = this.getRoomAverageRating.bind(this)
     }
 
+    async getAllReviews(req, res) {
+        try {
+            const reviews = await Review.find().sort({ addedDate: -1 }); // review mới nhất lên trước
+            return res.status(200).json({ reviews });
+        } catch (err) {
+            console.error("Lỗi khi lấy tất cả review:", err);
+            return res.status(500).json({ message: "Lỗi server" });
+        }
+    }
+
+    async getReviewById(req, res) {
+        const { reviewId } = req.params;
+    
+        try {
+            const review = await Review.findOne({ reviewId });
+    
+            if (!review) {
+                return res.status(404).json({
+                    message: 'Không tìm thấy đánh giá!'
+                });
+            }
+    
+            // Lấy thông tin Booking để xác định hotelId, roomId
+            const booking = await Booking.findOne({ bookingId: review.bookingId });
+            const hotelId = booking?.hotelId || null;
+            const roomId = booking?.roomId || null;
+    
+            let hotelName = "Tên khách sạn";
+            let roomName = "Tên phòng";
+    
+            if (hotelId) {
+                const Hotel = require("../models/hotel");
+                const hotel = await Hotel.findById(hotelId);
+                if (hotel) hotelName = hotel.name || hotel.hotelName || hotelName;
+            }
+    
+            if (roomId) {
+                const Room = require("../models/room");
+                const room = await Room.findById(roomId);
+                if (room) roomName = room.name || room.roomName || roomName;
+            }
+    
+            return res.status(200).json({
+                message: 'Lấy đánh giá thành công!',
+                review: {
+                    reviewId: review.reviewId,
+                    bookingId: review.bookingId,
+                    userId: review.userId,
+                    roomId: review.roomId,
+                    content: review.content,
+                    rating: review.rating,
+                    addedDate: review.addedDate,
+                    hotelName,
+                    roomName
+                }
+            });
+        } catch (err) {
+            console.error("Lỗi khi lấy review theo ID:", err);
+            return res.status(500).json({ message: "Lỗi server" });
+        }
+    }
+
     // POST /review
     async createReview(req, res) {
         const { userId, roomId, bookingId, content, rating } = req.body

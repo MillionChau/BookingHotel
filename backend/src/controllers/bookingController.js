@@ -127,7 +127,7 @@ class BookingController {
         }
     }
 
-    // GET /bookings/:id
+    // GET /booking/:id
     async getBookingById(req, res) {
         const { bookingId } = req.params
 

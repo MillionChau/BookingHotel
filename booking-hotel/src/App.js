@@ -25,6 +25,7 @@ import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import RevenueManager from "./admin/RevenueManager/RevenueManager";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
+import MyReview from "./component/MyReview/MyReview";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -62,7 +63,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/BookingHotel" element={<SearchPage />} />
-            <Route path="/BookingList" element={<HotelDetail />} />
+            <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -76,10 +77,18 @@ function App() {
               }
             />
             <Route
-              path="/BookingList" // Giữ lại route đúng cho BookingHistory
+              path="/bookingList" // Giữ lại route đúng cho BookingHistory
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <BookingHistory />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/danh-gia" // Giữ lại route đúng cho BookingHistory
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <MyReview />
                 </ProtectedRoute>
               }
             />
@@ -149,7 +158,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    {/* <ReviewManager /> */}
+                    <ReviewManager />
                   </ProtectedRoute>
                 }
               />

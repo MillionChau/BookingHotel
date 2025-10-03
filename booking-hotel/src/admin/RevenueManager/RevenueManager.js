@@ -183,8 +183,8 @@ export default function RevenueManager() {
                   onChange={handleFilterChange}
                 >
                   {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {getMonthName(i + 1)}
+                    <option key={i} value={i}>
+                      {getMonthName(i)}
                     </option>
                   ))}
                 </Form.Select>
