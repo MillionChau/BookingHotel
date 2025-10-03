@@ -28,6 +28,20 @@ function SearchPage() {
   const [searched, setSearched] = useState(false);
   const [dataHotels, setDataHotels] = useState([]);
 
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 250) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Lấy userId từ localStorage
   const getUserId = () => {
     try {
@@ -216,7 +230,9 @@ function SearchPage() {
       {/* --- FORM TÌM KIẾM --- */}
       <Form
         onSubmit={handleSubmit}
-        className="p-3 mb-4 bg-light rounded shadow-sm ">
+        className={`p-2 mb-4 bg-light rounded shadow-sm ${
+          isSticky ? "sticky-search" : ""
+        }`}>
         <Row className="g-3 align-items-end">
           <Col md={6}>
             <div className="mb-1">
@@ -224,7 +240,8 @@ function SearchPage() {
             </div>
             <Form.Group
               controlId="formDestination"
-              className="d-flex align-items-center border border-1 border-secondary rounded-2">
+              className={`d-flex align-items-center border border-1 border-secondary rounded-2 
+              }`}>
               <Form.Control
                 className="border-0 bg-none"
                 type="text"
@@ -267,7 +284,11 @@ function SearchPage() {
       <Row>
         {/* --- KẾT QUẢ TÌM KIẾM --- */}
         <Col md={8} lg={9} className="mx-auto">
-          {destination && <h4 className="fw-bold mb-4">Kết quả tìm kiếm</h4>}
+          {destination && (
+            <h4 className={`fw-bold mb-4 ${isSticky ? " searchHotel" : ""}`}>
+              Kết quả tìm kiếm
+            </h4>
+          )}
           {renderContent()}
         </Col>
       </Row>

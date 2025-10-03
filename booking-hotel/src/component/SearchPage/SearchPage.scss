@@ -1,27 +1,26 @@
 .search-page {
-  margin-top: 100px !important;
+  margin-top: 56px !important;
 }
 
-.star-filter {
-  font-size: 24px;
-  color: #ccc;
-  cursor: pointer;
-  margin: 0 5px;
-  transition: color 0.2s;
+.sticky-search {
+  position: fixed;
+  top: 76px;
+  width: 85%;
+  z-index: 200;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.7s ease forwards;
 }
-
-.star-filter:hover {
-  color: #ffc107;
+.sticky-search .searchHotel {
+  margin-top: 250px;
 }
-
-.star-filter.active {
-  color: #ffc107;
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
-// .sticky-search {
-//   position: fixed;
-//   top: 76px;
-//   width: 100%;
-//   z-index: 200;
-//   background: #fff;
-//   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-// }
