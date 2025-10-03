@@ -62,6 +62,7 @@ const HotelDetail = () => {
         const allRooms = roomRes.data.rooms || [];
         setRooms(allRooms);
 
+        // Gom nhóm loại phòng
         const grouped = Object.values(
           allRooms.reduce((acc, room) => {
             if (!acc[room.type]) {
@@ -119,6 +120,8 @@ const HotelDetail = () => {
         totalPrice: selectedRoom.price * nights,
       };
 
+      console.log(bookingData);
+
       const res = await axios.post("http://localhost:5360/api/momo/create", {
         bookingData,
       });
@@ -139,9 +142,8 @@ const HotelDetail = () => {
 
   return (
     <div className="container mt-5 pt-5">
-      {/* phần khác giữ nguyên ... */}
+      {/* Thanh chọn ngày */}
       <div className="bg-white rounded-3 shadow p-3 d-flex align-items-center gap-3 mb-4 border border-info position-fixed w-100 z-3" style={{ top: "80px", maxWidth: "86%" }}>
-        {/* Hotel name */}
         <div className="d-flex align-items-center bg-info bg-opacity-25 rounded px-3 py-2 flex-grow-1">
           <FaMapMarkerAlt className="me-2 text-info" />
           <span className="fw-semibold text-dark">{hotel.name}</span>
@@ -236,6 +238,7 @@ const HotelDetail = () => {
           </div>
         </div>
       </div>
+
       {/* Modal hiển thị tất cả ảnh */}
       <Modal
         show={showGallery}
@@ -269,51 +272,39 @@ const HotelDetail = () => {
           <p className="text-muted lh-base">{hotel.description}</p>
         </div>
       )}
+
       {/* --- Loại phòng --- */}
-{/* --- Loại phòng --- */}
-{roomTypes.map((room) => (
-  <div key={room.type} className="card mb-3 shadow-sm border-0">
-    {/* Căn giữa tất cả các cột theo chiều dọc */}
-    <div className="row g-0 align-items-center">
+      {roomTypes.map((room) => (
+        <div key={room.type} className="card mb-3 shadow-sm border-0">
+          <div className="row g-0 align-items-center">
+            {/* Hình ảnh */}
+            <div className="col-md-4 p-3">
+              <div className="rounded-3 overflow-hidden">
+                {room.images.length > 1 ? (
+                  <Carousel interval={null}>
+                    {room.images.map((img, idx) => (
+                      <Carousel.Item key={idx}>
+                        <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{minHeight: '200px', objectFit: 'cover'}} />
+                      </Carousel.Item>
+                    ))}
+                  </Carousel>
+                ) : (
+                  room.images[0] && (
+                    <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{minHeight: '200px', objectFit: 'cover'}} />
+                  )
+                )}
+              </div>
+            </div>
 
-      {/* CỘT 1: HÌNH ẢNH (4/12) */}
-      <div className="col-md-4 p-3">
-        <div className="rounded-3 overflow-hidden">
-          {/* Carousel Code (giữ nguyên không đổi) */}
-          {room.images.length > 1 ? (
-            <Carousel interval={null}>
-              {room.images.map((img, idx) => (
-                <Carousel.Item key={idx}>
-                  <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{minHeight: '200px', objectFit: 'cover'}} />
-                </Carousel.Item>
-              ))}
-            </Carousel>
-          ) : (
-            room.images[0] && (
-              <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{minHeight: '200px', objectFit: 'cover'}} />
-            )
-          )}
-        </div>
-      </div>
-
-      {/* CỘT 2: THÔNG TIN PHÒNG (4/12) */}
-      <div className="col-md-4 p-3">
-        <h5 className="fw-bold">{room.type}</h5>
-        <ul className="list-unstyled small mt-2">
-          <li className="mb-2">
-            <i className="bi bi-people-fill me-2"></i>
-            Tối đa {room.details?.guests} khách
-          </li>
-          <li className="mb-2">
-            <i className="bi bi-check2-square me-2"></i>
-            Đầy đủ tiện nghi cơ bản
-          </li>
-          <li className="mb-2 text-success">
-            <i className="bi bi-credit-card me-2"></i>
-            Thanh toán tại khách sạn hoặc online
-          </li>
-        </ul>
-      </div>
+            {/* Thông tin phòng */}
+            <div className="col-md-4 p-3">
+              <h5 className="fw-bold">{room.type}</h5>
+              <ul className="list-unstyled small mt-2">
+                <li className="mb-2">Tối đa 2 khách</li>
+                <li className="mb-2">Đầy đủ tiện nghi cơ bản</li>
+                <li className="mb-2 text-success">Thanh toán tại khách sạn hoặc online</li>
+              </ul>
+            </div>
 
       {/* CỘT 3: GIÁ (2/12) */}
       <div className="col-md-2 p-3 border-start text-center">
@@ -325,30 +316,36 @@ const HotelDetail = () => {
           Đã bao gồm thuế và phí
         </div>
       </div>
-
-      {/* CỘT 4: NÚT BẤM (2/12) */}
-      <div className="col-md-2 p-3 border-start">
-        <div className="d-grid">
-          <button
-            className="btn btn-primary fw-semibold"
-            onClick={() => {
-              if (!startDate || !endDate) {
-                alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
-                return;
-              }
-              setSelectedRoom(room);
-              setShowModal(true);
-            }}
-          >
-            Chọn
-          </button>
+            {/* Nút chọn */}
+            <div className="col-md-2 p-3 border-start">
+              <div className="d-grid">
+                <button
+                  className="btn btn-primary fw-semibold"
+                  onClick={() => {
+                    if (!startDate || !endDate) {
+                      alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
+                      return;
+                    }
+                    // 🔥 Lấy ra 1 phòng chi tiết từ rooms
+                    const foundRoom = rooms.find(r => r.type === room.type && r.status === "Trống");
+                    if (!foundRoom) {
+                      alert("Không còn phòng trống!");
+                      return;
+                    }
+                    setSelectedRoom(foundRoom);
+                    setShowModal(true);
+                  }}
+                >
+                  Chọn
+                </button>
+              </div>
+              <div className="small text-danger text-center mt-2">{room.status}</div>
+            </div>
+          </div>
         </div>
-        <div className="small text-danger text-center mt-2">{room.status}</div>
-      </div>
+      ))}
 
-    </div>
-  </div>
-))}
+      {/* Modal xác nhận */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
         <Modal.Header closeButton className="border-0">
           <Modal.Title className="fw-bold text-primary">Xác nhận đặt phòng</Modal.Title>
