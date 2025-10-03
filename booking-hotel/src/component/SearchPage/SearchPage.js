@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from "react";
+// import React, { useState, useCallback } from "react";
 import axios from "axios";
+
 import {
   Container,
   Row,
@@ -14,9 +15,16 @@ import {
 import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
 import "./SearchPage.scss";
+import React, { useState, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 function SearchPage() {
-  const [destination, setDestination] = useState("");
+  const query = useQuery(); // Thêm dòng này
+  
+  const [destination, setDestination] = useState(query.get("destination") || "");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [rating, setRating] = useState(0);
@@ -25,7 +33,7 @@ function SearchPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false);
+  const [searched, setSearched] = useState(!!query.get("destination"));
 
   // Lấy userId từ localStorage
   const getUserId = () => {
@@ -97,7 +105,14 @@ function SearchPage() {
       setLoading(false);
     }
   }, [destination, minPrice, maxPrice, rating, userId]);
-
+// Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
+  useEffect(() => {
+    const destinationFromUrl = query.get("destination");
+    if (destinationFromUrl) {
+      handleSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy một lần khi component được mount
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();

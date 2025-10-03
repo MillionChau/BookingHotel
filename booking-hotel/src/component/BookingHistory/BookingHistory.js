@@ -5,12 +5,21 @@ import { Card, Row, Col, Badge } from "react-bootstrap";
 
 const API_BASE = "http://localhost:5360";
 
+// Bảng màu tùy chỉnh
+const colors = {
+  primary: '#007bff', // Màu nhấn (Xanh dương)
+  danger: '#dc3545',  // Màu cảnh báo (Đỏ)
+  text: '#212529',    // Màu chữ chính (Đen)
+  muted: '#6c757d',   // Màu chữ phụ & Trạng thái hoàn thành (Xám)
+  background: '#f8f9fa' // Màu nền trang
+};
+
 function BookingHistory({ userId: propUserId }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState(null);
 
-  // Resolve userId
+  // Lấy userId từ props hoặc localStorage
   const userId = useMemo(() => {
     if (propUserId) return propUserId;
     try {
@@ -23,7 +32,7 @@ function BookingHistory({ userId: propUserId }) {
     }
   }, [propUserId]);
 
-  // Cancel booking
+  // Hàm xử lý hủy đặt phòng
   const handleCancelBooking = async (booking) => {
     const id = booking?.bookingId || booking?._id;
     if (!id) return alert("Không xác định được booking id.");
@@ -48,7 +57,7 @@ function BookingHistory({ userId: propUserId }) {
     }
   };
 
-  // Fetch bookings and related hotel/room info
+  // useEffect để lấy dữ liệu đặt phòng
   useEffect(() => {
     if (!userId) {
       setBookings([]);
@@ -131,33 +140,13 @@ function BookingHistory({ userId: propUserId }) {
     };
   }, [userId]);
 
-  // Helpers
+  // Các hàm tiện ích
   const getHotelName = (b) =>
-    b?.__hotel?.name ||
-    b?.__hotel?.hotelName ||
-    b?.__hotel?.title ||
-    b?.hotelName ||
-    (b?.hotel && typeof b.hotel === "string" ? b.hotel : null) ||
-    (b?.hotel && b.hotel.name) ||
-    "Tên khách sạn";
-
-  const getHotelImage = (b) =>
-    b?.__hotel?.imageUrl || b?.__hotel?.image || b?.__hotel?.img || b?.hotelImage || b?.imageUrl || null;
-
+    b?.__hotel?.name || b?.__hotel?.hotelName || b?.__hotel?.title || b?.hotelName || "Tên khách sạn";
   const getRoomName = (b) =>
-    b?.__room?.name ||
-    b?.__room?.roomName ||
-    b?.roomName ||
-    (b?.room && typeof b.room === "string" ? b.room : null) ||
-    (b?.room && b.room.name) ||
-    "Tên phòng";
-
+    b?.__room?.name || b?.__room?.roomName || b?.roomName || "Tên phòng";
   const getRoomImage = (b) =>
-    b?.__room?.imageUrl || b?.__room?.image || b?.__room?.img || b?.roomImage || null;
-
-  const getRoomType = (b) =>
-    b?.__room?.type || b?.roomType || (b?.room && b.room.type) || "Loại phòng";
-
+    b?.__room?.imageUrl || b?.__room?.image || b?.__room?.img || b?.roomImage || b?.__hotel?.imageUrl || null;
   const formatDate = (d) => {
     try {
       if (!d) return "--";
@@ -168,7 +157,6 @@ function BookingHistory({ userId: propUserId }) {
       return "--";
     }
   };
-
   const formatPrice = (p) => {
     try {
       const n = Number(p) || 0;
@@ -181,82 +169,90 @@ function BookingHistory({ userId: propUserId }) {
   if (loading) return <Loading />;
 
   if (!bookings.length) {
-    return <div className="text-center my-4">Bạn chưa có lịch sử đặt phòng nào.</div>;
+    return <div className="text-center my-5"><h3>🤔</h3><p>Bạn chưa có lịch sử đặt phòng nào.</p></div>;
   }
 
   return (
-    <div className="container mt-5 pt-4">
-      <h3 className="fw-bold mb-4">📖 Lịch sử đặt phòng</h3>
-      <Row>
+    <div className="container my-5 py-5" style={{ backgroundColor: colors.background, borderRadius: '1rem' }}>
+      <h3 className="fw-bold mb-4" style={{ color: colors.text }}>📖 Lịch sử đặt phòng</h3>
+      <div className="d-flex flex-column gap-4">
         {bookings.map((b) => {
-          const hotelName = getHotelName(b);
-          const roomName = getRoomName(b);
-          const roomType = getRoomType(b);
-          const img = getRoomImage(b) || getHotelImage(b) || "https://picsum.photos/400/250?random=1";
-          const key = b._id || b.bookingId || `${b.hotelId || "h"}-${b.roomId || "r"}-${Math.random()}`;
+          const key = b._id || b.bookingId || Math.random();
+          const img = getRoomImage(b) || `https://picsum.photos/400/300?random=${key}`;
+          const isCanceling = cancelingId === (b.bookingId || b._id);
+          
+          const statusText = b.status === "Booked" ? "Hoàn thành" : (b.status === "Cancelled" ? "Đã hủy" : b.status);
+          
+          // ===== THAY ĐỔI LOGIC MÀU SẮC NẰM Ở ĐÂY =====
+          const statusColor = b.status === "Cancelled" ? colors.danger : colors.muted;
 
           return (
-            <Col md={6} lg={4} className="mb-4" key={key}>
-              <Card className="shadow-sm rounded-3 overflow-hidden h-100">
-                <Card.Img variant="top" src={img} alt={roomName} style={{ height: 200, objectFit: "cover" }} />
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="fw-bold">{hotelName}</Card.Title>
-                  <Card.Subtitle className="text-muted">{roomName}</Card.Subtitle>
-                  <Badge bg="light" text="dark" className="mb-2">
-                    {roomType}
-                  </Badge>
-
-                  <div className="mb-1">
-                    <strong>Ngày nhận:</strong> {formatDate(b.checkinDate)}
-                  </div>
-                  <div className="mb-1">
-                    <strong>Ngày trả:</strong> {formatDate(b.checkOutDate)}
-                  </div>
-
-                  <div className="mb-2">
-                    <strong>Trạng thái:</strong>{" "}
-                    <span
-                      className={
-                        b.status === "Booked"
-                          ? "badge bg-success"
-                          : b.status === "Cancelled"
-                          ? "badge bg-danger"
-                          : "badge bg-secondary"
-                      }
-                    >
-                      {b.status}
-                    </span>
-                  </div>
-
-                  {b.status === "Booked" && (
-                    <div className="mt-2">
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        disabled={cancelingId === (b.bookingId || b._id)}
-                        onClick={() => handleCancelBooking(b)}
-                      >
-                        {cancelingId === (b.bookingId || b._id) ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                            Đang hủy...
-                          </>
-                        ) : (
-                          "❌ Hủy đặt phòng"
-                        )}
-                      </button>
+            <Card key={key} className="border-0 shadow-sm rounded-3 overflow-hidden">
+              <Row className="g-0">
+                <Col md={4} xl={3}>
+                  <img src={img} alt={getRoomName(b)} className="w-100 h-100" style={{ objectFit: "cover", minHeight: "240px" }} />
+                </Col>
+                <Col md={8} xl={9}>
+                  <Card.Body className="p-4 d-flex flex-column h-100">
+                    
+                    <div className="mb-3">
+                      <div className="d-flex align-items-center mb-1">
+                        <h5 className="fw-bold mb-0" style={{ color: colors.text }}>{getHotelName(b)}</h5>
+                        <Badge
+                          className="ms-2 fw-normal text-capitalize"
+                          style={{ backgroundColor: statusColor, color: '#fff' }}
+                        >
+                          {statusText}
+                        </Badge>
+                      </div>
+                      <p className="mb-0" style={{ color: colors.muted }}>{getRoomName(b)}</p>
                     </div>
-                  )}
 
-                  <div className="mb-1">
-                    <strong>Thanh toán:</strong> {b.paymentStatus || "-"}
-                  </div>
-                  <h5 className="text-primary mt-auto">{formatPrice(b.totalPrice)} VND</h5>
-                </Card.Body>
-              </Card>
-            </Col>
+                    <Row className="g-3 my-2">
+                      <Col xs={6} md={4}>
+                        <small style={{ color: colors.muted }}>🗓️ Ngày nhận phòng</small>
+                        <p className="fw-bold mb-0" style={{ color: colors.text }}>{formatDate(b.checkinDate)}</p>
+                      </Col>
+                      <Col xs={6} md={4}>
+                        <small style={{ color: colors.muted }}>🗓️ Ngày trả phòng</small>
+                        <p className="fw-bold mb-0" style={{ color: colors.text }}>{formatDate(b.checkOutDate)}</p>
+                      </Col>
+                      <Col xs={12} md={4}>
+                        <small style={{ color: colors.muted }}>💳 Thanh toán</small>
+                        <p className="fw-bold mb-0 text-capitalize" style={{ color: colors.text }}>{b.paymentStatus || "N/A"}</p>
+                      </Col>
+                    </Row>
+                    
+                    <div className="mt-auto pt-3 d-flex justify-content-between align-items-center">
+                      <div>
+                        <small style={{ color: colors.muted }}>Tổng cộng</small>
+                        <h4 className="fw-bolder mb-0" style={{ color: colors.primary }}>{formatPrice(b.totalPrice)} VND</h4>
+                      </div>
+
+                      {b.status === "Booked" && (
+                        <button
+                          className="btn btn-outline-danger"
+                          disabled={isCanceling}
+                          onClick={() => handleCancelBooking(b)}
+                        >
+                          {isCanceling ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                              <span>Đang hủy...</span>
+                            </>
+                          ) : (
+                            "Hủy phòng"
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </Card.Body>
+                </Col>
+              </Row>
+            </Card>
           );
         })}
-      </Row>
+      </div>
     </div>
   );
 }
