@@ -74,7 +74,7 @@ const HotelDetail = () => {
             }
             acc[room.type].images.push(room.imageUrl);
             acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
-            if (room.status === "Trống") acc[room.type].availableCount += 1;
+            if (room.status === "Trống" || room.status == "available") acc[room.type].availableCount += 1;
             return acc;
           }, {})
         );
@@ -322,7 +322,7 @@ const HotelDetail = () => {
         </div>
         <div className="small text-muted">/ đêm</div>
         <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
-          Đã gồm thuế, phí
+          Đã bao gồm thuế và phí
         </div>
       </div>
 

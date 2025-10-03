@@ -6,22 +6,22 @@ import { Link } from "react-router-dom";
 
 function Banner() {
   return (
-    <div className="bg-primary banner text-white text-center banner">
+    <div className="banner text-white text-center">
       <Container>
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng, minh bạch
         </h1>
         <p className="mb-4">
-          Tìm kiếm – Lọc – Đặt phòng – Quản lý mọi lúc, mọi nơi.
+          Tìm kiếm – Đặt phòng – Quản lý mọi lúc, mọi nơi.
         </p>
         <div>
           <Button
             as={Link}
             to="/search"
             variant="light"
-            className="me-2 fw-semibold bg-transparent text-white"
+            className="btn-hero" 
           >
-            <i className="bi bi-calendar-check me-1"></i> Đặt phòng ngay
+            <i className="bi bi-calendar-check me-1"></i> Khám phá khách sạn
           </Button>
         </div>
       </Container>

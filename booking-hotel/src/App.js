@@ -26,6 +26,7 @@ import BookingManagement from "./admin/BookingManagement/BookingManagement";
 import RevenueManager from "./admin/RevenueManager/RevenueManager";
 import UserManager from "./admin/UserManager/UserManager";
 import PaymentSuccess from "./component/PaymentSuccess/PaymentSuccess";
+import MyReview from "./component/MyReview/MyReview";
 
 // Protected Route
 const ProtectedRoute = ({ children, requiredRole, user }) => {
@@ -36,12 +37,14 @@ const ProtectedRoute = ({ children, requiredRole, user }) => {
 };
 
 function App() {
+  // Đọc user từ localStorage ngay khi khởi tạo state
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
   const location = useLocation();
+  // Chỉ cần 1 biến để kiểm tra ẩn/hiện layout
   const hideLayout = ["/login", "/register"].includes(location.pathname);
 
   const handleLogout = () => {
@@ -49,6 +52,8 @@ function App() {
     localStorage.removeItem("token");
     setUser(null);
   };
+
+  // Không cần state loading và useEffect nữa vì việc đọc localStorage là đồng bộ
 
   return (
     <>
@@ -59,6 +64,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -71,10 +77,18 @@ function App() {
               }
             />
             <Route
-              path="/BookingList"
+              path="/bookingList"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <BookingHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/danh-gia"
+              element={
+                <ProtectedRoute requiredRole="Customer" user={user}>
+                  <MyReview />
                 </ProtectedRoute>
               }
             />
@@ -136,7 +150,7 @@ function App() {
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RevenueManager /> 
+                    <RevenueManager />
                   </ProtectedRoute>
                 }
               />
@@ -144,7 +158,7 @@ function App() {
                 path="/review"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    {/* <ReviewManager /> */}
+                    <ReviewManager />
                   </ProtectedRoute>
                 }
               />
@@ -161,7 +175,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
-            
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route

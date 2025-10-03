@@ -12,34 +12,32 @@ function Home() {
   const [hotelIds, setHotelIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [startIndex, setStartIndex] = useState(0);
-
+  const [locations, setLocations] = useState([]);
+  
   const itemsPerPage = 4;
   const userId = localStorage.getItem("user");
 
-  const [locations, setLocations] = useState([]);
   useEffect(() => {
-    const fetchHotelIds = async () => {
+    const fetchHotelData = async () => {
       try {
         const res = await axios.get("http://localhost:5360/hotel/all");
         if (res.data && res.data.HotelList) {
-          const ids = res.data.HotelList.map((hotel) => hotel.hotelId);
+          const hotelList = res.data.HotelList;
+          const ids = hotelList.map((hotel) => hotel.hotelId);
           setHotelIds(ids);
 
           const grouped = {};
-          res.data.HotelList.forEach((hotel) => {
+          hotelList.forEach((hotel) => {
             if (hotel.address) {
               const parts = hotel.address.split("-");
               let location = parts[parts.length - 1];
               location = location.normalize("NFC").replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
-              if (!grouped[location]) grouped[location] = 0;
-              grouped[location]++;
+              if (location && !grouped[location]) grouped[location] = 0;
+              if (location) grouped[location]++;
             }
           });
 
-          const locationsArray = Object.entries(grouped).map(([name, count]) => ({
-            name,
-            count,
-          }));
+          const locationsArray = Object.entries(grouped).map(([name, count]) => ({ name, count }));
           setLocations(locationsArray);
         }
       } catch (err) {
@@ -48,7 +46,7 @@ function Home() {
         setLoading(false);
       }
     };
-    fetchHotelIds();
+    fetchHotelData();
   }, []);
 
   const locationImages = {
@@ -60,19 +58,13 @@ function Home() {
     "Vũng Tàu": "https://images.unsplash.com/photo-1613963901592-332194119313?q=80&w=2070&auto-format&fit=crop",
     "Đà Lạt": "https://images.unsplash.com/photo-1572455024443-a2e6f3a8bceb?q=80&w=1974&auto-format&fit=crop",
   };
-  const getLocationImage = (locationName) => {
-    return locationImages[locationName] || "/images/default.jpg";
-  };
+  
+  const getLocationImage = (locationName) => locationImages[locationName] || "/images/default.jpg";
 
-  const handlePrev = () => {
-    setStartIndex((prev) => (prev === 0 ? Math.max(hotelIds.length - itemsPerPage, 0) : prev - 1));
-  };
+  const handlePrev = () => setStartIndex((prev) => (prev === 0 ? Math.max(hotelIds.length - itemsPerPage, 0) : prev - 1));
+  const handleNext = () => setStartIndex((prev) => (prev + itemsPerPage >= hotelIds.length ? 0 : prev + 1));
 
-  const handleNext = () => {
-    setStartIndex((prev) => (prev + itemsPerPage >= hotelIds.length ? 0 : prev + 1));
-  };
-
-  if (loading) return <Spinner animation="border" />;
+  if (loading) return <div className="text-center my-5"><Spinner animation="border" /></div>;
 
   const currentItems = hotelIds.slice(startIndex, startIndex + itemsPerPage);
   const topLocations = locations.slice(0, 2);
@@ -81,79 +73,106 @@ function Home() {
   return (
     <div className="home-page my-5">
       <Banner />
-      <FeatureCard />
+      <div data-aos="fade-up">
+        <FeatureCard />
+      </div>
 
-      <h2 className="fw-bold text-center text-uppercase section-title pb-2 mb-4 mt-5">
-        Điểm đến hot nhất
-      </h2>
-      
-      <div className="container">
-        <div className="row g-3 mb-3">
-          {topLocations.map((loc) => (
-            <div key={loc.name} className="col-md-6">
-              <Link to={`/search?destination=${encodeURIComponent(loc.name)}`} className="location-link">
-                <div
-                  className="location-card large-card p-3 rounded text-white d-flex"
-                  style={{
-                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.4), transparent), url(${getLocationImage(
-                      loc.name
-                    )})`,
-                  }}
-                >
-                  <h5 className="fw-bold mt-auto">
-                    {loc.name} <FaStar style={{ color: "yellow", marginLeft: "4px" }} />
-                  </h5>
+      {/* ======================= KHU VỰC ĐIỂM ĐẾN HOT NHẤT ======================= */}
+      <div className="hottest-destinations-section container py-5">
+        <div className="text-center" data-aos="fade-up">
+          <h2 className="fw-bold text-uppercase section-title pb-2 mb-3">
+            Điểm đến hot nhất
+          </h2>
+          <p className="section-subtitle">
+            Những thành phố không thể bỏ lỡ trong chuyến hành trình tiếp theo của bạn.
+          </p>
+        </div>
+        
+        <div className="container">
+          <div className="row g-3 mb-3">
+            {topLocations.map((loc, index) => (
+              <div 
+                key={loc.name} 
+                className="col-md-6" 
+                data-aos="fade-up"
+                data-aos-delay={index * 150}
+              >
+                <Link to={`/search?destination=${encodeURIComponent(loc.name)}`} className="location-link">
+                  <div
+                    className="location-card large-card p-4 rounded d-flex flex-column"
+                    style={{ backgroundImage: `url(${getLocationImage(loc.name)})` }}
+                  >
+                    <div className="location-card-content mt-auto">
+                      <h5 className="location-name fw-bold mb-1">
+                        {loc.name} <FaStar style={{ color: "yellow", marginLeft: "4px" }} />
+                      </h5>
+                      <span className="location-count">{loc.count} Khách sạn</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+          <div className="row g-3">
+            {bottomLocations.map((loc, index) => (
+              <div 
+                key={loc.name} 
+                className="col-md-4" 
+                data-aos="fade-up"
+                data-aos-delay={index * 150}
+              >
+                <Link to={`/search?destination=${encodeURIComponent(loc.name)}`} className="location-link">
+                  <div
+                    className="location-card small-card p-4 rounded d-flex flex-column"
+                    style={{ backgroundImage: `url(${getLocationImage(loc.name)})` }}
+                  >
+                    <div className="location-card-content mt-auto">
+                      <h5 className="location-name fw-bold mb-1">
+                        {loc.name} <FaStar style={{ color: "yellow", marginLeft: "4px" }} />
+                      </h5>
+                      <span className="location-count">{loc.count} Khách sạn</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ======================= KHU VỰC CHỖ NGHỈ ĐỘC ĐÁO ======================= */}
+      <section className="featured-hotels-section">
+        <div className="container">
+          <div className="text-center" data-aos="fade-up">
+            <h2 className="fw-bold text-uppercase section-title pb-2 mb-3">
+              Lưu trú tại các chỗ nghỉ độc đáo hàng đầu
+            </h2>
+            <p className="section-subtitle">
+              Khám phá những lựa chọn hàng đầu được đánh giá cao bởi cộng đồng du khách của chúng tôi.
+            </p>
+          </div>
+
+          <div className="slider-container" data-aos="fade-up" data-aos-delay="200">
+            <Button onClick={handlePrev} variant="light" className="slider-nav-button prev">
+              <FaChevronLeft />
+            </Button>
+
+            <div className="slider-track">
+              {currentItems.map((id) => (
+                <div key={id} className="col-12 col-sm-6 col-lg-3 homeItem">
+                  <HotelCard hotelId={id} userId={userId} />
                 </div>
-              </Link>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="row g-3">
-          {bottomLocations.map((loc) => (
-            <div key={loc.name} className="col-md-4">
-              <Link to={`/search?destination=${encodeURIComponent(loc.name)}`} className="location-link">
-                <div
-                  className="location-card small-card p-3 rounded text-white d-flex"
-                  style={{
-                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.4), transparent), url(${getLocationImage(
-                      loc.name
-                    )})`,
-                  }}
-                >
-                  <h5 className="fw-bold mt-auto">
-                    {loc.name} <FaStar style={{ color: "yellow", marginLeft: "4px" }} />
-                  </h5>
-                </div>
-              </Link>
-            </div>
-          ))}
+            <Button onClick={handleNext} variant="light" className="slider-nav-button next">
+              <FaChevronRight />
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      <div className="container">
-        <hr className="section-divider" />
-      </div>
-      <h2 className="fw-bold text-center text-uppercase section-title pb-2 mb-4 mt-5">
-        Lưu trú tại các chỗ nghỉ độc đáo hàng đầu
-      </h2>
+      </section>
 
-      <div className="d-flex align-items-center justify-content-center" style={{ gap: "10px" }}>
-        <Button onClick={handlePrev} variant="secondary" style={{ width: "40px", height: "40px", marginRight: "30px", borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <FaChevronLeft />
-        </Button>
-        <div className="d-flex justify-content-center gap-3" style={{ width: "100%", maxWidth: "1320px" }}>
-          {currentItems.map((id) => (
-            <div key={id} style={{ flex: "1 1 25%", maxWidth: "25%" }} className="col-12 col-sm-6 col-lg-3 homeItem">
-              <HotelCard hotelId={id} userId={userId} />
-            </div>
-          ))}
-        </div>
-        <Button onClick={handleNext} variant="secondary" style={{ width: "40px", height: "40px", borderRadius: "50%", marginLeft: "30px", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <FaChevronRight />
-        </Button>
-      </div>
-    </div>
+    </div> 
   );
 }
 
