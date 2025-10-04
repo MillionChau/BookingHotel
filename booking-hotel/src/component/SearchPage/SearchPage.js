@@ -211,8 +211,8 @@ function SearchPage() {
 
    return (
     <Container className="search-page my-5">
-      <Card className="shadow-sm mb-5">
-        <Card.Body className="p-3"> 
+      <Card className="shadow-sm search-bar-card">
+        <Card.Body className="p-3">
           <h1 className="display-6 fw-bold text-center mb-4">
             Tìm kiếm nơi nghỉ dưỡng lý tưởng
           </h1>
