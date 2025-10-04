@@ -1,19 +1,83 @@
+
+$primary-color: #007bff;
+$light-gray: #f8f9fa;
+$shadow-color-light: rgba(0, 0, 0, 0.05); 
+$shadow-color-medium: rgba(0, 0, 0, 0.1);
+
 .search-page {
-  margin-top: 100px !important;
+  padding-top: 2rem;
+  max-width: 960px;
+  margin-left: auto; 
+  margin-right: auto;
 }
 
-.star-filter {
-  font-size: 24px;
-  color: #ccc;
-  cursor: pointer;
-  margin: 0 5px;
-  transition: color 0.2s;
+.card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 0.75rem 2rem $shadow-color-light; 
+  transition: all 0.3s ease-in-out; 
+
+  &:hover {
+    box-shadow: 0 1rem 2.5rem $shadow-color-medium !important; 
+  }
 }
 
-.star-filter:hover {
-  color: #ffc107;
+
+.display-6.fw-bold {
+  font-size: 2.2rem; 
+  margin-bottom: 2rem; 
+  color: #343a40; 
 }
 
-.star-filter.active {
-  color: #ffc107;
+.input-group-lg {
+  .form-control,
+  .btn {
+    height: 3.5rem; 
+    font-size: 1.1rem; 
+  }
+
+  .form-control {
+    border-radius: 0.75rem 0 0 0.75rem;
+    border: 1px solid #ced4da; 
+    padding-left: 1.5rem; 
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.1);
+    }
+  }
+
+  .btn-primary {
+    border-radius: 0 0.75rem 0.75rem 0;
+    background-color: $primary-color;
+    border-color: $primary-color;
+    padding: 0 1.5rem; 
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      background-color: darken($primary-color, 10%); 
+      border-color: darken($primary-color, 10%);
+      transform: translateY(-1px); 
+      box-shadow: 0 4px 8px rgba($primary-color, 0.3); 
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+  }
+
+  .ms-2 {
+    font-size: 1.1rem;
+  }
+}
+
+.search-results-container {
+  margin-top: 2.5rem;
+}
+
+.alert {
+  border-radius: 8px;
+  font-size: 1.1rem;
 }
