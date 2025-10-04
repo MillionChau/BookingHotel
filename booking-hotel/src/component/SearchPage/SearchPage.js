@@ -22,7 +22,7 @@ function useQuery() {
 }
 
 function SearchPage() {
-  const query = useQuery(); // Thêm dòng này
+  const query = useQuery();
   
   const [destination, setDestination] = useState(query.get("destination") || "");
   const [minPrice, setMinPrice] = useState("");
@@ -35,7 +35,7 @@ function SearchPage() {
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(!!query.get("destination"));
 
-  // Lấy userId từ localStorage
+
   const getUserId = () => {
     try {
       const userString = localStorage.getItem("user");
@@ -46,7 +46,7 @@ function SearchPage() {
   };
   const userId = getUserId();
 
-  // Hàm tìm kiếm khách sạn
+
   const handleSearch = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -72,12 +72,12 @@ function SearchPage() {
         data = data.filter((hotel) => hotel.price <= Number(maxPrice));
       }
 
-      // Lọc theo rating
+      
       if (rating > 0) {
         data = data.filter((hotel) => Math.floor(hotel.rating) === rating);
       }
 
-      // Lấy danh sách yêu thích của user
+      
       let favoriteList = [];
       if (userId) {
         const resFav = await axios.get(
@@ -86,7 +86,7 @@ function SearchPage() {
         favoriteList = resFav.data || [];
       }
 
-      // Map trạng thái isFavorite cho danh sách kết quả
+      
       const dataWithFavorite = data.map((hotel) => {
         const fav = favoriteList.find((f) => f.hotelId === hotel.hotelId);
         return {
@@ -105,14 +105,14 @@ function SearchPage() {
       setLoading(false);
     }
   }, [destination, minPrice, maxPrice, rating, userId]);
-// Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
+
   useEffect(() => {
     const destinationFromUrl = query.get("destination");
     if (destinationFromUrl) {
       handleSearch();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Chỉ chạy một lần khi component được mount
+    
+  }, []); 
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();
@@ -123,7 +123,6 @@ function SearchPage() {
     setRating(rating === newRating ? 0 : newRating);
   };
 
-  // Cập nhật lại state khi HotelCard toggle favorite
   const handleToggleFavorite = (hotelId, isFav, favId) => {
     setSearchResults((prev) =>
       prev.map((hotel) =>
@@ -134,7 +133,7 @@ function SearchPage() {
     );
   };
 
-  // Render kết quả
+
   const renderContent = () => {
     if (!searched) {
       return (
