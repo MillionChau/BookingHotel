@@ -25,8 +25,8 @@ function Header({ user, onLogout }) {
 
   const logoutHandler = () => {
     onLogout();
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
@@ -56,9 +56,9 @@ function Header({ user, onLogout }) {
               <Nav.Link as={NavLink} to="/" end>
                 Trang chủ
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/bookingHotel">
+              {/* <Nav.Link as={NavLink} to="/bookingHotel">
                 Đặt phòng
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link as={NavLink} to="/favoriteList">
                 Yêu thích
               </Nav.Link>
@@ -81,8 +81,7 @@ function Header({ user, onLogout }) {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end"
-                >
+                  align="end">
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>

@@ -1,7 +1,222 @@
+/* ================================== */
+/* == HIỆU ỨNG KHI MỚI VÀO TRANG == */
+/* ================================== */
+@keyframes page-load-animation {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-page {
+  animation: page-load-animation 0.8s ease-out forwards;
+}
+
+/* ================================== */
+/* == CÁC THÀNH PHẦN CHUNG == */
+/* ================================== */
 .homeItem {
   transition: transform 0.3s ease-in;
 }
 
 .homeItem:hover {
   transform: translateY(-3px);
+}
+
+.section-title {
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #0d6efd;
+  border-radius: 2px;
+}
+
+.section-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid #e9ecef;
+  margin-top: 3.5rem;
+}
+
+/* ============================================== */
+/* == STYLE CHO KHU VỰC ĐIỂM ĐẾN HOT NHẤT == */
+/* ============================================== */
+.hottest-destinations-section {
+  margin-top: 3.5rem; 
+}
+
+.location-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.location-card {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  color: white;
+  justify-content: flex-end;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 10%, transparent 50%);
+    transition: background 0.4s ease-in-out;
+    border-radius: inherit;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    &::before {
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.3) 10%, transparent 60%);
+    }
+    .location-card-content {
+      transform: translateY(-10px);
+    }
+  }
+
+  &.large-card {
+    min-height: 250px;
+  }
+  &.small-card {
+    min-height: 180px;
+  }
+}
+
+.location-card-content {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.4s ease;
+}
+
+.location-name {
+  font-size: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.location-count {
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  backdrop-filter: blur(2px);
+}
+
+/* ============================================== */
+/* == STYLE CHO KHU VỰC CHỖ NGHỈ ĐỘC ĐÁO == */
+/* ============================================== */
+@keyframes fadeInScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.featured-hotels-section {
+  padding: 4rem 0;
+  background-color: #f8f9fa;
+  margin-top: 3.5rem;
+  overflow: hidden;
+}
+
+.slider-container {
+  position: relative;
+  &:hover .slider-nav-button {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.slider-track {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  .homeItem {
+    animation: fadeInScaleUp 0.6s ease-out forwards;
+  }
+}
+
+.slider-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+
+  svg {
+    font-size: 1.2rem;
+    color: #343a40;
+  }
+  
+  &.prev {
+    left: -25px;
+  }
+  &.next {
+    right: -25px;
+  }
+
+  &:hover {
+    background-color: white;
+    transform: translateY(-50%) scale(1.1);
+  }
+}
+
+@media (max-width: 1400px) {
+  .slider-nav-button {
+    &.prev { left: 10px; }
+    &.next { right: 10px; }
+  }
 }
