@@ -164,6 +164,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                placeholder="hotelName"
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -174,6 +175,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
+                placeholder="hotelAddress"
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -185,6 +187,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
+                placeholder="hotelDesc"
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -195,6 +198,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, manager: e.target.value })
                 }
+                placeholder="hotelManager"
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -207,6 +211,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, rating: e.target.value })
                 }
+                placeholder="hotelReview"
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -217,6 +222,7 @@ export default function HotelManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, imageUrl: e.target.value })
                 }
+                placeholder="imageUrl"
               />
             </Form.Group>
           </Form>
