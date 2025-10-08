@@ -1,6 +1,5 @@
-// import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
-
 import {
   Container,
   Row,
@@ -9,21 +8,26 @@ import {
   Alert,
   Form,
   Button,
-  InputGroup,
   Card,
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
 import Loading from "../Loading/Loading";
 import "./SearchPage.scss";
-import React, { useState, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Fuse from "fuse.js"; // Thêm import Fuse
+
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 function SearchPage() {
-  const query = useQuery(); // Thêm dòng này
+  const query = useQuery();
+  
+  // Khai báo tất cả state và ref cần thiết
+  const [dataHotels, setDataHotels] = useState([]); // Thêm state này
+  const [isSticky, setIsSticky] = useState(false); // Thêm state này
+  const InputRef = useRef(null); // Thêm ref này
   
   const [destination, setDestination] = useState(query.get("destination") || "");
   const [minPrice, setMinPrice] = useState("");
@@ -31,7 +35,6 @@ function SearchPage() {
   const [rating, setRating] = useState(0);
   const [searchResults, setSearchResults] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(!!query.get("destination"));
@@ -45,13 +48,16 @@ function SearchPage() {
       return null;
     }
   };
+  
   const userId = getUserId();
+
   function normalize(str) {
     return str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   }
+
   useEffect(() => {
     const dataHotel = async () => {
       try {
@@ -63,6 +69,7 @@ function SearchPage() {
     };
     dataHotel();
   }, []);
+
   // Hàm tìm kiếm khách sạn
   const handleSearch = useCallback(async () => {
     setLoading(true);
@@ -81,6 +88,7 @@ function SearchPage() {
         setLoading(false);
         return;
       }
+      
       if (destination.trim() !== "") {
         const dataNorm = data.map((h) => ({
           ...h,
@@ -89,7 +97,6 @@ function SearchPage() {
         }));
 
         const destNorm = normalize(destination);
-
         const terms = destNorm.split(/\s+/).filter((t) => t);
 
         let matched = dataNorm;
@@ -134,7 +141,8 @@ function SearchPage() {
       setLoading(false);
     }
   }, [destination, minPrice, maxPrice, rating, userId]);
-// Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
+
+  // Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
   useEffect(() => {
     const destinationFromUrl = query.get("destination");
     if (destinationFromUrl) {
@@ -142,6 +150,7 @@ function SearchPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Chỉ chạy một lần khi component được mount
+
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();
@@ -241,8 +250,7 @@ function SearchPage() {
             </div>
             <Form.Group
               controlId="formDestination"
-              className={`d-flex align-items-center border border-1 border-secondary rounded-2 
-              }`}>
+              className={`d-flex align-items-center border border-1 border-secondary rounded-2`}>
               <Form.Control
                 className="border-0 bg-none"
                 type="text"
@@ -260,7 +268,7 @@ function SearchPage() {
                   }}
                   className="position-absolute"
                   style={{ right: "52%" }}>
-                  <i class="bi bi-x-lg"></i>
+                  <i className="bi bi-x-lg"></i>
                 </div>
               )}
             </Form.Group>
