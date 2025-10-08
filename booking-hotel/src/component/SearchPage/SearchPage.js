@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Container,
@@ -8,24 +8,36 @@ import {
   Alert,
   Form,
   Button,
-  InputGroup,
   Card,
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
+import Loading from "../Loading/Loading";
 import "./SearchPage.scss";
+import { useLocation } from "react-router-dom";
+import Fuse from "fuse.js"; // Thêm import Fuse
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 function SearchPage() {
-  const [destination, setDestination] = useState("");
+  const query = useQuery();
+  
+  // Khai báo tất cả state và ref cần thiết
+  const [dataHotels, setDataHotels] = useState([]); // Thêm state này
+  const [isSticky, setIsSticky] = useState(false); // Thêm state này
+  const InputRef = useRef(null); // Thêm ref này
+  
+  const [destination, setDestination] = useState(query.get("destination") || "");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [rating, setRating] = useState(0);
   const [searchResults, setSearchResults] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false);
+  const [searched, setSearched] = useState(!!query.get("destination"));
 
   // Lấy userId từ localStorage
   const getUserId = () => {
@@ -36,7 +48,27 @@ function SearchPage() {
       return null;
     }
   };
+  
   const userId = getUserId();
+
+  function normalize(str) {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  useEffect(() => {
+    const dataHotel = async () => {
+      try {
+        const res = await axios.get("http://localhost:5360/hotel/all");
+        setDataHotels(res.data.HotelList || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    dataHotel();
+  }, []);
 
   // Hàm tìm kiếm khách sạn
   const handleSearch = useCallback(async () => {
@@ -50,23 +82,35 @@ function SearchPage() {
       let data = res.data.HotelList || [];
 
       // Lọc theo điểm đến
+      if (destination.trim() === "") {
+        setError("Vui lòng nhập điểm đến hoặc tên khách sạn.");
+        setSearchResults([]);
+        setLoading(false);
+        return;
+      }
+      
       if (destination.trim() !== "") {
-        data = data.filter((item) =>
-          item.address.toLowerCase().includes(destination.toLowerCase())
-        );
-      }
+        const dataNorm = data.map((h) => ({
+          ...h,
+          name_norm: normalize(h.name),
+          address_norm: normalize(h.address),
+        }));
 
-      // Lọc theo giá
-      if (minPrice !== "") {
-        data = data.filter((hotel) => hotel.price >= Number(minPrice));
-      }
-      if (maxPrice !== "") {
-        data = data.filter((hotel) => hotel.price <= Number(maxPrice));
-      }
+        const destNorm = normalize(destination);
+        const terms = destNorm.split(/\s+/).filter((t) => t);
 
-      // Lọc theo rating
-      if (rating > 0) {
-        data = data.filter((hotel) => Math.floor(hotel.rating) === rating);
+        let matched = dataNorm;
+
+        terms.forEach((term) => {
+          const fuseTerm = new Fuse(matched, {
+            keys: ["name_norm", "address_norm"],
+            threshold: 0.4,
+          });
+          matched = fuseTerm.search(term).map((r) => r.item);
+        });
+
+        const matchedSet = new Set(matched.map((h) => h._id));
+        data = data.filter((h) => matchedSet.has(h._id));
       }
 
       // Lấy danh sách yêu thích của user
@@ -98,14 +142,19 @@ function SearchPage() {
     }
   }, [destination, minPrice, maxPrice, rating, userId]);
 
+  // Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
+  useEffect(() => {
+    const destinationFromUrl = query.get("destination");
+    if (destinationFromUrl) {
+      handleSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy một lần khi component được mount
+
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();
     setSearched(true);
-  };
-
-  const handleRatingClick = (newRating) => {
-    setRating(rating === newRating ? 0 : newRating);
   };
 
   // Cập nhật lại state khi HotelCard toggle favorite
@@ -123,19 +172,25 @@ function SearchPage() {
   const renderContent = () => {
     if (!searched) {
       return (
-        <Alert variant="info">
-          Vui lòng nhập thông tin và nhấn nút tìm kiếm.
-        </Alert>
+        <Row xs={1} md={3} className="g-4">
+          {dataHotels.slice(0, 6).map((hotel) => (
+            <Col key={hotel.hotelId}>
+              <HotelCard
+                hotelId={hotel.hotelId}
+                userId={userId}
+                isFavoriteDefault={hotel.isFavorite}
+                favoriteIdDefault={hotel.favoriteId}
+                hotel={hotel}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            </Col>
+          ))}
+        </Row>
       );
     }
 
     if (loading) {
-      return (
-        <div className="text-center my-5">
-          <Spinner animation="border" />
-          <p className="mt-2">Đang tìm kiếm... </p>
-        </div>
-      );
+      return <Loading />;
     }
 
     if (error) return <Alert variant="danger">{error}</Alert>;
@@ -181,23 +236,41 @@ function SearchPage() {
   };
 
   return (
-    <Container className="search-page my-5 pt-4">
+    <Container className="search-page my-5 pt-4 ">
       {/* --- FORM TÌM KIẾM --- */}
       <Form
         onSubmit={handleSubmit}
-        className="p-3 mb-4 bg-light rounded shadow-sm">
+        className={`p-2 mb-4 bg-light rounded shadow-sm ${
+          isSticky ? "sticky-search" : ""
+        }`}>
         <Row className="g-3 align-items-end">
           <Col md={6}>
-            <Form.Group controlId="formDestination">
-              <Form.Label>
-                <strong>Điểm đến</strong>
-              </Form.Label>
+            <div className="mb-1">
+              <strong>Điểm đến</strong>
+            </div>
+            <Form.Group
+              controlId="formDestination"
+              className={`d-flex align-items-center border border-1 border-secondary rounded-2`}>
               <Form.Control
+                className="border-0 bg-none"
                 type="text"
                 placeholder="Ví dụ: Hà Nội, Vũng Tàu..."
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
+                ref={InputRef}
               />
+              {/* convert destination sang boolean */}
+              {!!destination && (
+                <div
+                  onClick={() => {
+                    setDestination("");
+                    InputRef.current.focus();
+                  }}
+                  className="position-absolute"
+                  style={{ right: "52%" }}>
+                  <i className="bi bi-x-lg"></i>
+                </div>
+              )}
             </Form.Group>
           </Col>
           <Col md={2}>
@@ -218,59 +291,13 @@ function SearchPage() {
       <hr />
 
       <Row>
-        {/* --- SIDEBAR BỘ LỌC --- */}
-        <Col md={4} lg={3}>
-          <Card className="p-3 shadow-sm">
-            <Card.Title as="h5" className="fw-bold mb-4">
-              Bộ lọc
-            </Card.Title>
-            <div className="mb-4">
-              <h6 className="fw-bold mb-3">Khoảng giá (VNĐ)</h6>
-              <InputGroup className="mb-2">
-                <InputGroup.Text>Từ</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  placeholder="0"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  min={0}
-                />
-              </InputGroup>
-              <InputGroup>
-                <InputGroup.Text>Đến</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  placeholder="Không giới hạn"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  min={0}
-                />
-              </InputGroup>
-            </div>
-
-            <div className="mb-4">
-              <h6 className="fw-bold mb-3">Hạng sao</h6>
-              <div className="d-flex justify-content-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <FaStar
-                    key={star}
-                    className={`star-filter ${rating >= star ? "active" : ""}`}
-                    onClick={() => handleRatingClick(star)}
-                  />
-                ))}
-              </div>
-            </div>
-            <Button variant="primary" className="w-100" onClick={handleSubmit}>
-              Áp dụng bộ lọc
-            </Button>
-          </Card>
-        </Col>
-
         {/* --- KẾT QUẢ TÌM KIẾM --- */}
-        <Col md={8} lg={9}>
-          <h4 className="fw-bold mb-4">
-            Kết quả tìm kiếm <strong>{destination}</strong>
-          </h4>
+        <Col md={8} lg={9} className="mx-auto">
+          {destination && (
+            <h4 className={`fw-bold mb-4 ${isSticky ? " searchHotel" : ""}`}>
+              Kết quả tìm kiếm
+            </h4>
+          )}
           {renderContent()}
         </Col>
       </Row>

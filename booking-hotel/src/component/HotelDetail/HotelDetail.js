@@ -304,14 +304,16 @@ const HotelDetail = () => {
               </ul>
             </div>
 
-            {/* Giá */}
-            <div className="col-md-2 p-3 border-start text-center">
-              <div className="fw-bolder text-danger fs-5">
-                {room.minPrice.toLocaleString("vi-VN")} ₫
-              </div>
-              <div className="small text-muted">/ đêm</div>
-            </div>
-
+      {/* CỘT 3: GIÁ (2/12) */}
+      <div className="col-md-2 p-3 border-start text-center">
+        <div className="fw-bolder text-danger fs-5">
+          {room.minPrice.toLocaleString("vi-VN")} ₫
+        </div>
+        <div className="small text-muted">/ đêm</div>
+        <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
+          Đã bao gồm thuế và phí
+        </div>
+      </div>
             {/* Nút chọn */}
             <div className="col-md-2 p-3 border-start">
               <div className="d-grid">
