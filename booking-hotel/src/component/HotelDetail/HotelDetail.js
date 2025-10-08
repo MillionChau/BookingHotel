@@ -75,7 +75,7 @@ const HotelDetail = () => {
             }
             acc[room.type].images.push(room.imageUrl);
             acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
-            if (room.status === "Trống" || room.status == "available") acc[room.type].availableCount += 1;
+            if (room.status === "Trống" || room.status === 'available') acc[room.type].availableCount += 1;
             return acc;
           }, {})
         );
@@ -119,8 +119,6 @@ const HotelDetail = () => {
         unitPrice: selectedRoom.price,
         totalPrice: selectedRoom.price * nights,
       };
-
-      console.log(bookingData);
 
       const res = await axios.post("http://localhost:5360/api/momo/create", {
         bookingData,
@@ -327,7 +325,7 @@ const HotelDetail = () => {
                       return;
                     }
                     // 🔥 Lấy ra 1 phòng chi tiết từ rooms
-                    const foundRoom = rooms.find(r => r.type === room.type && r.status === "Trống");
+                    const foundRoom = rooms.find(r => (r.type === room.type && r.status === "Trống") || r.status === 'available');
                     if (!foundRoom) {
                       alert("Không còn phòng trống!");
                       return;
