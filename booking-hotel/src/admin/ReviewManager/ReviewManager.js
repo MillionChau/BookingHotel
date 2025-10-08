@@ -174,7 +174,7 @@ export default function ReviewManager() {
                     {renderRatingStars(review.rating)}
                   </td>
                   <td>{review.content || review.comment}</td>
-                  <td>{new Date(review.createdAt).toLocaleString('vi-VN')}</td>
+                  <td>{new Date(review.addedDate).toLocaleString('vi-VN')}</td>
                   <td>
                     <Button
                       variant="outline-danger"

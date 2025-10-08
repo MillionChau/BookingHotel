@@ -1,0 +1,149 @@
+name: CI/CD for Hotel Booking App
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Test Backend
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+
+    - name: Install backend dependencies
+      run: npm ci
+
+    - name: Run backend tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/test
+        JWT_SECRET: test-secret
+
+  # Test Frontend
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./booking-hotel
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './booking-hotel/package-lock.json'
+
+    - name: Install frontend dependencies
+      run: npm ci
+
+    - name: Run frontend tests
+      run: npm test -- --coverage --watchAll=false --passWithNoTests
+
+    - name: Build frontend
+      run: npm run build
+
+  # E2E Tests (Tùy chọn - có thể bỏ qua ban đầu)
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install frontend dependencies
+      run: npm ci
+      working-directory: ./booking-hotel
+
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: ./backend
+
+    - name: Start backend server
+      run: npm start &
+      working-directory: ./backend
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/test
+        JWT_SECRET: test-secret
+        PORT: 3001
+
+    - name: Wait for backend
+      run: npx wait-on http://localhost:3001 --timeout 60000
+
+    - name: Start frontend server
+      run: npm start &
+      working-directory: ./booking-hotel
+      env:
+        PORT: 3000
+        BROWSER: none
+
+    - name: Wait for frontend
+      run: npx wait-on http://localhost:3000 --timeout 60000
+
+    - name: Run E2E tests
+      run: npx cypress run
+      working-directory: ./booking-hotel
+
+  # Deploy to Production (CHẠY TỰ ĐỘNG KHI TESTS PASS)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]  # Có thể bỏ e2e-tests nếu chưa cần
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Deploy Frontend to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod'
+        working-directory: './booking-hotel'
+
+    - name: Deploy Backend to Heroku
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        appdir: "backend"
