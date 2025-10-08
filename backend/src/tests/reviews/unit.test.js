@@ -4,6 +4,9 @@ const Booking = require('../../models/booking')
 
 jest.mock('../../models/review')
 jest.mock('../../models/booking')
+jest.mock('../../services/ratingService', () => ({
+  updateRoomAndHotelRating: jest.fn().mockResolvedValue()
+}));
 
 describe('Review Controller - Unit Test', () => {
     let req, res
