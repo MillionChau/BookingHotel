@@ -6,7 +6,7 @@ import "./FeatureCard.scss";
 const FeatureCard = () => {
   const slides = [
     {
-      img: "https://static.vivnpay.vn/202311301357/app-dat-phong-khach-san.jpg",
+      img: "https://mrvivu.com/wp-content/uploads/2022/12/dat-khach-san-vi-mo-mo.png",
       title: "Đặt phòng dễ dàng",
       desc: "Chỉ vài bước để đặt khách sạn yêu thích nhanh chóng.",
       color: "text-warning",
@@ -14,11 +14,11 @@ const FeatureCard = () => {
     {
       img: "https://www.vietnambooking.com/wp-content/uploads/2020/08/LeQuocKhanh_checkin.png",
       title: "Ưu đãi mỗi ngày",
-      desc: "Săn deal khách sạn giá tốt, tiết kiệm đến 50%.",
+      desc: "Săn deal khách sạn giá tốt, tiết kiệm đến 29%.",
       color: "text-success",
     },
     {
-      img: "https://dolphintour.vn/images/uploadsimages/10-khach-san-sang-trong-nhat-the-gioi-1.png",
+      img: "https://acihome.vn/uploads/15/mau-thiet-ke-noi-that-phong-2-giuong-don-ben-trong-khach-san-3-4-5-sao-2.JPG",
       title: "Trải nghiệm tuyệt vời",
       desc: "Khám phá hàng nghìn khách sạn ở Việt Nam và quốc tế.",
       color: "text-danger",

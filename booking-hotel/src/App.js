@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-
 // Customer Components
 import Header from "./component/Header/Header";
 import Footer from "./component/Footer/Footer";
@@ -63,12 +62,11 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/BookingHotel" element={<SearchPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
-            {/* <Route path="/SearchPage" element={<SearchPage />} /> */}
             <Route
               path="/profile"
               element={
@@ -78,15 +76,15 @@ function App() {
               }
             />
             <Route
-              path="/bookingList" // Giữ lại route đúng cho BookingHistory
+              path="/bookingList"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <BookingHistory />
                 </ProtectedRoute>
               }
             />
-             <Route
-              path="/danh-gia" // Giữ lại route đúng cho BookingHistory
+            <Route
+              path="/danh-gia"
               element={
                 <ProtectedRoute requiredRole="Customer" user={user}>
                   <MyReview />
@@ -151,7 +149,7 @@ function App() {
                 path="/revenue"
                 element={
                   <ProtectedRoute requiredRole="Admin" user={user}>
-                    <RevenueManager /> 
+                    <RevenueManager />
                   </ProtectedRoute>
                 }
               />
@@ -175,7 +173,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/BookingHotel" element={<SearchPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route
