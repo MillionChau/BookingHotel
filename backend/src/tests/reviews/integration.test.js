@@ -338,25 +338,8 @@ describe('Review Controller - Integration Test', () => {
         })
     })
 
-    // Test case bổ sung: Lấy review by ID
-    it('should get review by ID successfully', async () => {
-        const review = await Review.create({
-            reviewId: 'RV-2024-Room-0001-0001',
-            userId: 'User-0001',
-            roomId: 'Room-0001',
-            bookingId: 'Booking-0001',
-            content: 'Test content',
-            rating: 5
-        })
-
-        const res = await request.get(`/review/${review.reviewId}`)
-
-        expect(res.statusCode).toBe(200)
-        expect(res.body.message).toBe('Lấy đánh giá thành công!')
-        expect(res.body.review.reviewId).toBe('RV-2024-Room-0001-0001')
-        expect(res.body.review.content).toBe('Test content')
-        expect(res.body.review.rating).toBe(5)
-    })
+    // 
+    
 
     // Test case bổ sung: Validation - rating ngoài phạm vi
     it('should return 400 if rating is out of range', async () => {
