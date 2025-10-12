@@ -21,27 +21,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 🧹 Dọn sạch workspace để tránh cache cũ
+      - name: Clean workspace
+        run: |
+          git fetch --all
+          git reset --hard origin/${{ github.ref_name }}
+          git clean -fdx
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           cache: 'npm'
           cache-dependency-path: './booking-hotel/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
 
-      # 🧹 Step mới: clear ESLint + build cache
-      - name: Clean build cache
+      - name: Clear ESLint and build cache
         run: |
           rm -rf node_modules/.cache
           rm -f .eslintcache
 
-      - name: Run tests
+      - name: Run Jest tests
         run: npm test -- --coverage --watchAll=false --passWithNoTests
 
-      - name: Build
-        run: npm run build
+      - name: Build production
+        run: npm run build --no-cache
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./booking-hotel
+          start: npx serve -s build -l 3000
+          wait-on: 'http://localhost:3000'
+          browser: chrome
+          command: npm run test:e2e
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
