@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { FaUserFriends, FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import { Carousel, Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
@@ -21,7 +21,7 @@ const HotelDetail = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const todayStr = today.toISOString().split("T")[0];
 
   useEffect(() => {

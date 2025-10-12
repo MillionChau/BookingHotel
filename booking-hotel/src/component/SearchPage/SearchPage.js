@@ -9,11 +9,8 @@ import {
   Alert,
   Form,
   Button,
-  InputGroup,
-  Card,
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
-import { FaStar } from "react-icons/fa";
 import Loading from "../Loading/Loading";
 import "./SearchPage.scss";
 
