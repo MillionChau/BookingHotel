@@ -19,27 +19,33 @@ jobs:
         working-directory: ./booking-hotel
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: './booking-hotel/package-lock.json'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './booking-hotel/package-lock.json'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run tests
-      run: npm test -- --coverage --watchAll=false --passWithNoTests
+      # 🧹 Step mới: clear ESLint + build cache
+      - name: Clean build cache
+        run: |
+          rm -rf node_modules/.cache
+          rm -f .eslintcache
 
-    - name: Build
-      run: npm run build
+      - name: Run tests
+        run: npm test -- --coverage --watchAll=false --passWithNoTests
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-build
-        path: booking-hotel/build/
-        retention-days: 7
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: booking-hotel/build/
+          retention-days: 7
