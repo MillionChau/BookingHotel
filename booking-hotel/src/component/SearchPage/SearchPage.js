@@ -1,6 +1,6 @@
-// import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
-
+import Fuse from "fuse.js";
 import {
   Container,
   Row,
@@ -9,32 +9,35 @@ import {
   Alert,
   Form,
   Button,
-  InputGroup,
-  Card,
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
-import { FaStar } from "react-icons/fa";
 import Loading from "../Loading/Loading";
 import "./SearchPage.scss";
-import React, { useState, useCallback, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 function SearchPage() {
-  const query = useQuery(); // Thêm dòng này
-  
-  const [destination, setDestination] = useState(query.get("destination") || "");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [rating, setRating] = useState(0);
+  const InputRef = useRef();
+  const [destination, setDestination] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(!!query.get("destination"));
+  const [searched, setSearched] = useState(false);
+  const [dataHotels, setDataHotels] = useState([]);
+
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 250) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Lấy userId từ localStorage
   const getUserId = () => {
@@ -133,15 +136,8 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [destination, minPrice, maxPrice, rating, userId]);
-// Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
-  useEffect(() => {
-    const destinationFromUrl = query.get("destination");
-    if (destinationFromUrl) {
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Chỉ chạy một lần khi component được mount
+  }, [destination, userId]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();

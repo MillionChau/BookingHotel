@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table, Form, Button, Row, Col, Card, Spinner, Pagination, Alert } from "react-bootstrap";
 import axios from "axios";
 import "./RevenueManager.module.scss";
@@ -6,10 +6,10 @@ import "./RevenueManager.module.scss";
 export default function RevenueManager() {
   const [revenues, setRevenues] = useState([]);
   const [stats, setStats] = useState({});
-  const [filters, setFilters] = useState({ 
-    month: new Date().getMonth() + 1, 
-    year: new Date().getFullYear(), 
-    hotelId: "" 
+  const [filters, setFilters] = useState({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    hotelId: ""
   });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,36 +18,10 @@ export default function RevenueManager() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState("");
 
-  // Fetch danh sách khách sạn và stats
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        // Fetch stats
-        const statsRes = await axios.get("http://localhost:5360/revenue/stats");
-        setStats(statsRes.data.data || {});
-        
-        // Fetch danh sách khách sạn thực tế
-        const hotelsRes = await axios.get("http://localhost:5360/hotel/all");
-        // Sử dụng HotelList từ response
-        setHotels(hotelsRes.data.HotelList || []);
-      } catch (err) {
-        console.error("Lỗi lấy dữ liệu ban đầu:", err);
-        setError("Không thể tải dữ liệu khởi tạo!");
-      }
-    };
-    
-    fetchInitialData();
-  }, []);
-
-  // Fetch revenues khi filters thay đổi
-  useEffect(() => {
-    fetchRevenues();
-  }, [filters, page]);
-
-  const fetchRevenues = async () => {
+  const fetchRevenues = useCallback(async () => {
     setLoading(true);
     setError("");
-    
+
     try {
       let revenueData = [];
       let response;
@@ -79,7 +53,30 @@ export default function RevenueManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page]);
+
+  // Fetch danh sách khách sạn và stats
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const statsRes = await axios.get("http://localhost:5360/revenue/stats");
+        setStats(statsRes.data.data || {});
+
+        const hotelsRes = await axios.get("http://localhost:5360/hotel/all");
+        setHotels(hotelsRes.data.HotelList || []);
+      } catch (err) {
+        console.error("Lỗi lấy dữ liệu ban đầu:", err);
+        setError("Không thể tải dữ liệu khởi tạo!");
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  // Fetch revenues khi filters hoặc page thay đổi
+  useEffect(() => {
+    fetchRevenues();
+  }, [fetchRevenues]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -95,10 +92,10 @@ export default function RevenueManager() {
   };
 
   const handleResetFilters = () => {
-    setFilters({ 
-      month: new Date().getMonth() + 1, 
-      year: new Date().getFullYear(), 
-      hotelId: "" 
+    setFilters({
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      hotelId: ""
     });
     setSelectedHotel("");
     setPage(1);
@@ -112,7 +109,6 @@ export default function RevenueManager() {
     return months[month - 1] || `Tháng ${month}`;
   };
 
-  // Tìm tên khách sạn theo hotelId
   const getHotelName = (hotelId) => {
     const hotel = hotels.find(h => h.hotelId === hotelId);
     return hotel ? `${hotel.name} (${hotelId})` : hotelId;
@@ -204,9 +200,9 @@ export default function RevenueManager() {
               </Form.Group>
             </Col>
             <Col md={2} className="d-flex align-items-end">
-              <Button 
-                variant="primary" 
-                onClick={fetchRevenues} 
+              <Button
+                variant="primary"
+                onClick={fetchRevenues}
                 disabled={loading}
                 className="w-100"
               >
@@ -214,8 +210,8 @@ export default function RevenueManager() {
               </Button>
             </Col>
             <Col md={2} className="d-flex align-items-end">
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 onClick={handleResetFilters}
                 className="w-100"
               >
@@ -229,20 +225,20 @@ export default function RevenueManager() {
       {/* Hiển thị thông tin filter hiện tại */}
       {filters.hotelId && (
         <Alert variant="info" className="mb-3">
-          Đang xem doanh thu cho: <strong>{getHotelName(filters.hotelId)}</strong> - 
+          Đang xem doanh thu cho: <strong>{getHotelName(filters.hotelId)}</strong> -
           <strong> {getMonthName(filters.month)}/{filters.year}</strong>
         </Alert>
       )}
 
       {error && <Alert variant="danger">{error}</Alert>}
-      
+
       {/* Bảng doanh thu */}
       <Card>
         <Card.Header className="d-flex justify-content-between align-items-center">
           <h5 className="mb-0">Chi tiết doanh thu</h5>
-          <Button 
-            variant="outline-primary" 
-            size="sm" 
+          <Button
+            variant="outline-primary"
+            size="sm"
             onClick={fetchRevenues}
             disabled={loading}
           >
@@ -308,24 +304,24 @@ export default function RevenueManager() {
               {/* Pagination chỉ hiển thị khi xem tất cả khách sạn */}
               {!filters.hotelId && totalPages > 1 && (
                 <Pagination className="justify-content-center mt-3">
-                  <Pagination.Prev 
-                    disabled={page === 1} 
-                    onClick={() => setPage(page - 1)} 
+                  <Pagination.Prev
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
                   />
-                  
+
                   {[...Array(totalPages).keys()].map((num) => (
-                    <Pagination.Item 
-                      key={num + 1} 
-                      active={num + 1 === page} 
+                    <Pagination.Item
+                      key={num + 1}
+                      active={num + 1 === page}
                       onClick={() => setPage(num + 1)}
                     >
                       {num + 1}
                     </Pagination.Item>
                   ))}
-                  
-                  <Pagination.Next 
-                    disabled={page === totalPages} 
-                    onClick={() => setPage(page + 1)} 
+
+                  <Pagination.Next
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
                   />
                 </Pagination>
               )}
