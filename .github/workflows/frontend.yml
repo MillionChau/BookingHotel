@@ -2,7 +2,7 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, MillionChau ]
     paths:
       - 'booking-hotel/**'
       - '.github/workflows/frontend.yml'
@@ -12,20 +12,22 @@ on:
       - 'booking-hotel/**'
 
 jobs:
-  test:
+  frontend-test:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./booking-hotel
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref }}
 
-      # 🧹 Dọn sạch workspace để tránh cache cũ
       - name: Clean workspace
         run: |
-          git fetch --all
-          git reset --hard origin/${{ github.ref_name }}
+          git reset --hard
           git clean -fdx
 
       - name: Setup Node.js
@@ -49,13 +51,15 @@ jobs:
       - name: Build production
         run: npm run build --no-cache
 
-      - name: Run Cypress tests
+      - name: Run Cypress tests (E2E)
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./booking-hotel
           start: npx serve -s build -l 3000
           wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
           browser: chrome
+          headed: false
           command: npm run test:e2e
 
       - name: Upload build artifacts
