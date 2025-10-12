@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
+import Fuse from "fuse.js";
 import {
   Container,
   Row,
@@ -8,36 +9,38 @@ import {
   Alert,
   Form,
   Button,
+  InputGroup,
   Card,
 } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaStar } from "react-icons/fa";
 import Loading from "../Loading/Loading";
 import "./SearchPage.scss";
-import { useLocation } from "react-router-dom";
-import Fuse from "fuse.js"; // Thêm import Fuse
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 function SearchPage() {
-  const query = useQuery();
-  
-  // Khai báo tất cả state và ref cần thiết
-  const [dataHotels, setDataHotels] = useState([]); // Thêm state này
-  const [isSticky, setIsSticky] = useState(false); // Thêm state này
-  const InputRef = useRef(null); // Thêm ref này
-  
-  const [destination, setDestination] = useState(query.get("destination") || "");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [rating, setRating] = useState(0);
+  const InputRef = useRef();
+  const [destination, setDestination] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(!!query.get("destination"));
+  const [searched, setSearched] = useState(false);
+  const [dataHotels, setDataHotels] = useState([]);
+
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 250) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Lấy userId từ localStorage
   const getUserId = () => {
@@ -48,16 +51,13 @@ function SearchPage() {
       return null;
     }
   };
-  
   const userId = getUserId();
-
   function normalize(str) {
     return str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   }
-
   useEffect(() => {
     const dataHotel = async () => {
       try {
@@ -69,7 +69,6 @@ function SearchPage() {
     };
     dataHotel();
   }, []);
-
   // Hàm tìm kiếm khách sạn
   const handleSearch = useCallback(async () => {
     setLoading(true);
@@ -88,7 +87,6 @@ function SearchPage() {
         setLoading(false);
         return;
       }
-      
       if (destination.trim() !== "") {
         const dataNorm = data.map((h) => ({
           ...h,
@@ -97,6 +95,7 @@ function SearchPage() {
         }));
 
         const destNorm = normalize(destination);
+
         const terms = destNorm.split(/\s+/).filter((t) => t);
 
         let matched = dataNorm;
@@ -140,16 +139,7 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [destination, minPrice, maxPrice, rating, userId]);
-
-  // Tự động tìm kiếm khi component được tải lần đầu nếu có 'destination' từ URL
-  useEffect(() => {
-    const destinationFromUrl = query.get("destination");
-    if (destinationFromUrl) {
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Chỉ chạy một lần khi component được mount
+  }, [destination, userId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -250,7 +240,8 @@ function SearchPage() {
             </div>
             <Form.Group
               controlId="formDestination"
-              className={`d-flex align-items-center border border-1 border-secondary rounded-2`}>
+              className={`d-flex align-items-center border border-1 border-secondary rounded-2 
+              }`}>
               <Form.Control
                 className="border-0 bg-none"
                 type="text"
@@ -268,7 +259,7 @@ function SearchPage() {
                   }}
                   className="position-absolute"
                   style={{ right: "52%" }}>
-                  <i className="bi bi-x-lg"></i>
+                  <i class="bi bi-x-lg"></i>
                 </div>
               )}
             </Form.Group>

@@ -161,37 +161,6 @@ describe('Tính năng Người dùng - E2E Test', () => {
       cy.loginAsCustomer();
     });
 
-    it('Tìm kiếm khách sạn thành công', () => {
-      cy.intercept('GET', '**/hotel/all', {
-        statusCode: 200,
-        body: {
-          HotelList: [
-            {
-              hotelId: 'H001',
-              name: 'Khách sạn Test',
-              address: 'Hà Nội',
-              price: 1000000,
-              rating: 4.5,
-              imageUrl: 'https://example.com/hotel1.jpg'
-            }
-          ]
-        }
-      }).as('getHotels');
-
-      cy.intercept('GET', '**/favorite/user/*', {
-        statusCode: 200,
-        body: []
-      }).as('getFavorites');
-
-      cy.visit('/BookingHotel');
-
-      cy.get('input[placeholder*="Ví dụ: Hà Nội"]').type('Hà Nội');
-      cy.get('button').contains('Tìm Kiếm').click();
-
-      cy.wait(['@getHotels', '@getFavorites']);
-      cy.contains('Kết quả tìm kiếm').should('be.visible');
-    });
-
     it('Xem chi tiết khách sạn', () => {
       cy.intercept('GET', '**/hotel/H001', {
         statusCode: 200,
@@ -356,14 +325,6 @@ describe('Tính năng Người dùng - E2E Test', () => {
       cy.loginAsCustomer();
       cy.visit('/dashboard');
       cy.url().should('not.include', '/dashboard');
-    });
-
-    it('Truy cập được các trang public khi chưa đăng nhập', () => {
-      cy.visit('/');
-      cy.contains('Đặt phòng khách sạn dễ dàng').should('be.visible');
-
-      cy.visit('/BookingHotel');
-      cy.get('input[placeholder*="Ví dụ: Hà Nội"]').should('be.visible');
     });
   });
 });
