@@ -5,6 +5,7 @@ import { Carousel, Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
 import "./HotelDetail.scss";
+import HotelReviews from "../HotelReview/HotelReview";
 
 const HotelDetail = () => {
   const { hotelId } = useParams();
@@ -324,8 +325,8 @@ const HotelDetail = () => {
                       alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
                       return;
                     }
-                    // 🔥 Lấy ra 1 phòng chi tiết từ rooms
-                    const foundRoom = rooms.find(r => (r.type === room.type && r.status === "Trống") || r.status === 'available');
+                    //  Lấy ra 1 phòng chi tiết từ rooms
+                    const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
                     if (!foundRoom) {
                       alert("Không còn phòng trống!");
                       return;
@@ -407,6 +408,8 @@ const HotelDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <HotelReviews hotelId={hotelId} />
     </div>
   );
 };
