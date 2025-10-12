@@ -2,28 +2,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function HotelReviews({ hotelId }) {
-  const [rooms, setRooms] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchHotelReviews = async () => {
       try {
-        // Lấy danh sách phòng theo hotelId
         const roomRes = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
         const allRooms = roomRes.data.rooms || [];
-        setRooms(allRooms);
-
-        
-
         const allReviews = [];
 
-        // Lấy review của từng phòng
         for (const room of allRooms) {
           try {
             const reviewRes = await axios.get(`http://localhost:5360/review/room/${room.roomId}`);
-            if (reviewRes.data && reviewRes.data.reviews) {
-              // Gắn thêm tên phòng vào review để hiển thị
+            if (reviewRes.data?.reviews) {
               const roomReviews = reviewRes.data.reviews.map((r) => ({
                 ...r,
                 roomName: room.roomName || room.name || "Phòng không tên",
@@ -31,9 +23,7 @@ export default function HotelReviews({ hotelId }) {
               }));
               allReviews.push(...roomReviews);
             }
-          } catch (error) {
-            // Nếu phòng chưa có đánh giá thì bỏ qua
-          }
+          } catch (_) {}
         }
 
         setReviews(allReviews);
@@ -67,7 +57,7 @@ export default function HotelReviews({ hotelId }) {
             }}
           >
             <h4>Phòng: {review.roomName}</h4>
-            <p><strong>Loại phòng: </strong> {review.roomTypeName} </p>
+            <p><strong>Loại phòng:</strong> {review.roomTypeName}</p>
             <p><strong>Người đánh giá:</strong> {review.userId.fullname || "Ẩn danh"}</p>
             <p><strong>Đánh giá:</strong> {review.rating} ⭐</p>
             <p><strong>Nội dung:</strong> {review.content}</p>
