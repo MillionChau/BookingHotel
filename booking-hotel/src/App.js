@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+
 // Customer Components
 import Header from "./component/Header/Header";
 import Footer from "./component/Footer/Footer";
@@ -62,7 +63,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="/searchpage" element={<SearchPage />} />
             <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />

@@ -152,9 +152,9 @@
 }
 
 .featured-hotels-section {
-  padding: 4rem 0;
+  padding: 2.5rem 0; 
   background-color: #f8f9fa;
-  margin-top: 3.5rem;
+  margin-top: 2.5rem; 
   overflow: hidden;
 }
 
@@ -169,9 +169,8 @@
 .slider-track {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1320px;
+  gap: 1rem; 
+  width: 95%;
   margin: 0 auto;
   .homeItem {
     animation: fadeInScaleUp 0.6s ease-out forwards;
@@ -182,8 +181,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -197,15 +196,15 @@
   transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
 
   svg {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #343a40;
   }
   
   &.prev {
-    left: -25px;
+    left: -50px;
   }
   &.next {
-    right: -25px;
+    right: -50px;
   }
 
   &:hover {
