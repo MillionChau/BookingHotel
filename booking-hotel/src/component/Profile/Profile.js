@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Modal, Button, Alert } from "react-bootstrap";
+import { Modal, Alert } from "react-bootstrap";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaKey } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.scss";
