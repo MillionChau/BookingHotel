@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import Loading from "../Loading/Loading";
 import { Card, Row, Col, Form, Button, Modal, Spinner } from "react-bootstrap";
@@ -14,7 +14,7 @@ export default function MyReview() {
   const [reviewedBookingIds, setReviewedBookingIds] = useState([]);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
-  // modal xem lich su 
+  // modal xem lịch sử 
   const [showHistory, setShowHistory] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -29,22 +29,26 @@ export default function MyReview() {
     }
   }, []);
 
-  // get ten ksan
+  // get tên khách sạn
   const getHotelName = (b) =>
     b?.__hotel?.name ||
     b?.hotelName ||
-    (b?.hotel && typeof b.hotel === "object" ? (b.hotel.name || b.hotel.hotelName) : b?.hotel) ||
+    (b?.hotel && typeof b.hotel === "object"
+      ? b.hotel.name || b.hotel.hotelName
+      : b?.hotel) ||
     "Tên khách sạn";
 
-  // get ten phong
+  // get tên phòng
   const getRoomName = (b) =>
     b?.__room?.name ||
     b?.roomName ||
-    (b?.room && typeof b.room === "object" ? (b.room.name || b.room.roomName) : b?.room) ||
+    (b?.room && typeof b.room === "object"
+      ? b.room.name || b.room.roomName
+      : b?.room) ||
     "Tên phòng";
 
   // fetch bookings 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     if (!userId) {
       setBookings([]);
       setLoading(false);
@@ -53,14 +57,16 @@ export default function MyReview() {
 
     try {
       setLoading(true);
-      const res = await axios.get(`${API_BASE}/booking/user/${encodeURIComponent(userId)}`);
-      const rawList = res?.data?.bookings || res?.data?.BookingList || res?.data || [];
+      const res = await axios.get(
+        `${API_BASE}/booking/user/${encodeURIComponent(userId)}`
+      );
+      const rawList =
+        res?.data?.bookings || res?.data?.BookingList || res?.data || [];
 
       // collect ids
       const hotelIds = new Set();
       const roomIds = new Set();
       rawList.forEach((b) => {
-        // lay trang thai "Completed"
         if (!b) return;
         if (b.status === "Completed") {
           if (b.hotelId) hotelIds.add(b.hotelId);
@@ -68,14 +74,16 @@ export default function MyReview() {
         }
       });
 
-      // fetch 
+      // fetch helper
       const fetchMap = async (ids, endpoint) => {
         if (!ids || ids.size === 0) return {};
         const arr = [...ids];
         const results = await Promise.all(
           arr.map(async (id) => {
             try {
-              const r = await axios.get(`${API_BASE}/${endpoint}/${encodeURIComponent(id)}`);
+              const r = await axios.get(
+                `${API_BASE}/${endpoint}/${encodeURIComponent(id)}`
+              );
               const data = r.data?.hotel || r.data?.room || r.data;
               return [id, data];
             } catch {
@@ -86,17 +94,28 @@ export default function MyReview() {
         return Object.fromEntries(results);
       };
 
-      const [hotelMap, roomMap] = await Promise.all([fetchMap(hotelIds, "hotel"), fetchMap(roomIds, "room")]);
+      const [hotelMap, roomMap] = await Promise.all([
+        fetchMap(hotelIds, "hotel"),
+        fetchMap(roomIds, "room"),
+      ]);
 
       const normalized = rawList
         .filter((b) => b?.status === "Completed")
         .map((b) => {
-          const hotelObj = b?.hotel && typeof b.hotel === "object" ? b.hotel : hotelMap[b.hotelId] || hotelMap[b.hotel] || null;
-          const roomObj = b?.room && typeof b.room === "object" ? b.room : roomMap[b.roomId] || roomMap[b.room] || null;
+          const hotelObj =
+            b?.hotel && typeof b.hotel === "object"
+              ? b.hotel
+              : hotelMap[b.hotelId] || hotelMap[b.hotel] || null;
+          const roomObj =
+            b?.room && typeof b.room === "object"
+              ? b.room
+              : roomMap[b.roomId] || roomMap[b.room] || null;
           return { ...b, __hotel: hotelObj, __room: roomObj };
         });
 
-      const reviewed = normalized.filter(b => b.reviewed).map(b => b.bookingId || b._id);
+      const reviewed = normalized
+        .filter((b) => b.reviewed)
+        .map((b) => b.bookingId || b._id);
 
       setBookings(normalized);
       setReviewedBookingIds(reviewed);
@@ -107,7 +126,7 @@ export default function MyReview() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   // fetch reviews 
   const fetchMyReviews = async () => {
@@ -120,35 +139,47 @@ export default function MyReview() {
       setReviewsLoading(true);
       let data = null;
 
-      // 1) try /review/user/:userId
       try {
-        const r1 = await axios.get(`${API_BASE}/review/user/${encodeURIComponent(userId)}`);
+        const r1 = await axios.get(
+          `${API_BASE}/review/user/${encodeURIComponent(userId)}`
+        );
         data = r1?.data?.reviews || r1?.data || [];
       } catch (errUser) {
         try {
           const r2 = await axios.get(`${API_BASE}/review/all`);
           const all = r2?.data?.reviews || r2?.data || [];
-          data = Array.isArray(all) ? all.filter(item => String(item.userId) === String(userId)) : [];
+          data = Array.isArray(all)
+            ? all.filter((item) => String(item.userId) === String(userId))
+            : [];
         } catch (errAll) {
-          // final fallback: empty
-          console.warn("Không lấy được reviews theo user, thử all cũng thất bại.", errUser?.message, errAll?.message);
+          console.warn(
+            "Không lấy được reviews theo user, thử all cũng thất bại.",
+            errUser?.message,
+            errAll?.message
+          );
           data = [];
         }
       }
 
       const enriched = data.map((rev) => {
         const bookingId = rev.bookingId || rev.booking || rev.booking_id;
-        const booking = bookings.find(b => String(b.bookingId || b._id) === String(bookingId));
+        const booking = bookings.find(
+          (b) => String(b.bookingId || b._id) === String(bookingId)
+        );
 
-        const hotelName = booking ? getHotelName(booking) : (rev.hotelName || rev.hotel || "");
-        const roomName = booking ? getRoomName(booking) : (rev.roomName || rev.room || "");
+        const hotelName = booking
+          ? getHotelName(booking)
+          : rev.hotelName || rev.hotel || "";
+        const roomName = booking
+          ? getRoomName(booking)
+          : rev.roomName || rev.room || "";
 
         return {
           ...rev,
           hotelName,
           roomName,
           rating: Number(rev.rating) || 0,
-          content: rev.content || rev.comment || ""
+          content: rev.content || rev.comment || "",
         };
       });
 
@@ -167,11 +198,10 @@ export default function MyReview() {
     } else {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, fetchBookings]);
 
   // open modal -> fetch review
   const openHistory = async () => {
-    // loading
     if (loading) await fetchBookings();
     await fetchMyReviews();
     setShowHistory(true);
@@ -197,7 +227,11 @@ export default function MyReview() {
       setSubmittingId(bookingId);
 
       const payload = {
-        roomId: booking.roomId || booking?.room?._id || booking?.roomId || "",
+        roomId:
+          booking.roomId ||
+          booking?.room?._id ||
+          booking?.roomId ||
+          "",
         userId: userId || "",
         bookingId: bookingId || "",
         content: input.content || "",
@@ -209,14 +243,22 @@ export default function MyReview() {
 
       alert(res?.data?.message || "Đã gửi đánh giá thành công!");
 
-      setReviewedBookingIds(prev => Array.from(new Set([...prev, bookingId])));
-      setReviewInputs(prev => {
+      setReviewedBookingIds((prev) =>
+        Array.from(new Set([...prev, bookingId]))
+      );
+      setReviewInputs((prev) => {
         const copy = { ...prev };
         delete copy[bookingId];
         return copy;
       });
 
-      setBookings(prev => prev.map(b => (String(b.bookingId || b._id) === String(bookingId) ? { ...b, reviewed: true } : b)));
+      setBookings((prev) =>
+        prev.map((b) =>
+          String(b.bookingId || b._id) === String(bookingId)
+            ? { ...b, reviewed: true }
+            : b
+        )
+      );
 
       await fetchMyReviews();
     } catch (err) {
@@ -229,8 +271,12 @@ export default function MyReview() {
 
   if (loading) return <Loading />;
 
-  const selectableBookings = bookings.filter(b => !reviewedBookingIds.includes(b.bookingId || b._id));
-  const selectedBooking = selectableBookings.find(b => String(b.bookingId || b._id) === String(selectedBookingId));
+  const selectableBookings = bookings.filter(
+    (b) => !reviewedBookingIds.includes(b.bookingId || b._id)
+  );
+  const selectedBooking = selectableBookings.find(
+    (b) => String(b.bookingId || b._id) === String(selectedBookingId)
+  );
 
   return (
     <div className="container mt-5 pt-5 pb-5">
@@ -261,12 +307,18 @@ export default function MyReview() {
             <Card className="shadow-sm">
               <Card.Img
                 variant="top"
-                src={selectedBooking.__room?.imageUrl || selectedBooking.roomImage || "https://picsum.photos/400/250"}
+                src={
+                  selectedBooking.__room?.imageUrl ||
+                  selectedBooking.roomImage ||
+                  "https://picsum.photos/400/250"
+                }
                 style={{ height: 200, objectFit: "cover" }}
               />
               <Card.Body>
                 <Card.Title>{getHotelName(selectedBooking)}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">{getRoomName(selectedBooking)}</Card.Subtitle>
+                <Card.Subtitle className="mb-2 text-muted">
+                  {getRoomName(selectedBooking)}
+                </Card.Subtitle>
 
                 <Form.Group className="mb-2">
                   <Form.Label>Nội dung đánh giá</Form.Label>
@@ -274,7 +326,9 @@ export default function MyReview() {
                     as="textarea"
                     rows={3}
                     value={reviewInputs[selectedBookingId]?.content || ""}
-                    onChange={(e) => handleChange(selectedBookingId, "content", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(selectedBookingId, "content", e.target.value)
+                    }
                   />
                 </Form.Group>
 
@@ -285,35 +339,48 @@ export default function MyReview() {
                     min={1}
                     max={5}
                     value={reviewInputs[selectedBookingId]?.rating || ""}
-                    onChange={(e) => handleChange(selectedBookingId, "rating", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(selectedBookingId, "rating", e.target.value)
+                    }
                   />
                 </Form.Group>
 
                 <div className="d-flex gap-2">
-                  <Button variant="primary" disabled={submittingId === selectedBookingId} onClick={() => submitReview(selectedBooking)}>
-                    {submittingId === selectedBookingId ? "Đang gửi..." : "Gửi đánh giá"}
+                  <Button
+                    variant="primary"
+                    disabled={submittingId === selectedBookingId}
+                    onClick={() => submitReview(selectedBooking)}
+                  >
+                    {submittingId === selectedBookingId
+                      ? "Đang gửi..."
+                      : "Gửi đánh giá"}
                   </Button>
                 </div>
               </Card.Body>
             </Card>
           ) : (
-            <div className="text-muted">Vui lòng chọn booking hoàn thành để đánh giá.</div>
+            <div className="text-muted">
+              Vui lòng chọn booking hoàn thành để đánh giá.
+            </div>
           )}
         </Col>
 
-        {/* right column +  modal button */}
+        {/* right column + modal button */}
         <Col md={6}>
           <Button variant="secondary" onClick={openHistory}>
-          <i className="bi bi-clock-history me-2">
-
-          </i>
+            <i className="bi bi-clock-history me-2"></i>
             Lịch sử đánh giá
           </Button>
         </Col>
       </Row>
 
       {/* Modal */}
-      <Modal show={showHistory} onHide={() => setShowHistory(false)} size="lg" className="pt-5">
+      <Modal
+        show={showHistory}
+        onHide={() => setShowHistory(false)}
+        size="lg"
+        className="pt-5"
+      >
         <Modal.Header closeButton>
           <Modal.Title>📜 Lịch sử đánh giá</Modal.Title>
         </Modal.Header>
@@ -329,9 +396,15 @@ export default function MyReview() {
               <Card key={r.reviewId || r._id} className="mb-3 shadow-sm">
                 <Card.Body>
                   <Card.Title>{r.hotelName || "Tên khách sạn"}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">{r.roomName || "Tên phòng"}</Card.Subtitle>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    {r.roomName || "Tên phòng"}
+                  </Card.Subtitle>
                   <p style={{ marginBottom: 6 }}>
-                    <strong>Đánh giá:</strong> {"⭐".repeat(Math.max(0, Math.min(5, Number(r.rating) || 0)))} ({r.rating})
+                    <strong>Đánh giá:</strong>{" "}
+                    {"⭐".repeat(
+                      Math.max(0, Math.min(5, Number(r.rating) || 0))
+                    )}{" "}
+                    ({r.rating})
                   </p>
                   <p style={{ marginBottom: 0 }}>{r.content}</p>
                 </Card.Body>

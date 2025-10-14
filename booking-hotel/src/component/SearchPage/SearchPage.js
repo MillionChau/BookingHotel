@@ -11,7 +11,7 @@ import {
   Card,
   InputGroup,
 } from "react-bootstrap";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaSearch } from "react-icons/fa";
 import "./SearchPage.scss";
@@ -22,16 +22,16 @@ function useQuery() {
 
 function SearchPage() {
   const query = useQuery();
-  const navigate = useNavigate();
-
   const [destination, setDestination] = useState(query.get("destination") || "");
   const [searchResults, setSearchResults] = useState([]);
   const [visibleCount, setVisibleCount] = useState(9);
-  const [loading, setLoading] = useState(false); // Set to false initially
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   const [searched, setSearched] = useState(!!query.get("destination"));
 
-  const getUserId = () => {
+  
+  const getUserId = useCallback(() => {
     try {
       const userString = localStorage.getItem("user");
       return userString ? JSON.parse(userString).id : null;
@@ -39,60 +39,44 @@ function SearchPage() {
       console.error("Failed to parse user from localStorage", e);
       return null;
     }
-  };
+  }, []);
   const userId = getUserId();
 
+  
   const fetchAndMergeFavorites = async (hotelData) => {
-    if (!userId) {
-      return hotelData.map(hotel => ({ ...hotel, isFavorite: false, favoriteId: null }));
-    }
-    try {
-      const resFav = await axios.get(`http://localhost:5360/favorite/user/${userId}`);
-      const favoriteList = resFav.data || [];
-      const favoriteHotelIds = new Map(favoriteList.map(fav => [fav.hotelId, fav._id]));
+    let favoriteList = [];
+    if (userId) {
+      try {
+        const resFav = await axios.get(
+          `http://localhost:5360/favorite/user/${userId}`
+        );
+        favoriteList = resFav.data || [];
+      } catch (favError) {
+        console.error("Could not fetch favorites", favError);
       
-      return hotelData.map((hotel) => {
-        const isFav = favoriteHotelIds.has(hotel.hotelId);
-        return {
-          ...hotel,
-          isFavorite: isFav,
-          favoriteId: isFav ? favoriteHotelIds.get(hotel.hotelId) : null,
-        };
-      });
-    } catch (favError) {
-      console.error("Could not fetch favorites", favError);
-      // Return original data if favorites fail to load
-      return hotelData.map(hotel => ({ ...hotel, isFavorite: false, favoriteId: null }));
+      }
     }
+    return hotelData.map((hotel) => {
+      const fav = favoriteList.find((f) => f.hotelId === hotel.hotelId);
+      return {
+        ...hotel,
+        isFavorite: !!fav,
+        favoriteId: fav ? fav._id : null,
+      };
+    });
   };
 
-  const handleSearch = useCallback(async (searchQuery) => {
+
+  const fetchAllHotels = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
-    const trimmedQuery = searchQuery ? searchQuery.trim() : "";
-    const isSearching = !!trimmedQuery;
-    setSearched(isSearching);
-
-    // Use backend search if a query exists, otherwise fetch all
-    const url = isSearching
-      ? `http://localhost:5360/hotel/search?address=${encodeURIComponent(trimmedQuery)}`
-      : "http://localhost:5360/hotel/all";
+    setSearched(false);
 
     try {
-      const res = await axios.get(url);
-      const data = res.data.HotelList || [];
-      
+      const res = await axios.get("http://localhost:5360/hotel/all");
+      let data = res.data.HotelList || [];
       const dataWithFavorites = await fetchAndMergeFavorites(data);
       setSearchResults(dataWithFavorites);
-
-      // Update URL to reflect the search state without reloading the page
-      const searchParams = new URLSearchParams();
-      if (isSearching) {
-        searchParams.set("destination", trimmedQuery);
-      }
-      navigate(`?${searchParams.toString()}`, { replace: true });
-
     } catch (err) {
       console.error(err);
       setError("Không thể tải danh sách khách sạn. Vui lòng thử lại sau.");
@@ -100,17 +84,49 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [userId, navigate]); // Dependencies for the search logic
+  }, [userId]);
 
-  // Effect to run the search on initial component load
+  const handleSearch = useCallback(async () => {
+    if (!destination.trim()) {
+      fetchAllHotels();
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+
+    try {
+      const res = await axios.get("http://localhost:5360/hotel/all");
+      let data = res.data.HotelList || [];
+
+    
+      const filteredData = data.filter((item) =>
+        item.address.toLowerCase().includes(destination.toLowerCase())
+      );
+      
+      const dataWithFavorites = await fetchAndMergeFavorites(filteredData);
+      setSearchResults(dataWithFavorites);
+    } catch (err) {
+      console.error(err);
+      setError("Không thể tải danh sách khách sạn. Vui lòng thử lại sau.");
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [destination, userId, fetchAllHotels]);
+
   useEffect(() => {
-    const initialDestination = query.get("destination") || "";
-    handleSearch(initialDestination);
-  }, [handleSearch]); // Run once when handleSearch is stable
+    if (query.get("destination")) {
+      handleSearch();
+    } else {
+      fetchAllHotels();
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleSearch(destination);
+    handleSearch();
   };
 
   const handleToggleFavorite = (hotelId, isFav, favId) => {
@@ -121,7 +137,6 @@ function SearchPage() {
           : hotel
       )
     );
-    // DO NOT navigate away. Let the user continue browsing.
   };
   
   const renderContent = () => {
@@ -149,7 +164,7 @@ function SearchPage() {
           <h2 className="mb-4 fw-bold">
             {searched ? (
               <>
-                Kết quả cho: <span className="text-primary">{query.get("destination")}</span>
+                Kết quả cho: <span className="text-primary">{destination}</span>
               </>
             ) : (
               "Khám phá tất cả khách sạn"
@@ -158,10 +173,8 @@ function SearchPage() {
           <Row xs={1} md={2} lg={3} className="g-4">
             {visibleResults.map((s) => (
               <Col key={s.hotelId}>
-                {/* Ensure hotelId is passed for toggle updates */}
                 <HotelCard
                   hotel={s}
-                  hotelId={s.hotelId}
                   userId={userId}
                   isFavoriteDefault={s.isFavorite}
                   favoriteIdDefault={s.favoriteId}
@@ -188,15 +201,11 @@ function SearchPage() {
         return (
           <Alert variant="warning" className="text-center">
             Rất tiếc, không tìm thấy khách sạn nào phù hợp tại{" "}
-            <strong>"{query.get("destination")}"</strong>.
+            <strong>"{destination}"</strong>.
           </Alert>
         );
       }
-      return (
-        <Alert variant="info" className="text-center">
-          Không có khách sạn nào để hiển thị.
-        </Alert>
-      );
+      return null;
     }
   };
 
@@ -233,7 +242,7 @@ function SearchPage() {
         </Card.Body>
       </Card>
 
-      <div className="search-results-container mt-5">{renderContent()}</div>
+      <div className="search-results-container">{renderContent()}</div>
     </Container>
   );
 }
