@@ -62,7 +62,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="/searchpage" element={<SearchPage />} />
             <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
@@ -101,9 +101,10 @@ function App() {
 
       {/* ======================= Layout Admin ======================= */}
       {user && user.role === "Admin" && (
-        <div style={{ display: "flex" }}>
+        <div className="admin-layout">
           <Sidebar onLogout={handleLogout} />
-          <div style={{ flex: 1, padding: "20px" }}>
+
+          <main className="admin-main">
             <Routes>
               <Route
                 path="/dashboard"
@@ -163,9 +164,10 @@ function App() {
               />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
-          </div>
+          </main>
         </div>
       )}
+
 
       {/* ======================= Layout Guest ======================= */}
       {!user && (
@@ -173,7 +175,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="/searchpage" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route

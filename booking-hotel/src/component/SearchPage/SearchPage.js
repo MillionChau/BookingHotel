@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Container,
@@ -43,7 +43,7 @@ function SearchPage() {
   const userId = getUserId();
 
   
-  const fetchAndMergeFavorites = async (hotelData) => {
+  const fetchAndMergeFavorites = useCallback(async (hotelData) => {
     let favoriteList = [];
     if (userId) {
       try {
@@ -64,7 +64,7 @@ function SearchPage() {
         favoriteId: fav ? fav._id : null,
       };
     });
-  };
+  }, [userId]);
 
 
   const fetchAllHotels = useCallback(async () => {
@@ -84,7 +84,7 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [fetchAndMergeFavorites]);
 
   const handleSearch = useCallback(async () => {
     if (!destination.trim()) {
@@ -114,15 +114,24 @@ function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [destination, userId, fetchAllHotels]);
+  }, [destination, fetchAllHotels, fetchAndMergeFavorites]);
+
+  // Sử dụng ref để tránh dependency cycle
+  const handleSearchRef = useRef(handleSearch);
+  const fetchAllHotelsRef = useRef(fetchAllHotels);
+
+  useEffect(() => {
+    handleSearchRef.current = handleSearch;
+    fetchAllHotelsRef.current = fetchAllHotels;
+  }, [handleSearch, fetchAllHotels]);
 
   useEffect(() => {
     if (query.get("destination")) {
-      handleSearch();
+      handleSearchRef.current();
     } else {
-      fetchAllHotels();
+      fetchAllHotelsRef.current();
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = (e) => {
     e.preventDefault();
