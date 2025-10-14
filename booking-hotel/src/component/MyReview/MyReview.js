@@ -15,7 +15,6 @@ export default function MyReview() {
   const [reviewInputs, setReviewInputs] = useState({});
   const [submittingId, setSubmittingId] = useState(null);
   const [reviewedBookingIds, setReviewedBookingIds] = useState([]);
-  const [selectedBookingId] = useState(null);
 
   // modal xem lịch sử 
   const [showHistory, setShowHistory] = useState(false);
@@ -277,9 +276,6 @@ export default function MyReview() {
   const selectableBookings = bookings.filter(
     (b) => !reviewedBookingIds.includes(b.bookingId || b._id)
   );
-  // const selectedBooking = selectableBookings.find(
-  //   (b) => String(b.bookingId || b._id) === String(selectedBookingId)
-  // );
 
   return (
     <div className="container mt-5 pt-5 pb-5">
