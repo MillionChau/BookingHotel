@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import './HotelReview.scss';
 
 export default function HotelReviews({ hotelId }) {
   const [reviews, setReviews] = useState([]);
@@ -40,33 +41,53 @@ export default function HotelReviews({ hotelId }) {
   if (loading) return <p>Đang tải đánh giá...</p>;
 
   return (
-    <div>
-      <h3>📝 Danh sách đánh giá của khách sạn</h3>
-      {reviews.length === 0 ? (
-        <p>Chưa có đánh giá nào cho khách sạn này.</p>
-      ) : (
-        reviews.map((review) => (
-          <div
-            key={review._id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "12px",
-              margin: "10px 0",
-              backgroundColor: "#fafafa",
-            }}
-          >
-            <h4>Phòng: {review.roomName}</h4>
-            <p><strong>Loại phòng:</strong> {review.roomTypeName}</p>
-            <p><strong>Người đánh giá:</strong> {review.userId.fullname || "Ẩn danh"}</p>
-            <p><strong>Đánh giá:</strong> {review.rating} ⭐</p>
-            <p><strong>Nội dung:</strong> {review.content}</p>
-            <p style={{ fontStyle: "italic" }}>
+  <div className="reviews-container">
+    <h3 className="reviews-title">
+      Danh sách đánh giá của khách sạn
+    </h3>
+    {reviews.length === 0 ? (
+      <div className="no-reviews">
+        Chưa có đánh giá nào cho khách sạn này.
+      </div>
+    ) : (
+      <div className="reviews-list">
+        {reviews.map((review) => (
+          <div key={review._id} className="review-card">
+            <div className="review-header">
+              <h4 className="room-name">
+                Phòng: {review.roomName}
+              </h4>
+              <div className="room-type-badge">
+                <strong>Loại phòng:</strong> {review.roomTypeName}
+              </div>
+            </div>
+            
+            <div className="review-details">
+              <p className="reviewer-info">
+                <strong>Người đánh giá:</strong> {review.userId.fullname || "Ẩn danh"}
+              </p>
+              <div className="rating-section">
+                <strong>Đánh giá:</strong>
+                <div className="stars">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <span key={i}>⭐</span>
+                  ))}
+                </div>
+                <span className="rating-score">({review.rating}/5)</span>
+              </div>
+            </div>
+            
+            <p className="review-content">
+              <strong>Nội dung:</strong> {review.content}
+            </p>
+            
+            <p className="review-date">
               Ngày: {new Date(review.addedDate).toLocaleDateString("vi-VN")}
             </p>
           </div>
-        ))
-      )}
-    </div>
-  );
+        ))}
+      </div>
+    )}
+  </div>
+);
 }

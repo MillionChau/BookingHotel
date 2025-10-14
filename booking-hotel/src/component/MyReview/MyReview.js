@@ -280,100 +280,104 @@ export default function MyReview() {
 
   return (
     <div className="container mt-5 pt-5 pb-5">
-      <Row>
-        {/* left column: form */}
-        <Col md={6}>
-          <h3 className="fw-bold mb-3">📝 Đánh giá phòng đã đặt</h3>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h3 className="fw-bold mb-0">📝 Những phòng bạn có thể đánh giá</h3>
+        <Button variant="outline-secondary" onClick={openHistory}>
+          <i className="bi bi-clock-history me-2"></i>
+          Xem lại tất cả đánh giá
+        </Button>
+      </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Chọn phòng để đánh giá</Form.Label>
-            <Form.Select
-              value={selectedBookingId || ""}
-              onChange={(e) => setSelectedBookingId(e.target.value)}
-            >
-              <option value="">-- Chọn phòng --</option>
-              {selectableBookings.map((b) => {
-                const id = b.bookingId || b._id;
-                return (
-                  <option key={id} value={id}>
-                    {getHotelName(b)} — {getRoomName(b)}
-                  </option>
-                );
-              })}
-            </Form.Select>
-          </Form.Group>
-
-          {selectedBooking ? (
-            <Card className="shadow-sm">
-              <Card.Img
-                variant="top"
-                src={
-                  selectedBooking.__room?.imageUrl ||
-                  selectedBooking.roomImage ||
-                  "https://picsum.photos/400/250"
-                }
-                style={{ height: 200, objectFit: "cover" }}
-              />
+      {/* Kiểm tra xem có phòng nào để đánh giá không */}
+      {selectableBookings.length > 0 ? (
+        // Lặp qua mỗi phòng có thể đánh giá và hiển thị thành 1 card
+        selectableBookings.map((booking) => {
+          const bookingId = booking.bookingId || booking._id;
+          return (
+            <Card key={bookingId} className="mb-4 shadow-sm">
               <Card.Body>
-                <Card.Title>{getHotelName(selectedBooking)}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  {getRoomName(selectedBooking)}
-                </Card.Subtitle>
+                <Row>
+                  {/* Cột bên trái cho hình ảnh */}
+                  <Col md={4} lg={3}>
+                    <img
+                      src={
+                        booking.__room?.imageUrl ||
+                        booking.roomImage ||
+                        "https://via.placeholder.com/400x250?text=Room+Image"
+                      }
+                      className="img-fluid rounded"
+                      style={{ width: '100%', height: '170px', objectFit: 'cover' }}
+                      alt={`Phòng ${getRoomName(booking)}`}
+                    />
+                  </Col>
 
-                <Form.Group className="mb-2">
-                  <Form.Label>Nội dung đánh giá</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={reviewInputs[selectedBookingId]?.content || ""}
-                    onChange={(e) =>
-                      handleChange(selectedBookingId, "content", e.target.value)
-                    }
-                  />
-                </Form.Group>
+                  {/* Cột bên phải cho thông tin và form */}
+                  <Col md={8} lg={9}>
+                    <Card.Title className="fw-bold">{getHotelName(booking)}</Card.Title>
+                    <Card.Subtitle className="mb-3 text-muted">
+                      {getRoomName(booking)}
+                    </Card.Subtitle>
 
-                <Form.Group className="mb-2">
-                  <Form.Label>Đánh giá (1-5)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    min={1}
-                    max={5}
-                    value={reviewInputs[selectedBookingId]?.rating || ""}
-                    onChange={(e) =>
-                      handleChange(selectedBookingId, "rating", e.target.value)
-                    }
-                  />
-                </Form.Group>
+                    <Form.Group className="mb-2">
+                      <Form.Label className="small">Nội dung đánh giá</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        placeholder="Chia sẻ trải nghiệm của bạn..."
+                        value={reviewInputs[bookingId]?.content || ""}
+                        onChange={(e) =>
+                          handleChange(bookingId, "content", e.target.value)
+                        }
+                      />
+                    </Form.Group>
 
-                <div className="d-flex gap-2">
-                  <Button
-                    variant="primary"
-                    disabled={submittingId === selectedBookingId}
-                    onClick={() => submitReview(selectedBooking)}
-                  >
-                    {submittingId === selectedBookingId
-                      ? "Đang gửi..."
-                      : "Gửi đánh giá"}
-                  </Button>
-                </div>
+                    <Row>
+                      <Col sm={8}>
+                        <Form.Group>
+                          <Form.Label className="small">Xếp hạng của bạn</Form.Label>
+                          {/* Gợi ý: Dùng Select để chọn sao sẽ thân thiện hơn */}
+                          <Form.Select
+                            value={reviewInputs[bookingId]?.rating || ""}
+                            onChange={(e) =>
+                              handleChange(bookingId, "rating", e.target.value)
+                            }
+                          >
+                            <option value="">-- Chọn số sao --</option>
+                            <option value="5">5 sao ★★★★★</option>
+                            <option value="4">4 sao ★★★★☆</option>
+                            <option value="3">3 sao ★★★☆☆</option>
+                            <option value="2">2 sao ★★☆☆☆</option>
+                            <option value="1">1 sao ★☆☆☆☆</option>
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
+                      <Col sm={4} className="d-flex align-items-end">
+                        <Button
+                            variant="primary"
+                            disabled={submittingId === bookingId}
+                            onClick={() => submitReview(booking)}
+                            className="w-100 mt-3 mt-sm-0"
+                          >
+                            {submittingId === bookingId
+                              ? "Đang gửi..."
+                              : "Gửi"}
+                          </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
               </Card.Body>
             </Card>
-          ) : (
-            <div className="text-muted">
-              Vui lòng chọn booking hoàn thành để đánh giá.
-            </div>
-          )}
-        </Col>
+          );
+        })
+      ) : (
+        // Hiển thị thông báo nếu không có phòng nào để đánh giá
+        <div className="text-center p-5 bg-light rounded">
+          <p className="mb-0">🎉 Chúc mừng! Bạn đã đánh giá tất cả các phòng đã hoàn thành.</p>
+        </div>
+      )}
 
-        {/* right column + modal button */}
-        <Col md={6}>
-          <Button variant="secondary" onClick={openHistory}>
-            <i className="bi bi-clock-history me-2"></i>
-            Lịch sử đánh giá
-          </Button>
-        </Col>
-      </Row>
-
+      
       {/* Modal */}
       <Modal
         show={showHistory}

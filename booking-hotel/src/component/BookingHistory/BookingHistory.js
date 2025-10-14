@@ -8,13 +8,16 @@ const API_BASE = "http://localhost:5360";
 // Bảng màu tùy chỉnh
 const colors = {
   primary: '#007bff', // Màu nhấn (Xanh dương)
-  danger: '#dc3545',  // Màu cảnh báo (Đỏ)
+  danger: 'danger',  // Màu cảnh báo (Đỏ)
   text: '#212529',    // Màu chữ chính (Đen)
   muted: '#6c757d',   // Màu chữ phụ & Trạng thái hoàn thành (Xám)
   background: '#f8f9fa' // Màu nền trang
 };
 
 function BookingHistory({ userId: propUserId }) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState(null);
@@ -181,10 +184,27 @@ function BookingHistory({ userId: propUserId }) {
           const img = getRoomImage(b) || `https://picsum.photos/400/300?random=${key}`;
           const isCanceling = cancelingId === (b.bookingId || b._id);
           
-          const statusText = b.status === "Booked" ? "Hoàn thành" : (b.status === "Cancelled" ? "Đã hủy" : b.status);
-          
-          // ===== THAY ĐỔI LOGIC MÀU SẮC NẰM Ở ĐÂY =====
-          const statusColor = b.status === "Cancelled" ? colors.danger : colors.muted;
+          const getStatusText = (status) => {
+            switch (status) {
+              case "Booked": return "Đã đặt";
+              case "Completed": return "Hoàn thành";
+              case "Cancelled": return "Đã hủy";
+              default: return status; // Fallback nếu có trạng thái khác
+            }
+          };
+
+          const getStatusColor = (status) => {
+            switch (status) {
+              case "Booked": return "primary"; // Xanh dương
+              case "Completed": return "success"; // Xanh lá
+              case "Cancelled": return "danger"; // Đỏ
+              default: return "secondary"; // Màu xám cho fallback
+            }
+          };
+
+          // Trong component của bạn
+          const statusText = getStatusText(b.status);
+          const statusColor = getStatusColor(b.status);
 
           return (
             <Card key={key} className="border-0 shadow-sm rounded-3 overflow-hidden">
@@ -200,7 +220,8 @@ function BookingHistory({ userId: propUserId }) {
                         <h5 className="fw-bold mb-0" style={{ color: colors.text }}>{getHotelName(b)}</h5>
                         <Badge
                           className="ms-2 fw-normal text-capitalize"
-                          style={{ backgroundColor: statusColor, color: '#fff' }}
+                          // 
+                          bg={statusColor}
                         >
                           {statusText}
                         </Badge>

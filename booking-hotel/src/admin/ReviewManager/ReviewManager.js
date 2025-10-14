@@ -123,7 +123,7 @@ export default function ReviewManager() {
       {/* Bộ lọc + thống kê */}
       <div className="row mb-4">
         <div className="col-md-6">
-          <Form.Group>
+          {/* <Form.Group>
             <Form.Label>Phòng</Form.Label>
             <Form.Select
               value={selectedRoom}
@@ -136,7 +136,7 @@ export default function ReviewManager() {
                 </option>
               ))}
             </Form.Select>
-          </Form.Group>
+          </Form.Group> */}
         </div>
 
         {selectedRoom && (
@@ -166,7 +166,7 @@ export default function ReviewManager() {
         </div>
       ) : (
         <Table striped bordered hover responsive>
-          <thead className="table-dark">
+          <thead>
             <tr>
               <th>#</th>
               <th>Mã đánh giá</th>

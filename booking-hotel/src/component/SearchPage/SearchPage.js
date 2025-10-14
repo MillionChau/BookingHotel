@@ -21,6 +21,9 @@ function useQuery() {
 }
 
 function SearchPage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const query = useQuery();
   const [destination, setDestination] = useState(query.get("destination") || "");
   const [searchResults, setSearchResults] = useState([]);
