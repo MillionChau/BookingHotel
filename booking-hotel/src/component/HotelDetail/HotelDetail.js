@@ -8,6 +8,9 @@ import "./HotelDetail.scss";
 import HotelReviews from "../HotelReview/HotelReview";
 
 const HotelDetail = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const { hotelId } = useParams();
   const [hotel, setHotel] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);

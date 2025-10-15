@@ -166,7 +166,7 @@ export default function ReviewManager() {
         </div>
       ) : (
         <Table striped bordered hover responsive>
-          <thead className="table-dark">
+          <thead>
             <tr>
               <th>#</th>
               <th>Mã đánh giá</th>
