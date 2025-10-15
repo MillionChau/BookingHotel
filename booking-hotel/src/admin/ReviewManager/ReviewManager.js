@@ -146,7 +146,10 @@ export default function ReviewManager() {
                 <h5>📊 Thống kê đánh giá</h5>
                 <p>
                   Trung bình:{" "}
-                  <Badge bg="primary">{stats.averageRating.toFixed(1)}/5</Badge>
+                  <Badge bg="primary">
+                    {Number(stats.averageRating || 0).toFixed(1)}/5
+                  </Badge>
+
                 </p>
                 <p>
                   Tổng số đánh giá:{" "}
