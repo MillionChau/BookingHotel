@@ -8,10 +8,11 @@ const app = express()
 require('./src/services/roomScheduler')
 const momoRoutes = require('./src/routes/momoRoutes');
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -30,6 +31,13 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   })
 })
+
+const { register } = require('./src/config/metrics');
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 app.use((err, req, res, next) => {
   console.error(err.stack)

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: booking_mongodb_prod
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data_prod:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - booking-network-prod
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: booking_backend_prod
+    ports:
+      - "5360:5360"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/booking?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=5360
+    depends_on:
+      - mongodb
+    networks:
+      - booking-network-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "health-check.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./booking-hotel
+      dockerfile: Dockerfile
+    container_name: booking_frontend_prod
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - booking-network-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mongodb_data_prod:
+
+networks:
+  booking-network-prod:
+    driver: bridge
