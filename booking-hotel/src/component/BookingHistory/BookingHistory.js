@@ -143,6 +143,24 @@ function BookingHistory({ userId: propUserId }) {
     };
   }, [userId]);
 
+  // Sắp xếp bookings từ mới nhất đến cũ nhất
+  const sortedBookings = useMemo(() => {
+    return [...bookings].sort((a, b) => {
+      // Ưu tiên sắp xếp theo ngày đặt (createdAt) trước
+      const dateA = new Date(a.createdAt || a.bookingDate || a.checkinDate);
+      const dateB = new Date(b.createdAt || b.bookingDate || b.checkinDate);
+      
+      // Nếu không có ngày đặt, sử dụng ngày check-in
+      if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) {
+        const checkinA = new Date(a.checkinDate);
+        const checkinB = new Date(b.checkinDate);
+        return checkinB - checkinA; // Mới nhất -> cũ nhất
+      }
+      
+      return dateB - dateA; // Mới nhất -> cũ nhất
+    });
+  }, [bookings]);
+
   // Các hàm tiện ích
   const getHotelName = (b) =>
     b?.__hotel?.name || b?.__hotel?.hotelName || b?.__hotel?.title || b?.hotelName || "Tên khách sạn";
@@ -171,7 +189,7 @@ function BookingHistory({ userId: propUserId }) {
 
   if (loading) return <Loading />;
 
-  if (!bookings.length) {
+  if (!sortedBookings.length) {
     return <div className="text-center my-5"><h3>🤔</h3><p>Bạn chưa có lịch sử đặt phòng nào.</p></div>;
   }
 
@@ -179,7 +197,7 @@ function BookingHistory({ userId: propUserId }) {
     <div className="container my-5 py-5" style={{ backgroundColor: colors.background, borderRadius: '1rem' }}>
       <h3 className="fw-bold mb-4" style={{ color: colors.text }}>📖 Lịch sử đặt phòng</h3>
       <div className="d-flex flex-column gap-4">
-        {bookings.map((b) => {
+        {sortedBookings.map((b) => {
           const key = b._id || b.bookingId || Math.random();
           const img = getRoomImage(b) || `https://picsum.photos/400/300?random=${key}`;
           const isCanceling = cancelingId === (b.bookingId || b._id);
@@ -202,7 +220,6 @@ function BookingHistory({ userId: propUserId }) {
             }
           };
 
-          // Trong component của bạn
           const statusText = getStatusText(b.status);
           const statusColor = getStatusColor(b.status);
 
@@ -220,7 +237,6 @@ function BookingHistory({ userId: propUserId }) {
                         <h5 className="fw-bold mb-0" style={{ color: colors.text }}>{getHotelName(b)}</h5>
                         <Badge
                           className="ms-2 fw-normal text-capitalize"
-                          // 
                           bg={statusColor}
                         >
                           {statusText}
@@ -243,6 +259,18 @@ function BookingHistory({ userId: propUserId }) {
                         <p className="fw-bold mb-0 text-capitalize" style={{ color: colors.text }}>{b.paymentStatus || "N/A"}</p>
                       </Col>
                     </Row>
+
+                    {/* Thêm thông tin ngày đặt */}
+                    {(b.createdAt || b.bookingDate) && (
+                      <Row className="g-3 mb-2">
+                        <Col xs={12}>
+                          <small style={{ color: colors.muted }}>📅 Ngày đặt</small>
+                          <p className="fw-bold mb-0" style={{ color: colors.text }}>
+                            {formatDate(b.createdAt || b.bookingDate)}
+                          </p>
+                        </Col>
+                      </Row>
+                    )}
                     
                     <div className="mt-auto pt-3 d-flex justify-content-between align-items-center">
                       <div>

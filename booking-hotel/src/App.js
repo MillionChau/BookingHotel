@@ -62,7 +62,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/searchpage" element={<SearchPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/bookingList" element={<BookingHistory />} />
             <Route path="/favoriteList" element={<FavoriteList />} />
             <Route path="/HotelDetail/:hotelId" element={<HotelDetail />} />
@@ -175,7 +175,7 @@ function App() {
           {!hideLayout && <Header user={user} onLogout={handleLogout} />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/searchpage" element={<SearchPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/BookingList" element={<HotelDetail />} />
             <Route path="/FavoriteList" element={<FavoriteList />} />
             <Route
