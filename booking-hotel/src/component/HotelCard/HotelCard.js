@@ -13,19 +13,22 @@ const HotelCard = ({
   hotel,
   onToggleFavorite,
 }) => {
+  // Khai báo các state quản lý dữ liệu, trạng thái loading và yêu thích
   const [hotelData, setHotelData] = useState(hotel || null);
   const [loading, setLoading] = useState(!hotel);
   const [favorite, setFavorite] = useState(isFavoriteDefault);
   const [favoriteId, setFavoriteId] = useState(favoriteIdDefault);
 
+  // Lấy userId từ localStorage nếu không được truyền qua props
   const user = localStorage.getItem('user');
   if (user) {
     const userData = JSON.parse(user);
     userId = userData.id;
   }
 
+  // Effect để fetch dữ liệu khách sạn và kiểm tra trạng thái yêu thích
   useEffect(() => {
-    if (hotel) return; // đã có dữ liệu từ props thì không fetch lại
+    if (hotel) return; 
 
     if (!hotelId) return;
 
@@ -56,27 +59,28 @@ const HotelCard = ({
     fetchHotel();
   }, [hotelId, userId, hotel]);
 
+  // Hàm xử lý thêm/xóa khách sạn khỏi danh sách yêu thích
   const toggleFavorite = async () => {
     try {
       if (!userId) {
-        alert("Bạn cần đăng nhập để thêm yêu thích");
+        alert("Bạn cần đăng nhập để thêm yêu thích");
         return;
       }
 
       if (favorite) {
-        // xóa khỏi yêu thích
         await axios.delete(`http://localhost:5360/favorite/${favoriteId}`);
+        alert("Đã xóa khách sạn khỏi danh sách yêu thích."); // Thêm thông báo
         setFavorite(false);
         setFavoriteId(null);
         if (onToggleFavorite) {
           onToggleFavorite(hotelId, false, null);
         }
       } else {
-        // thêm vào yêu thích
         const res = await axios.post(`http://localhost:5360/favorite/create`, {
           userId,
           hotelId,
         });
+        alert("Đã thêm khách sạn vào danh sách yêu thích!"); // Thêm thông báo
         setFavorite(true);
         setFavoriteId(res.data.favorite._id);
         if (onToggleFavorite) {
@@ -85,16 +89,22 @@ const HotelCard = ({
       }
     } catch (err) {
       console.error("Lỗi khi toggle favorite:", err);
+      alert("Thao tác thất bại, vui lòng thử lại."); // Thêm thông báo lỗi
     }
   };
 
+  // Xử lý các trường hợp component đang tải hoặc không có dữ liệu
   if (loading) return <Spinner animation="border" />;
   if (!hotelData) return <div>Khách sạn không tồn tại</div>;
 
   return (
     <Card
-      style={{ width: "100%", margin: "0 auto" }}
-      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative">
+      style={{ 
+        width: "100%", 
+        margin: "0 auto",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease" 
+      }}
+      className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card">
       {/* Icon yêu thích */}
       <div
         style={{
@@ -104,6 +114,7 @@ const HotelCard = ({
           backgroundColor: "rgba(255,255,255,0.8)",
           cursor: "pointer",
           boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+          transition: "transform 0.2s ease"
         }}
         onClick={toggleFavorite}
         className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center">
@@ -118,8 +129,9 @@ const HotelCard = ({
         alt={hotelData.name}
         style={{ height: "200px", objectFit: "cover", width: "100%" }}
       />
-
-      <Card.Body className="d-flex flex-column p-2">
+      
+      {/* Thân thẻ chứa thông tin chi tiết */}
+      <Card.Body className="d-flex flex-column p-3">
         <Card.Title className="fw-bold fs-6 my-1 hotel-title">
           {hotelData.name}
         </Card.Title>
@@ -127,7 +139,7 @@ const HotelCard = ({
           {hotelData.address}
         </Card.Text>
 
-        <div className="d-flex align-items-center my-1">
+        <div className="d-flex align-items-center my-2">
           <FaStar className="text-warning me-2" />
           {hotelData.rating && hotelData.rating > 0 ? (
             <span>{hotelData.rating.toFixed(1)} / 5</span>
@@ -142,7 +154,7 @@ const HotelCard = ({
           <Button
             variant="primary"
             className="w-100 mt-2"
-            style={{ borderRadius: "0.5rem", padding: "0.25rem 0" }}>
+            style={{ borderRadius: "8px", padding: "0.5rem 0", fontWeight: "500" }}>
             Xem chi tiết
           </Button>
         </Link>

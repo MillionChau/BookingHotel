@@ -1,11 +1,21 @@
 .hotel-title {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem; // Tăng nhẹ font-size cho tiêu đề rõ hơn
   margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+// Bổ sung hiệu ứng cho class `hotel-card` đã thêm ở trên
+.hotel-card {
+  // Hiệu ứng "nâng" card khi hover
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important; // Ghi đè shadow-sm của bootstrap
+  }
+}
+
 .hotel-card .favorite-icon {
   width: 36px;
   height: 36px;
@@ -13,8 +23,13 @@
   background-color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  opacity: 0; /* ẩn mặc định */
-  transition: opacity 0.3s ease;
+  opacity: 0; 
+  transition: opacity 0.3s ease, transform 0.2s ease; // Thêm transition cho transform
+
+  // Hiệu ứng phóng to nhẹ khi hover trực tiếp vào icon
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .hotel-card:hover .favorite-icon {

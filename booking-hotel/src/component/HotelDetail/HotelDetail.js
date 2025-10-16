@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { FaUserFriends, FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import { Carousel, Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
 import "./HotelDetail.scss";
+import HotelReviews from "../HotelReview/HotelReview";
 
 const HotelDetail = () => {
   const { hotelId } = useParams();
@@ -21,7 +22,7 @@ const HotelDetail = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
   const todayStr = today.toISOString().split("T")[0];
 
   useEffect(() => {
@@ -75,7 +76,7 @@ const HotelDetail = () => {
             }
             acc[room.type].images.push(room.imageUrl);
             acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
-            if (room.status === "Trống" || room.status == "available") acc[room.type].availableCount += 1;
+            if (room.status === "Trống" || room.status === 'available') acc[room.type].availableCount += 1;
             return acc;
           }, {})
         );
@@ -119,8 +120,6 @@ const HotelDetail = () => {
         unitPrice: selectedRoom.price,
         totalPrice: selectedRoom.price * nights,
       };
-
-      console.log(bookingData);
 
       const res = await axios.post("http://localhost:5360/api/momo/create", {
         bookingData,
@@ -326,8 +325,8 @@ const HotelDetail = () => {
                       alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
                       return;
                     }
-                    // 🔥 Lấy ra 1 phòng chi tiết từ rooms
-                    const foundRoom = rooms.find(r => r.type === room.type && r.status === "Trống");
+                    //  Lấy ra 1 phòng chi tiết từ rooms
+                    const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
                     if (!foundRoom) {
                       alert("Không còn phòng trống!");
                       return;
@@ -409,6 +408,8 @@ const HotelDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <HotelReviews hotelId={hotelId} />
     </div>
   );
 };
