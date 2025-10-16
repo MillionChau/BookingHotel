@@ -186,6 +186,7 @@ function SearchPage() {
             {visibleResults.map((s) => (
               <Col key={s.hotelId}>
                 <HotelCard
+                  hotelId={s.hotelId} 
                   hotel={s}
                   userId={userId}
                   isFavoriteDefault={s.isFavorite}
