@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Spinner } from "react-bootstrap";
+import React, { useState, useEffect, useCallback } from "react";
+import { Table, Button, Modal, Form, Spinner, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserManager.css';
@@ -10,7 +10,9 @@ export default function UserManager() {
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -25,31 +27,57 @@ export default function UserManager() {
     password: "",
   });
 
+  // State cho Toast
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
   const formatUserId = (userId) => {
     if (!userId) return "N/A";
-    
     const firstTwoChars = userId.substring(0, 2);
-    
     const lastThreeChars = userId.substring(userId.length - 3);
-    
     return `${firstTwoChars}***${lastThreeChars}`;
   };
 
-  const fetchUsers = async () => {
+  const maskEmail = (email) => {
+    if (!email || !email.includes("@")) return "N/A";
+    const [name, domain] = email.split("@");
+    const visible = name.slice(0, 2);
+    return `${visible}***@${domain}`;
+  };
+
+  const maskPhone = (phone) => {
+    if (!phone) return "N/A";
+    const cleaned = phone.toString().replace(/\D/g, "");
+    if (cleaned.length <= 4) return "*".repeat(cleaned.length);
+    const prefix = cleaned.slice(0, 2);
+    const suffix = cleaned.slice(-3);
+    return `${prefix}****${suffix}`;
+  };
+
+  const showToastMessage = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
+
+  // Sử dụng useCallback để memoize hàm fetchUsers
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get("http://localhost:5360/user/all-user");
       setUsers(res.data.users || []);
     } catch (err) {
       console.error("Lỗi khi lấy danh sách người dùng:", err);
+      showToastMessage("Lỗi khi tải danh sách người dùng", "danger");
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Dependency array rỗng vì hàm không phụ thuộc vào props hay state nào
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]); // Thêm fetchUsers vào dependency array
 
   const handleEditUser = (user) => {
     setCurrentUser(user);
@@ -70,21 +98,30 @@ export default function UserManager() {
       );
       fetchUsers();
       setShowEditModal(false);
+      showToastMessage("Cập nhật thông tin người dùng thành công!");
     } catch (err) {
       console.error("Lỗi khi cập nhật user:", err.response?.data || err);
-      alert(err.response?.data?.message || "Có lỗi xảy ra!");
+      showToastMessage(err.response?.data?.message || "Có lỗi xảy ra khi cập nhật!", "danger");
     }
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa người dùng này?")) return;
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    
     try {
-      await axios.delete(`http://localhost:5360/user/${userId}`);
+      await axios.delete(`http://localhost:5360/user/delete/${userToDelete.userId}`);
       fetchUsers();
-      alert("Xóa người dùng thành công!");
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+      showToastMessage("Xóa người dùng thành công!");
     } catch (err) {
       console.error("Lỗi khi xóa user:", err.response?.data || err);
-      alert(err.response?.data?.message || "Có lỗi xảy ra!");
+      showToastMessage(err.response?.data?.message || "Có lỗi xảy ra khi xóa!", "danger");
     }
   };
 
@@ -94,10 +131,10 @@ export default function UserManager() {
       fetchUsers();
       setShowCreateModal(false);
       setCreateData({ fullname: "", email: "", phone: "", address: "", password: "" });
-      alert("Tạo người dùng thành công!");
+      showToastMessage("Tạo người dùng thành công!");
     } catch (err) {
       console.error("Lỗi khi tạo user:", err.response?.data || err);
-      alert(err.response?.data?.message || "Có lỗi xảy ra!");
+      showToastMessage(err.response?.data?.message || "Có lỗi xảy ra khi tạo người dùng!", "danger");
     }
   };
 
@@ -152,8 +189,8 @@ export default function UserManager() {
                 <tr key={user.userId}>
                   <td title={user.userId}>{formatUserId(user.userId)}</td>
                   <td>{user.fullname}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
+                  <td title={user.email}>{maskEmail(user.email)}</td>
+                  <td title={user.phone}>{maskPhone(user.phone)}</td>
                   <td>{user.address}</td>
                   <td>{user.role}</td>
                   <td>{new Date(user.createAt).toLocaleString()}</td>
@@ -162,7 +199,7 @@ export default function UserManager() {
                       <Button variant="outline-warning" size="sm" onClick={() => handleEditUser(user)}>
                         <FiEdit />
                       </Button>
-                      <Button variant="outline-danger" size="sm" onClick={() => handleDeleteUser(user.userId)}>
+                      <Button variant="outline-danger" size="sm" onClick={() => handleDeleteClick(user)}>
                         <FiTrash2 />
                       </Button>
                     </div>
@@ -230,6 +267,47 @@ export default function UserManager() {
           <Button variant="success" onClick={handleCreateUser}>Tạo</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal Xác nhận xóa */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Bạn có chắc muốn xóa người dùng này?</p>
+          <p className="text-danger mt-2">Hành động này không thể hoàn tác!</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Hủy</Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>Xóa</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Toast Notification */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+        <Toast 
+          show={showToast} 
+          onClose={() => setShowToast(false)} 
+          delay={4000} 
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success" ? "✅ Thành công" : "❌ Lỗi"}
+            </strong>
+            <button 
+              type="button" 
+              className="btn-close btn-close-white" 
+              onClick={() => setShowToast(false)}
+              aria-label="Close"
+            ></button>
+          </Toast.Header>
+          <Toast.Body className="bg-light">
+            {toastMessage}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 }

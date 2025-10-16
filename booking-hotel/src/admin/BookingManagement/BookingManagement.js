@@ -10,6 +10,16 @@ const BookingManagement = () => {
   // API base URL - adjust according to your backend
   const API_BASE_URL = "http://localhost:5360/booking";
 
+  const formatUserId = (userId) => {
+    if (!userId) return "N/A";
+
+    const firstTwoChars = userId.substring(0, 2);
+
+    const lastThreeChars = userId.substring(userId.length - 3);
+
+    return `${firstTwoChars}***${lastThreeChars}`;
+  };
+
   // Fetch all bookings from backend
   const fetchBookings = async () => {
     try {
@@ -135,7 +145,7 @@ const BookingManagement = () => {
               bookings.map((booking) => (
                 <tr key={booking.bookingId}>
                   <td>{booking.bookingId}</td>
-                  <td>{booking.userId}</td>
+                  <td>{formatUserId(booking.userId)}</td>
                   <td>{booking.hotelId}</td>
                   <td>{new Date(booking.checkinDate).toLocaleDateString('vi-VN')}</td>
                   <td>{new Date(booking.checkOutDate).toLocaleDateString('vi-VN')}</td>

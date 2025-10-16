@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
-import { Carousel, Modal, Button, Form } from "react-bootstrap";
+import { Carousel, Modal, Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
 import "./HotelDetail.scss";
@@ -11,6 +11,7 @@ const HotelDetail = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+  
   const { hotelId } = useParams();
   const [hotel, setHotel] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -24,6 +25,18 @@ const HotelDetail = () => {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
+  // Hiển thị toast
+  const showToastMessage = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
 
   const today = useMemo(() => new Date(), []);
   const todayStr = today.toISOString().split("T")[0];
@@ -94,6 +107,7 @@ const HotelDetail = () => {
         setRoomTypes(finalData);
       } catch (err) {
         console.error("Lỗi fetch:", err);
+        showToastMessage("Lỗi khi tải thông tin khách sạn!", "danger");
       }
     };
 
@@ -110,7 +124,7 @@ const HotelDetail = () => {
   const handleConfirmBooking = async () => {
     try {
       if (!selectedRoom || !nights) {
-        alert("Vui lòng chọn ngày trước khi đặt!");
+        showToastMessage("Vui lòng chọn ngày trước khi đặt!", "danger");
         return;
       }
 
@@ -129,17 +143,35 @@ const HotelDetail = () => {
       });
 
       if (res.data && res.data.payUrl) {
-        window.location.href = res.data.payUrl;
+        showToastMessage("Đang chuyển hướng đến trang thanh toán...", "success");
+        setTimeout(() => {
+          window.location.href = res.data.payUrl;
+        }, 1500);
       } else {
-        alert("Không lấy được link thanh toán!");
+        showToastMessage("Không lấy được link thanh toán!", "danger");
       }
     } catch (err) {
       console.error("Axios error:", err.response?.data || err.message);
-      alert(
-        "Có lỗi khi tạo thanh toán: " +
-          (err.response?.data?.message || err.message)
+      showToastMessage(
+        "Có lỗi khi tạo thanh toán: " + (err.response?.data?.message || err.message),
+        "danger"
       );
     }
+  };
+
+  const handleRoomSelection = (room) => {
+    if (!startDate || !endDate) {
+      showToastMessage("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!", "warning");
+      return;
+    }
+    
+    const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
+    if (!foundRoom) {
+      showToastMessage("Không còn phòng trống!", "danger");
+      return;
+    }
+    setSelectedRoom(foundRoom);
+    setShowModal(true);
   };
 
   return (
@@ -308,35 +340,23 @@ const HotelDetail = () => {
               </ul>
             </div>
 
-      {/* CỘT 3: GIÁ (2/12) */}
-      <div className="col-md-2 p-3 border-start text-center">
-        <div className="fw-bolder text-danger fs-5">
-          {room.minPrice.toLocaleString("vi-VN")} ₫
-        </div>
-        <div className="small text-muted">/ đêm</div>
-        <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
-          Đã bao gồm thuế và phí
-        </div>
-      </div>
+            {/* CỘT 3: GIÁ (2/12) */}
+            <div className="col-md-2 p-3 border-start text-center">
+              <div className="fw-bolder text-danger fs-5">
+                {room.minPrice.toLocaleString("vi-VN")} ₫
+              </div>
+              <div className="small text-muted">/ đêm</div>
+              <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
+                Đã bao gồm thuế và phí
+              </div>
+            </div>
+
             {/* Nút chọn */}
             <div className="col-md-2 p-3 border-start">
               <div className="d-grid">
                 <button
                   className="btn btn-primary fw-semibold"
-                  onClick={() => {
-                    if (!startDate || !endDate) {
-                      alert("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!");
-                      return;
-                    }
-                    //  Lấy ra 1 phòng chi tiết từ rooms
-                    const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
-                    if (!foundRoom) {
-                      alert("Không còn phòng trống!");
-                      return;
-                    }
-                    setSelectedRoom(foundRoom);
-                    setShowModal(true);
-                  }}
+                  onClick={() => handleRoomSelection(room)}
                 >
                   Chọn
                 </button>
@@ -411,6 +431,31 @@ const HotelDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast Notification */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={4000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success" ? "✅ Thành công" : 
+               toastVariant === "danger" ? "❌ Lỗi" : "⚠️ Cảnh báo"}
+            </strong>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              onClick={() => setShowToast(false)}
+              aria-label="Close"
+            ></button>
+          </Toast.Header>
+          <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
 
       <HotelReviews hotelId={hotelId} />
     </div>

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Form } from "react-bootstrap";
-import { FaMoneyBill, FaShoppingBag, FaChartLine, FaUsers } from "react-icons/fa";
+import {
+  FaMoneyBill,
+  FaShoppingBag,
+  FaChartLine,
+  FaUsers,
+} from "react-icons/fa";
 import {
   LineChart,
   Line,
@@ -12,22 +17,23 @@ import {
 } from "recharts";
 import axios from "axios";
 
-// format VNĐ
+// Format VNĐ
 const formatCurrency = (value) =>
-  value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  value?.toLocaleString("vi-VN", { style: "currency", currency: "VND" }) ?? "0₫";
 
-const Dashboard = () => {
+export default function Dashboard() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState("");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // tháng hiện tại
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [revenue, setRevenue] = useState([]);
   const [occupancy, setOccupancy] = useState(null);
   const [userCount, setUserCount] = useState(0);
 
-  // fetch hotel list
+  // Fetch hotel list
   useEffect(() => {
-    axios.get("http://localhost:5360/hotel/all")
+    axios
+      .get("http://localhost:5360/hotel/all")
       .then((res) => {
         const list = res.data.HotelList || [];
         setHotels(list);
@@ -38,63 +44,72 @@ const Dashboard = () => {
       .catch((err) => console.error("Error fetching hotels:", err));
   }, []);
 
-  // fetch occupancy + revenue + user count when hotel/year/month changes
+  // Fetch occupancy + revenue + user count
   useEffect(() => {
     if (!selectedHotel) return;
 
-    // Occupancy
-    axios.get(`http://localhost:5360/room/hotel/${selectedHotel}/occupancy`)
-      .then((res) => setOccupancy(res.data.occupancy))
-      .catch((err) => console.error("Error fetching occupancy:", err));
+    Promise.all([
+      axios.get(`http://localhost:5360/room/hotel/${selectedHotel}/occupancy`),
+      axios.get(
+        `http://localhost:5360/revenue/hotel/${selectedHotel}?year=${selectedYear}`
+      ),
+      axios.get("http://localhost:5360/user/all-user"),
+    ])
+      .then(([occRes, revRes, userRes]) => {
+        setOccupancy(occRes.data.occupancy);
+        setUserCount(userRes.data.users?.length || 0);
 
+        // Xử lý dữ liệu doanh thu
+        const allRevs =
+          revRes.data.data?.revenues?.map((r) => ({
+            month: Number(r.month),
+            revenue: r.totalPrice,
+          })) || [];
 
-    axios.get(
-      `http://localhost:5360/revenue/hotel/${selectedHotel}?year=${selectedYear}`
-    )
-      .then((res) => {
-        const allRevs = res.data.data?.revenues?.map((r) => ({
-          month: Number(r.month), // số tháng
-          revenue: r.totalPrice,
-        })) || [];
+        let filtered = allRevs;
 
-        // lọc tháng trước, tháng hiện tại, tháng sau
-        const prev = selectedMonth - 1;
-        const next = selectedMonth + 1;
-        const filtered = allRevs.filter(
-          (r) =>
-            r.month === prev || r.month === selectedMonth || r.month === next
-        );
+        // Nếu người dùng chọn 1 tháng cụ thể => lọc 3 tháng: trước, hiện tại, sau
+        if (selectedMonth !== "all") {
+          const monthNum = Number(selectedMonth);
+          const prev = monthNum === 1 ? 12 : monthNum - 1;
+          const next = monthNum === 12 ? 1 : monthNum + 1;
+          filtered = allRevs.filter((r) =>
+            [prev, monthNum, next].includes(r.month)
+          );
+        }
 
-        // sort để biểu đồ đúng thứ tự
+        // Sắp xếp theo tháng
         filtered.sort((a, b) => a.month - b.month);
 
-        // chuyển month về "Tháng X" cho hiển thị
+        // Format cho hiển thị biểu đồ
         const formatted = filtered.map((r) => ({
-          month: `Tháng ${r.month}`,
+          month: `T${r.month}`,
           revenue: r.revenue,
         }));
 
         setRevenue(formatted);
       })
-      .catch((err) => console.error("Error fetching revenue:", err));
-
-    // User count
-    axios.get("http://localhost:5360/user/all-user")
-      .then((res) => setUserCount(res.data.users?.length || 0))
-      .catch((err) => console.error("Error fetching users:", err));
+      .catch((err) => console.error("Error fetching dashboard data:", err));
   }, [selectedHotel, selectedYear, selectedMonth]);
+
+  // Lấy doanh thu tháng hiện tại (chính xác)
+  const currentRevenue =
+    selectedMonth === "all"
+      ? revenue.reduce((sum, r) => sum + r.revenue, 0)
+      : revenue.find((r) => r.month === `T${selectedMonth}`)?.revenue || 0;
 
   return (
     <div className="d-flex">
       <div className="flex-grow-1 p-4">
         <h4 className="mb-4">Tổng quan</h4>
 
-        {/* Filters */}
+        {/* --- Bộ lọc --- */}
         <Row className="mb-3">
           <Col md={3}>
             <Form.Select
               value={selectedHotel}
-              onChange={(e) => setSelectedHotel(e.target.value)}>
+              onChange={(e) => setSelectedHotel(e.target.value)}
+            >
               {hotels.map((hotel) => (
                 <option key={hotel.hotelId} value={hotel.hotelId}>
                   {hotel.name}
@@ -106,7 +121,8 @@ const Dashboard = () => {
           <Col md={2}>
             <Form.Select
               value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}>
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
               <option value="2025">Năm 2025</option>
               <option value="2026">Năm 2026</option>
             </Form.Select>
@@ -115,7 +131,9 @@ const Dashboard = () => {
           <Col md={2}>
             <Form.Select
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}>
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              <option value="all">Tất cả</option>
               {Array.from({ length: 12 }, (_, i) => (
                 <option key={i + 1} value={i + 1}>
                   Tháng {i + 1}
@@ -125,23 +143,25 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        {/* Cards */}
+        {/* --- Thống kê nhanh --- */}
         <Row className="mb-4">
           <Col md={3}>
             <Card className="p-3 shadow-sm">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h6>Doanh thu (tháng {selectedMonth})</h6>
-                  <h5>
-                    {revenue.length > 0
-                      ? formatCurrency(revenue[0].revenue)
-                      : "0₫"}
-                  </h5>
+                  <h6>
+                    Doanh thu{" "}
+                    {selectedMonth === "all"
+                      ? "(cả năm)"
+                      : `(tháng ${selectedMonth})`}
+                  </h6>
+                  <h5>{formatCurrency(currentRevenue)}</h5>
                 </div>
                 <FaMoneyBill size={28} />
               </div>
             </Card>
           </Col>
+
           <Col md={3}>
             <Card className="p-3 shadow-sm">
               <div className="d-flex justify-content-between align-items-center">
@@ -153,6 +173,7 @@ const Dashboard = () => {
               </div>
             </Card>
           </Col>
+
           <Col md={3}>
             <Card className="p-3 shadow-sm">
               <div className="d-flex justify-content-between align-items-center">
@@ -164,6 +185,7 @@ const Dashboard = () => {
               </div>
             </Card>
           </Col>
+
           <Col md={3}>
             <Card className="p-3 shadow-sm">
               <div className="d-flex justify-content-between align-items-center">
@@ -177,7 +199,7 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        {/* Chart */}
+        {/* --- Biểu đồ --- */}
         <Card className="p-3 shadow-sm">
           <h6>Doanh thu theo tháng</h6>
           <div style={{ width: "100%", height: 300 }}>
@@ -185,7 +207,9 @@ const Dashboard = () => {
               <LineChart data={revenue}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
-                <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(0)}tr`} />
+                <YAxis
+                  tickFormatter={(value) => `${(value / 1_000_000).toFixed(0)}tr`}
+                />
                 <Tooltip formatter={(value) => formatCurrency(value)} />
                 <Line type="monotone" dataKey="revenue" stroke="#007bff" />
               </LineChart>
@@ -195,6 +219,4 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-export default Dashboard;
+}
