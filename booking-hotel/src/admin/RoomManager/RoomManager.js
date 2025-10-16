@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Alert } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Alert,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 
@@ -8,6 +16,7 @@ export default function RoomManager() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
     roomId: "",
     name: "",
@@ -18,9 +27,22 @@ export default function RoomManager() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentRoomId, setCurrentRoomId] = useState(null);
+  const [roomToDelete, setRoomToDelete] = useState(null); // Sửa từ userToDelete thành roomToDelete
   const [error, setError] = useState("");
 
-  // Lấy danh sách khách sạn
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
+  // Hiển thị toast
+  const showToastMessage = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
+
+  // Fetch hotel list
   useEffect(() => {
     axios
       .get("http://localhost:5360/hotel/all")
@@ -32,7 +54,7 @@ export default function RoomManager() {
       .catch(console.error);
   }, []);
 
-  // Lấy danh sách phòng khi chọn khách sạn
+  // Fetch room list by hotel
   useEffect(() => {
     if (selectedHotel) fetchRooms(selectedHotel);
   }, [selectedHotel]);
@@ -64,7 +86,7 @@ export default function RoomManager() {
         imageUrl: room.imageUrl || "",
         status: room.status,
       });
-      setCurrentRoomId(room.roomId); // Sửa: dùng roomId thay vì _id
+      setCurrentRoomId(room.roomId);
       setIsEditing(true);
     } else {
       setFormData({
@@ -93,48 +115,63 @@ export default function RoomManager() {
         return;
       }
 
-      const payload = { 
-        ...formData, 
+      const payload = {
+        ...formData,
         hotelId: selectedHotel,
-        price: Number(formData.price)
+        price: Number(formData.price),
       };
 
       if (isEditing) {
-        await axios.put(`http://localhost:5360/room/update/${currentRoomId}`, payload);
+        await axios.put(
+          `http://localhost:5360/room/update/${currentRoomId}`,
+          payload
+        );
+        showToastMessage("Cập nhật phòng thành công!", "success");
       } else {
         await axios.post("http://localhost:5360/room/create", payload);
+        showToastMessage("Thêm phòng mới thành công!", "success");
       }
-      
+
       fetchRooms(selectedHotel);
       setShowModal(false);
       setError("");
     } catch (err) {
       console.error("Lỗi khi lưu phòng:", err.response?.data || err);
-      setError(err.response?.data?.message || "Lỗi khi lưu thông tin phòng!");
+      showToastMessage(
+        err.response?.data?.message || "Lỗi khi lưu thông tin phòng!",
+        "danger"
+      );
     }
   };
 
-  const handleDelete = async (roomId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa phòng này?")) return;
+  // Sửa hàm handleConfirmDelete để xóa phòng
+  const handleConfirmDelete = async () => {
+    if (!roomToDelete) return;
     
     try {
-      await axios.delete(`http://localhost:5360/room/delete/${roomId}`);
+      await axios.delete(`http://localhost:5360/room/delete/${roomToDelete}`);
       fetchRooms(selectedHotel);
+      setShowDeleteModal(false);
+      setRoomToDelete(null);
+      showToastMessage("Xóa phòng thành công!");
     } catch (err) {
       console.error("Lỗi khi xóa phòng:", err.response?.data || err);
-      setError(err.response?.data?.message || "Lỗi khi xóa phòng!");
+      showToastMessage(err.response?.data?.message || "Có lỗi xảy ra khi xóa phòng!", "danger");
     }
   };
 
-  // Hàm chuyển đổi trạng thái để hiển thị
+  // Sửa hàm handleDeleteClick để xóa phòng
+  const handleDeleteClick = (roomId) => {
+    setRoomToDelete(roomId);
+    setShowDeleteModal(true);
+  };
+
   const getStatusDisplay = (status) => {
     const statusMap = {
-      'available': 'Trống',
-      'occupied': 'Đang sử dụng',
-      'maintenance': 'Bảo trì',
-      'Đang đặt': 'Đang đặt',
-      'Trống': 'Trống',
-      'Bảo trì': 'Bảo trì'
+      available: "Trống",
+      occupied: "Đang sử dụng",
+      maintenance: "Bảo trì",
+      Trống: "Trống",
     };
     return statusMap[status] || status;
   };
@@ -158,7 +195,11 @@ export default function RoomManager() {
         ))}
       </Form.Select>
 
-      <Button variant="primary" onClick={() => handleShow()} disabled={!selectedHotel}>
+      <Button
+        variant="primary"
+        onClick={() => handleShow()}
+        disabled={!selectedHotel}
+      >
         <FiPlus className="me-1" /> Thêm phòng
       </Button>
 
@@ -185,8 +226,13 @@ export default function RoomManager() {
                 <td>{getStatusDisplay(room.status)}</td>
                 <td>
                   {room.imageUrl ? (
-                    <img src={room.imageUrl} alt={room.name} width="120" height="80" 
-                         style={{objectFit: 'cover'}} />
+                    <img
+                      src={room.imageUrl}
+                      alt={room.name}
+                      width="120"
+                      height="80"
+                      style={{ objectFit: "cover" }}
+                    />
                   ) : (
                     <span>No image</span>
                   )}
@@ -203,7 +249,7 @@ export default function RoomManager() {
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => handleDelete(room.roomId)}
+                      onClick={() => handleDeleteClick(room.roomId)}
                     >
                       <FiTrash2 />
                     </Button>
@@ -214,13 +260,16 @@ export default function RoomManager() {
           ) : (
             <tr>
               <td colSpan="7" className="text-center">
-                {selectedHotel ? "Chưa có phòng nào" : "Vui lòng chọn khách sạn"}
+                {selectedHotel
+                  ? "Chưa có phòng nào"
+                  : "Vui lòng chọn khách sạn"}
               </td>
             </tr>
           )}
         </tbody>
       </Table>
 
+      {/* Modal thêm/sửa */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{isEditing ? "Sửa phòng" : "Thêm phòng"}</Modal.Title>
@@ -230,12 +279,14 @@ export default function RoomManager() {
           <Form>
             {!isEditing && (
               <Form.Group className="mb-2">
-                <Form.Label>Mã phòng (Để trống để tự động tạo)</Form.Label>
+                <Form.Label>Mã phòng (Tự tạo nếu để trống)</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Để trống để tự động tạo mã"
+                  placeholder="VD: A101"
                   value={formData.roomId}
-                  onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, roomId: e.target.value })
+                  }
                 />
               </Form.Group>
             )}
@@ -243,9 +294,10 @@ export default function RoomManager() {
               <Form.Label>Tên phòng *</Form.Label>
               <Form.Control
                 type="text"
-                required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -253,23 +305,28 @@ export default function RoomManager() {
               <Form.Control
                 type="text"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Giá *</Form.Label>
               <Form.Control
                 type="number"
-                required
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Trạng thái</Form.Label>
               <Form.Select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
               >
                 <option value="available">Trống</option>
                 <option value="occupied">Đang sử dụng</option>
@@ -280,9 +337,10 @@ export default function RoomManager() {
               <Form.Label>Ảnh (URL)</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="https://example.com/image.jpg"
                 value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, imageUrl: e.target.value })
+                }
               />
             </Form.Group>
           </Form>
@@ -296,6 +354,45 @@ export default function RoomManager() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal xóa phòng - Sửa nội dung cho phù hợp */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Bạn có chắc muốn xóa phòng này?</p>
+          <p className="text-danger mt-2">Hành động này không thể hoàn tác!</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Hủy</Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>Xóa</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Toast Notification */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={4000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success" ? "✅ Thành công" : "❌ Lỗi"}
+            </strong>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              onClick={() => setShowToast(false)}
+              aria-label="Close"
+            ></button>
+          </Toast.Header>
+          <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 }

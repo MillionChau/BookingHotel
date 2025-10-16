@@ -13,11 +13,48 @@ import {
 import axios from "axios";
 import "./RevenueManager.module.scss";
 
+// Helper functions defined outside component
+const getMonthName = (month) => {
+  if (month === "all" || month == null) return "Tất cả các tháng";
+  const months = [
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12",
+  ];
+  const n = Number(month);
+  const idx = Number.isInteger(n) ? n - 1 : -1;
+  return idx >= 0 && idx < 12 ? months[idx] : `Tháng ${month}`;
+};
+
+// Normalize function defined outside component
+const normalizeRevenueItems = (items, currentFilters) => {
+  const arr = Array.isArray(items) ? items : items ? [items] : [];
+  return arr.map((it) => {
+    const copy = { ...it };
+    if ((copy.month === undefined || copy.month === null || copy.month === "") && currentFilters.month !== "all") {
+      copy.month = Number(currentFilters.month);
+    }
+    if ((copy.year === undefined || copy.year === null || copy.year === "") && currentFilters.year) {
+      copy.year = Number(currentFilters.year);
+    }
+    return copy;
+  });
+};
+
 export default function RevenueManager() {
   const [revenues, setRevenues] = useState([]);
   const [stats, setStats] = useState({});
   const [filters, setFilters] = useState({
-    month: "all", // default: xem tất cả tháng
+    month: "all",
     year: String(new Date().getFullYear()),
     hotelId: "",
   });
@@ -28,84 +65,144 @@ export default function RevenueManager() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState("");
 
-  // safer getMonthName that accepts number or numeric string
-  const getMonthName = (month) => {
-    if (month === "all" || month == null) return "Tất cả các tháng";
-    const months = [
-      "Tháng 1",
-      "Tháng 2",
-      "Tháng 3",
-      "Tháng 4",
-      "Tháng 5",
-      "Tháng 6",
-      "Tháng 7",
-      "Tháng 8",
-      "Tháng 9",
-      "Tháng 10",
-      "Tháng 11",
-      "Tháng 12",
-    ];
-    const n = Number(month);
-    const idx = Number.isInteger(n) ? n - 1 : -1;
-    return idx >= 0 && idx < 12 ? months[idx] : `Tháng ${month}`;
-  };
-
-  // helper: ensure each revenue item has month/year when possible
-  const normalizeRevenueItems = (items) => {
-    // items could be object or array
-    const arr = Array.isArray(items) ? items : items ? [items] : [];
-    return arr.map((it) => {
-      // clone to avoid mutating original
-      const copy = { ...it };
-      // if no month/year on item, but filters contain a specific month/year -> fill it
-      if ((copy.month === undefined || copy.month === null || copy.month === "") && filters.month !== "all") {
-        copy.month = Number(filters.month);
-      }
-      if ((copy.year === undefined || copy.year === null || copy.year === "") && filters.year) {
-        // keep as number for consistent math; but rendering handles strings too
-        copy.year = Number(filters.year);
-      }
-      return copy;
-    });
-  };
-
   // fetch revenues (hotel-specific or all)
   const fetchRevenues = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-      const params = {
+      const baseParams = {
         year: Number(filters.year),
         page,
         limit: 10,
       };
 
-      if (filters.month !== "all") params.month = Number(filters.month);
-
-      let response;
-
+      // 1) Nếu chọn 1 khách sạn cụ thể
       if (filters.hotelId) {
-        // hotel-specific endpoint may return a single object (no month/year)
-        response = await axios.get(
-          `http://localhost:5360/revenue/hotel/${filters.hotelId}`,
-          { params }
-        );
-        const data = response.data.data;
-        const normalized = normalizeRevenueItems(data);
-        setRevenues(normalized);
-        setTotalPages(1);
-      } else {
-        // monthly (paginated) endpoint
-        response = await axios.get("http://localhost:5360/revenue/monthly", {
-          params,
-        });
-        const data = response.data.data;
-        // data may have docs + totalPages, or be array directly
-        const docs = data?.docs || data || [];
-        const normalized = normalizeRevenueItems(docs);
-        setRevenues(normalized);
-        setTotalPages(data?.totalPages || 1);
+        // && month is specific -> call hotel endpoint (existing)
+        if (filters.month !== "all") {
+          const params = { ...baseParams, month: Number(filters.month) };
+          const response = await axios.get(
+            `http://localhost:5360/revenue/hotel/${filters.hotelId}`,
+            { params }
+          );
+          const data = response.data.data;
+          const normalized = normalizeRevenueItems(data, filters);
+          setRevenues(normalized);
+          setTotalPages(1);
+        }
+        // nếu hotelId + month = "all" -> gọi /revenue/monthly?hotelId=xxx&month=m cho từng tháng
+        else {
+          const monthRequests = Array.from({ length: 12 }, (_, i) => {
+            const m = i + 1;
+            return axios.get("http://localhost:5360/revenue/monthly", {
+              params: { ...baseParams, month: m, hotelId: filters.hotelId },
+            }).then(res => ({ ok: true, res })).catch(err => ({ ok: false, err, month: m }));
+          });
+
+          const results = await Promise.all(monthRequests);
+          const allItems = [];
+
+          results.forEach((r, idx) => {
+            const month = idx + 1;
+            if (r.ok) {
+              const data = r.res.data.data;
+              const docs = data?.docs || data || [];
+              let normalized = normalizeRevenueItems(docs, { ...filters, month });
+              // ensure each item has month/year filled (some APIs return object without month)
+              normalized = normalized.map((it) => {
+                const copy = { ...it };
+                if (copy.month === undefined || copy.month === null || copy.month === "") {
+                  copy.month = month;
+                }
+                if (copy.year === undefined || copy.year === null || copy.year === "") {
+                  copy.year = Number(filters.year);
+                }
+                return copy;
+              });
+              allItems.push(...normalized);
+            } else {
+              // no data for that month -> skip (optional: log)
+              console.warn(`No data for month ${r.month}/${filters.year} (hotel ${filters.hotelId})`, r.err);
+            }
+          });
+
+          // sort by year then month asc for predictable ordering
+          allItems.sort((a, b) => {
+            const ay = Number(a.year || filters.year);
+            const by = Number(b.year || filters.year);
+            const am = Number(a.month || 0);
+            const bm = Number(b.month || 0);
+            return ay !== by ? ay - by : am - bm;
+          });
+
+          setRevenues(allItems);
+          setTotalPages(1);
+        }
+      }
+
+      // 2) Nếu không chọn khách sạn (tất cả khách sạn)
+      else {
+        // a) tất cả tháng -> gọi từng tháng (1..12) cho toàn bộ hotels
+        if (filters.month === "all") {
+          // parallel requests for months 1..12
+          const requests = Array.from({ length: 12 }, (_, i) =>
+            axios
+              .get("http://localhost:5360/revenue/monthly", {
+                params: { ...baseParams, month: i + 1 },
+              })
+              .then(res => ({ ok: true, res }))
+              .catch(err => ({ ok: false, err, month: i + 1 }))
+          );
+
+          const results = await Promise.all(requests);
+          const allMonths = [];
+
+          results.forEach((r, idx) => {
+            const month = idx + 1;
+            if (r.ok) {
+              const data = r.res.data.data;
+              const docs = data?.docs || data || [];
+              let normalized = normalizeRevenueItems(docs, { ...filters, month });
+              // ensure month/year present
+              normalized = normalized.map((it) => {
+                const copy = { ...it };
+                if (copy.month === undefined || copy.month === null || copy.month === "") {
+                  copy.month = month;
+                }
+                if (copy.year === undefined || copy.year === null || copy.year === "") {
+                  copy.year = Number(filters.year);
+                }
+                return copy;
+              });
+              allMonths.push(...normalized);
+            } else {
+              console.warn(`No data for month ${r.month}/${filters.year}`, r.err);
+            }
+          });
+
+          allMonths.sort((a, b) => {
+            const ay = Number(a.year || filters.year);
+            const by = Number(b.year || filters.year);
+            const am = Number(a.month || 0);
+            const bm = Number(b.month || 0);
+            return ay !== by ? ay - by : am - bm;
+          });
+
+          setRevenues(allMonths);
+          setTotalPages(1);
+        }
+        // b) không chọn hotel + chỉ 1 tháng -> gọi monthly bình thường (có pagination)
+        else {
+          const response = await axios.get("http://localhost:5360/revenue/monthly", {
+            params: { ...baseParams, month: Number(filters.month) },
+          });
+          const data = response.data.data;
+          const docs = data?.docs || data || [];
+          const normalized = normalizeRevenueItems(docs, filters);
+          setRevenues(normalized);
+          setTotalPages(data?.totalPages || 1);
+        }
       }
     } catch (err) {
       console.error("Lỗi lấy revenues:", err.response?.data || err);
@@ -375,8 +472,8 @@ export default function RevenueManager() {
                         <td className="fw-bold">
                           {rev.totalRevenue && rev.totalBookings > 0
                             ? Math.round(
-                                rev.totalRevenue / rev.totalBookings
-                              ).toLocaleString("vi-VN") + " ₫"
+                              rev.totalRevenue / rev.totalBookings
+                            ).toLocaleString("vi-VN") + " ₫"
                             : "0 ₫"}
                         </td>
                       </tr>

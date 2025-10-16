@@ -275,14 +275,6 @@ export default function UserManager() {
         </Modal.Header>
         <Modal.Body>
           <p>Bạn có chắc muốn xóa người dùng này?</p>
-          {userToDelete && (
-            <div className="user-info bg-light p-3 rounded">
-              <p><strong>Họ và tên:</strong> {userToDelete.fullname}</p>
-              <p><strong>Email:</strong> {userToDelete.email}</p>
-              <p><strong>Điện thoại:</strong> {userToDelete.phone}</p>
-              <p><strong>Địa chỉ:</strong> {userToDelete.address}</p>
-            </div>
-          )}
           <p className="text-danger mt-2">Hành động này không thể hoàn tác!</p>
         </Modal.Body>
         <Modal.Footer>
