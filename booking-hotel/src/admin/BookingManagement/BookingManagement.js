@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
+import { API_BASE_URL } from "../../config/api";
 
 const BookingManagement = () => {
   const [bookings, setBookings] = useState([]);
@@ -8,23 +9,22 @@ const BookingManagement = () => {
   const [error, setError] = useState(null);
 
   // API base URL - adjust according to your backend
-  const API_BASE_URL = "http://localhost:5360/booking";
+  const API_BOOKING_URL = `${API_BASE_URL}/booking`;
 
   const formatUserId = (userId) => {
     if (!userId) return "N/A";
 
     const firstTwoChars = userId.substring(0, 2);
-
     const lastThreeChars = userId.substring(userId.length - 3);
 
     return `${firstTwoChars}***${lastThreeChars}`;
   };
 
-  // Fetch all bookings from backend
-  const fetchBookings = async () => {
+  // Fetch all bookings from backend - FIXED: added API_BOOKING_URL to dependencies
+  const fetchBookings = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(API_BASE_URL);
+      const response = await axios.get(API_BOOKING_URL);
       setBookings(response.data.bookings);
       setError(null);
     } catch (err) {
@@ -33,12 +33,12 @@ const BookingManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BOOKING_URL]); // ✅ Đã thêm API_BOOKING_URL vào dependencies
 
-  // Fetch bookings on component mount
+  // Fetch bookings on component mount - FIXED: removed API_BOOKING_URL from dependencies
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [fetchBookings]); // ✅ Chỉ cần fetchBookings vì nó đã phụ thuộc vào API_BOOKING_URL
 
   // Badge màu trạng thái đơn
   const renderStatusBadge = (status) => {

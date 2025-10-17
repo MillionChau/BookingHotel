@@ -2,8 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import Loading from "../Loading/Loading";
 import { Card, Row, Col, Form, Button, Modal, Spinner, Tab, Tabs } from "react-bootstrap";
-
-const API_BASE = "http://localhost:5360";
+import { API_BASE_URL } from "../../config/api";
 
 export default function MyReview() {
   useEffect(() => {
@@ -58,11 +57,11 @@ export default function MyReview() {
       let userReviews = [];
       
       try {
-        const response = await axios.get(`${API_BASE}/review/user/${encodeURIComponent(userId)}`);
+        const response = await axios.get(`${API_BASE_URL}/review/user/${encodeURIComponent(userId)}`);
         userReviews = response?.data?.reviews || response?.data || [];
       } catch (err) {
         // Fallback: lấy tất cả và filter
-        const response = await axios.get(`${API_BASE}/review/all`);
+        const response = await axios.get(`${API_BASE_URL}/review/all`);
         const allReviews = response?.data?.reviews || response?.data || [];
         userReviews = Array.isArray(allReviews) 
           ? allReviews.filter(review => String(review.userId) === String(userId))
@@ -89,7 +88,7 @@ export default function MyReview() {
       
       // Fetch song song bookings và reviews
       const [bookingsRes, userReviewsData] = await Promise.all([
-        axios.get(`${API_BASE}/booking/user/${encodeURIComponent(userId)}`),
+        axios.get(`${API_BASE_URL}/booking/user/${encodeURIComponent(userId)}`),
         fetchUserReviews()
       ]);
 
@@ -112,7 +111,7 @@ export default function MyReview() {
         const results = await Promise.all(
           arr.map(async (id) => {
             try {
-              const r = await axios.get(`${API_BASE}/${endpoint}/${encodeURIComponent(id)}`);
+              const r = await axios.get(`${API_BASE_URL}/${endpoint}/${encodeURIComponent(id)}`);
               const data = r.data?.hotel || r.data?.room || r.data;
               return [id, data];
             } catch {
@@ -238,7 +237,7 @@ export default function MyReview() {
         rating: Number(input.rating),
       };
 
-      const res = await axios.post(`${API_BASE}/review/create`, payload);
+      const res = await axios.post(`${API_BASE_URL}/review/create`, payload);
 
       alert(res?.data?.message || "Đã gửi đánh giá thành công!");
 

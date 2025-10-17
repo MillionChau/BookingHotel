@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Table, Button, Modal, Form, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import { API_BASE_URL } from "../../config/api";
 
 export default function HotelManagement() {
   const [hotels, setHotels] = useState([]);
@@ -33,7 +34,7 @@ export default function HotelManagement() {
 
   const fetchHotels = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5360/hotel/all");
+      const res = await axios.get(`${API_BASE_URL}/hotel/all`);
       setHotels(res.data.HotelList || []);
     } catch (err) {
       console.error("Lỗi khi tải khách sạn:", err);
@@ -85,12 +86,12 @@ export default function HotelManagement() {
 
       if (isEditing) {
         await axios.put(
-          `http://localhost:5360/hotel/update/${currentId}`,
+          `${API_BASE_URL}/hotel/update/${currentId}`,
           formData
         );
         showToastMessage("Cập nhật khách sạn thành công!", "success");
       } else {
-        await axios.post("http://localhost:5360/hotel/create", formData);
+        await axios.post(`${API_BASE_URL}/hotel/create`, formData);
         showToastMessage("Thêm khách sạn mới thành công!", "success");
       }
       fetchHotels();
@@ -109,7 +110,7 @@ export default function HotelManagement() {
     if (!hotelToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5360/hotel/delete/${hotelToDelete}`);
+      await axios.delete(`${API_BASE_URL}/hotel/delete/${hotelToDelete}`);
       fetchHotels();
       setShowDeleteModal(false);
       setHotelToDelete(null);
