@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import { API_BASE_URL } from "../../config/api";
 
 export default function RoomManager() {
   const [rooms, setRooms] = useState([]);
@@ -45,7 +46,7 @@ export default function RoomManager() {
   // Fetch hotel list
   useEffect(() => {
     axios
-      .get("http://localhost:5360/hotel/all")
+      .get(`${API_BASE_URL}/hotel/all`)
       .then((res) => {
         const hotelList = res.data.HotelList || res.data.hotels || [];
         setHotels(hotelList);
@@ -61,7 +62,7 @@ export default function RoomManager() {
 
   const fetchRooms = async (hotelId) => {
     try {
-      const res = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+      const res = await axios.get(`${API_BASE_URL}/room/hotel/${hotelId}`);
       setRooms(res.data.rooms || []);
       setError("");
     } catch (err) {
@@ -123,12 +124,12 @@ export default function RoomManager() {
 
       if (isEditing) {
         await axios.put(
-          `http://localhost:5360/room/update/${currentRoomId}`,
+          `${API_BASE_URL}/room/update/${currentRoomId}`,
           payload
         );
         showToastMessage("Cập nhật phòng thành công!", "success");
       } else {
-        await axios.post("http://localhost:5360/room/create", payload);
+        await axios.post(`${API_BASE_URL}/room/create`, payload);
         showToastMessage("Thêm phòng mới thành công!", "success");
       }
 
@@ -149,7 +150,7 @@ export default function RoomManager() {
     if (!roomToDelete) return;
     
     try {
-      await axios.delete(`http://localhost:5360/room/delete/${roomToDelete}`);
+      await axios.delete(`${API_BASE_URL}/room/delete/${roomToDelete}`);
       fetchRooms(selectedHotel);
       setShowDeleteModal(false);
       setRoomToDelete(null);

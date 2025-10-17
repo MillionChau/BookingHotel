@@ -9,6 +9,7 @@ const reviewRoutes = require('./reviewRoute')
 const favoriteRoutes = require('./favoriteRoute')
 const roomRoutes = require('./roomRoute')
 const revenueRoutes = require('./revenueRoute')
+const momoRoutes = require('./momoRoutes')
 
 router.use('/auth', authRoutes)
 router.use('/user', userRoutes)
@@ -18,5 +19,6 @@ router.use('/review', reviewRoutes)
 router.use('/favorite', favoriteRoutes)
 router.use('/room', roomRoutes)
 router.use('/revenue', revenueRoutes)
+router.use('/momo', momoRoutes)
 
 module.exports = router

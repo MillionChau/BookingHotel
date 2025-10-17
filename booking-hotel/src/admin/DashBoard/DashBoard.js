@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
+import { API_BASE_URL  } from "../../config/api";
 
 // Format VNĐ
 const formatCurrency = (value) =>
@@ -33,7 +34,7 @@ export default function Dashboard() {
   // Fetch hotel list
   useEffect(() => {
     axios
-      .get("http://localhost:5360/hotel/all")
+      .get(`${API_BASE_URL}/hotel/all`)
       .then((res) => {
         const list = res.data.HotelList || [];
         setHotels(list);
@@ -49,11 +50,11 @@ export default function Dashboard() {
     if (!selectedHotel) return;
 
     Promise.all([
-      axios.get(`http://localhost:5360/room/hotel/${selectedHotel}/occupancy`),
+      axios.get(`${API_BASE_URL}/room/hotel/${selectedHotel}/occupancy`),
       axios.get(
-        `http://localhost:5360/revenue/hotel/${selectedHotel}?year=${selectedYear}`
+        `${API_BASE_URL}/revenue/hotel/${selectedHotel}?year=${selectedYear}`
       ),
-      axios.get("http://localhost:5360/user/all-user"),
+      axios.get(`${API_BASE_URL}/user/all-user`),
     ])
       .then(([occRes, revRes, userRes]) => {
         setOccupancy(occRes.data.occupancy);

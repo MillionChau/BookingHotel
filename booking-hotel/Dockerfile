@@ -2,21 +2,25 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 RUN npm ci
 
-# Copy source code và build
 COPY . .
+
+# Nhận biến môi trường API URL từ docker-compose
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Build production (React sẽ inject biến này)
 RUN npm run build
 
-# Production stage
+# ---------- PRODUCTION STAGE ----------
 FROM nginx:alpine
 
-# Copy built app
+# Copy built app vào nginx
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy nginx config
+# Copy file cấu hình nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 3000

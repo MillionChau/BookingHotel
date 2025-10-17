@@ -6,12 +6,13 @@ import axios from "axios";
 import Loading from "../Loading/Loading";
 import "./HotelDetail.scss";
 import HotelReviews from "../HotelReview/HotelReview";
+import { API_BASE_URL } from "../../config/api";
 
 const HotelDetail = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  
+
   const { hotelId } = useParams();
   const [hotel, setHotel] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -72,10 +73,10 @@ const HotelDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const hotelRes = await axios.get(`http://localhost:5360/hotel/${hotelId}`);
+        const hotelRes = await axios.get(`${API_BASE_URL}/hotel/${hotelId}`);
         if (hotelRes.data && hotelRes.data.hotel) setHotel(hotelRes.data.hotel);
 
-        const roomRes = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+        const roomRes = await axios.get(`${API_BASE_URL}/room/hotel/${hotelId}`);
         const allRooms = roomRes.data.rooms || [];
         setRooms(allRooms);
 
@@ -138,7 +139,7 @@ const HotelDetail = () => {
         totalPrice: selectedRoom.price * nights,
       };
 
-      const res = await axios.post("http://localhost:5360/api/momo/create", {
+      const res = await axios.post(`${API_BASE_URL}/momo/create`, {
         bookingData,
       });
 
@@ -164,7 +165,7 @@ const HotelDetail = () => {
       showToastMessage("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!", "warning");
       return;
     }
-    
+
     const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
     if (!foundRoom) {
       showToastMessage("Không còn phòng trống!", "danger");
@@ -278,7 +279,7 @@ const HotelDetail = () => {
         show={showGallery}
         onHide={() => setShowGallery(false)}
         size="lg"
-        centered 
+        centered
         className="pt-5">
         <Modal.Header closeButton>
           <Modal.Title>Tất cả hình ảnh</Modal.Title>
@@ -318,13 +319,13 @@ const HotelDetail = () => {
                   <Carousel interval={null}>
                     {room.images.map((img, idx) => (
                       <Carousel.Item key={idx}>
-                        <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{minHeight: '200px', objectFit: 'cover'}} />
+                        <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{ minHeight: '200px', objectFit: 'cover' }} />
                       </Carousel.Item>
                     ))}
                   </Carousel>
                 ) : (
                   room.images[0] && (
-                    <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{minHeight: '200px', objectFit: 'cover'}} />
+                    <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{ minHeight: '200px', objectFit: 'cover' }} />
                   )
                 )}
               </div>
@@ -346,7 +347,7 @@ const HotelDetail = () => {
                 {room.minPrice.toLocaleString("vi-VN")} ₫
               </div>
               <div className="small text-muted">/ đêm</div>
-              <div className="small text-muted mt-1" style={{fontSize: '0.75rem'}}>
+              <div className="small text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                 Đã bao gồm thuế và phí
               </div>
             </div>
@@ -432,8 +433,16 @@ const HotelDetail = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Toast Notification */}
-      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+      {/* Toast Notification - FIXED POSITION */}
+      <ToastContainer
+        position="top-end"
+        className="p-3 position-fixed"
+        style={{
+          zIndex: 9999,
+          top: "100px",
+          right: "20px"
+        }}
+      >
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
@@ -443,15 +452,9 @@ const HotelDetail = () => {
         >
           <Toast.Header className={`bg-${toastVariant} text-white`}>
             <strong className="me-auto">
-              {toastVariant === "success" ? "✅ Thành công" : 
-               toastVariant === "danger" ? "❌ Lỗi" : "⚠️ Cảnh báo"}
+              {toastVariant === "success" ? "✅ Thành công" :
+                toastVariant === "danger" ? "❌ Lỗi" : "⚠️ Cảnh báo"}
             </strong>
-            <button
-              type="button"
-              className="btn-close btn-close-white"
-              onClick={() => setShowToast(false)}
-              aria-label="Close"
-            ></button>
           </Toast.Header>
           <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
         </Toast>

@@ -1,14 +1,19 @@
 const getApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+
   if (process.env.NODE_ENV === 'development') {
-    const isNetworkAccess = window.location.hostname !== 'localhost' && 
-                           window.location.hostname !== '127.0.0.1';
-    
-    if (isNetworkAccess) {
-      return `http://${window.location.hostname}:5360`;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:5360/api';
     }
-    return 'http://localhost:5360';
+    return `http://${hostname}:5360/api`;
   }
-  return '/api';
+
+  return process.env.REACT_APP_API_URL || `http://${hostname}:5360/api`;
 };
 
-export const API_BASE_URL = getApiBaseUrl();
+if (typeof window !== 'undefined') {
+  window.API_BASE_URL = getApiBaseUrl();
+}
+
+export const API_BASE_URL =
+  typeof window !== 'undefined' ? window.API_BASE_URL : getApiBaseUrl();

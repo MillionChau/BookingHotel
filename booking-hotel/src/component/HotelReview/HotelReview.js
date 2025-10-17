@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './HotelReview.scss';
+import { API_BASE_URL } from "../../config/api";
 
 export default function HotelReviews({ hotelId }) {
   const [reviews, setReviews] = useState([]);
@@ -9,13 +10,13 @@ export default function HotelReviews({ hotelId }) {
   useEffect(() => {
     const fetchHotelReviews = async () => {
       try {
-        const roomRes = await axios.get(`http://localhost:5360/room/hotel/${hotelId}`);
+        const roomRes = await axios.get(`${API_BASE_URL}/room/hotel/${hotelId}`);
         const allRooms = roomRes.data.rooms || [];
         const allReviews = [];
 
         for (const room of allRooms) {
           try {
-            const reviewRes = await axios.get(`http://localhost:5360/review/room/${room.roomId}`);
+            const reviewRes = await axios.get(`${API_BASE_URL}/review/room/${room.roomId}`);
             if (reviewRes.data?.reviews) {
               const roomReviews = reviewRes.data.reviews.map((r) => ({
                 ...r,

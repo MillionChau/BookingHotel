@@ -39,23 +39,26 @@ services:
       retries: 3
     env_file:
       - .env.network
-
+      
   frontend:
     build:
       context: ./booking-hotel
       dockerfile: Dockerfile
     container_name: booking_frontend
     ports:
-      - "0.0.0.0:3000:3000"
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://backend:5360/api
     depends_on:
       - backend
     networks:
       - booking-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
+
 
   prometheus:
     image: prom/prometheus:latest

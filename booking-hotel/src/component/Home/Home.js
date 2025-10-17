@@ -7,6 +7,7 @@ import FeatureCard from "../FeatureCard/FeatureCard";
 import HotelCard from "../HotelCard/HotelCard";
 import { Spinner, Button } from "react-bootstrap";
 import { FaChevronLeft, FaChevronRight, FaStar } from "react-icons/fa";
+import { API_BASE_URL } from "../../config/api";
 
 function Home() {
   const [hotelIds, setHotelIds] = useState([]);
@@ -20,7 +21,7 @@ function Home() {
   useEffect(() => {
     const fetchHotelData = async () => {
       try {
-        const res = await axios.get("http://localhost:5360/hotel/all");
+        const res = await axios.get(`${API_BASE_URL}/hotel/all`);
         if (res.data && res.data.HotelList) {
           const hotelList = res.data.HotelList;
           const ids = hotelList.map((hotel) => hotel.hotelId);

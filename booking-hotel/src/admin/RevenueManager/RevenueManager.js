@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import "./RevenueManager.module.scss";
+import { API_BASE_URL } from "../../config/api";
 
 // Helper functions defined outside component
 const getMonthName = (month) => {
@@ -83,7 +84,7 @@ export default function RevenueManager() {
         if (filters.month !== "all") {
           const params = { ...baseParams, month: Number(filters.month) };
           const response = await axios.get(
-            `http://localhost:5360/revenue/hotel/${filters.hotelId}`,
+            `${API_BASE_URL}/revenue/hotel/${filters.hotelId}`,
             { params }
           );
           const data = response.data.data;
@@ -95,7 +96,7 @@ export default function RevenueManager() {
         else {
           const monthRequests = Array.from({ length: 12 }, (_, i) => {
             const m = i + 1;
-            return axios.get("http://localhost:5360/revenue/monthly", {
+            return axios.get(`${API_BASE_URL}/revenue/monthly`, {
               params: { ...baseParams, month: m, hotelId: filters.hotelId },
             }).then(res => ({ ok: true, res })).catch(err => ({ ok: false, err, month: m }));
           });
@@ -148,7 +149,7 @@ export default function RevenueManager() {
           // parallel requests for months 1..12
           const requests = Array.from({ length: 12 }, (_, i) =>
             axios
-              .get("http://localhost:5360/revenue/monthly", {
+              .get(`${API_BASE_URL}/revenue/monthly`, {
                 params: { ...baseParams, month: i + 1 },
               })
               .then(res => ({ ok: true, res }))
@@ -194,7 +195,7 @@ export default function RevenueManager() {
         }
         // b) không chọn hotel + chỉ 1 tháng -> gọi monthly bình thường (có pagination)
         else {
-          const response = await axios.get("http://localhost:5360/revenue/monthly", {
+          const response = await axios.get(`${API_BASE_URL}/revenue/monthly`, {
             params: { ...baseParams, month: Number(filters.month) },
           });
           const data = response.data.data;
@@ -221,10 +222,10 @@ export default function RevenueManager() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const statsRes = await axios.get("http://localhost:5360/revenue/stats");
+        const statsRes = await axios.get(`${API_BASE_URL}/revenue/stats`);
         setStats(statsRes.data.data || {});
 
-        const hotelsRes = await axios.get("http://localhost:5360/hotel/all");
+        const hotelsRes = await axios.get(`${API_BASE_URL}/hotel/all`);
         setHotels(hotelsRes.data.HotelList || []);
       } catch (err) {
         console.error("Lỗi lấy dữ liệu ban đầu:", err);

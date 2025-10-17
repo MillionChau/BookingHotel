@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Loading from "../Loading/Loading";
-import { Card, Row, Col, Badge } from "react-bootstrap";
-
-const API_BASE = "http://localhost:5360";
+import { Card, Row, Col, Badge, Modal, Button, Toast, ToastContainer } from "react-bootstrap";
+import { API_BASE_URL } from "../../config/api";
 
 // Bảng màu tùy chỉnh
 const colors = {
@@ -22,6 +21,22 @@ function BookingHistory({ userId: propUserId }) {
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState(null);
 
+  // State cho modal xác nhận hủy
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+
+  // State cho toast thông báo
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
+  // Hiển thị toast
+  const showToastMessage = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
+
   // Lấy userId từ props hoặc localStorage
   const userId = useMemo(() => {
     if (propUserId) return propUserId;
@@ -35,28 +50,44 @@ function BookingHistory({ userId: propUserId }) {
     }
   }, [propUserId]);
 
-  // Hàm xử lý hủy đặt phòng
-  const handleCancelBooking = async (booking) => {
-    const id = booking?.bookingId || booking?._id;
-    if (!id) return alert("Không xác định được booking id.");
+  // Hàm mở modal xác nhận hủy
+  const openCancelModal = (booking) => {
+    setBookingToCancel(booking);
+    setShowCancelModal(true);
+  };
 
-    if (!window.confirm("Bạn có chắc muốn hủy đặt phòng này không?")) return;
+  // Hàm đóng modal xác nhận hủy
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setBookingToCancel(null);
+  };
+
+  // Hàm xử lý hủy đặt phòng
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return;
+    
+    const id = bookingToCancel?.bookingId || bookingToCancel?._id;
+    if (!id) {
+      showToastMessage("Không xác định được booking id.", "danger");
+      return;
+    }
 
     try {
       setCancelingId(id);
-      const res = await axios.patch(`${API_BASE}/booking/${encodeURIComponent(id)}/cancel`);
+      const res = await axios.patch(`${API_BASE_URL}/booking/${encodeURIComponent(id)}/cancel`);
       const updated = res?.data?.booking || res?.data;
       setBookings((prev) =>
         prev.map((b) =>
           (b.bookingId && b.bookingId === id) || b._id === id ? { ...b, ...updated } : b
         )
       );
-      alert(res?.data?.message || "Đã hủy đặt phòng");
+      showToastMessage(res?.data?.message || "Đã hủy đặt phòng thành công", "success");
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || "Hủy không thành công");
+      showToastMessage(err?.response?.data?.message || "Hủy không thành công", "danger");
     } finally {
       setCancelingId(null);
+      closeCancelModal();
     }
   };
 
@@ -76,7 +107,7 @@ function BookingHistory({ userId: propUserId }) {
       const results = await Promise.all(
         arr.map(async (id) => {
           try {
-            const res = await axios.get(`${API_BASE}/${endpoint}/${encodeURIComponent(id)}`);
+            const res = await axios.get(`${API_BASE_URL}/${endpoint}/${encodeURIComponent(id)}`);
             return [id, res.data?.hotel || res.data?.room || res.data];
           } catch {
             return [id, null];
@@ -89,7 +120,7 @@ function BookingHistory({ userId: propUserId }) {
     const loadBookings = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE}/booking/user/${encodeURIComponent(userId)}`);
+        const res = await axios.get(`${API_BASE_URL}/booking/user/${encodeURIComponent(userId)}`);
         const rawList = res?.data?.bookings || res?.data?.BookingList || res?.data || [];
         if (!mounted) return;
 
@@ -131,6 +162,7 @@ function BookingHistory({ userId: propUserId }) {
       } catch (err) {
         console.error("Lỗi khi lấy lịch sử đặt phòng:", err);
         setBookings([]);
+        showToastMessage("Lỗi khi tải lịch sử đặt phòng", "danger");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -282,7 +314,7 @@ function BookingHistory({ userId: propUserId }) {
                         <button
                           className="btn btn-outline-danger"
                           disabled={isCanceling}
-                          onClick={() => handleCancelBooking(b)}
+                          onClick={() => openCancelModal(b)}
                         >
                           {isCanceling ? (
                             <>
@@ -302,6 +334,73 @@ function BookingHistory({ userId: propUserId }) {
           );
         })}
       </div>
+
+      {/* Modal xác nhận hủy đặt phòng */}
+      <Modal show={showCancelModal} onHide={closeCancelModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="text-danger">⚠️ Xác nhận hủy đặt phòng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Bạn có chắc chắn muốn hủy đặt phòng này không?</p>
+          {bookingToCancel && (
+            <div className="bg-light p-3 rounded small">
+              <strong>Thông tin đặt phòng:</strong><br />
+              Khách sạn: {getHotelName(bookingToCancel)}<br />
+              Phòng: {getRoomName(bookingToCancel)}<br />
+              Ngày nhận: {formatDate(bookingToCancel.checkinDate)}<br />
+              Ngày trả: {formatDate(bookingToCancel.checkOutDate)}
+            </div>
+          )}
+          <p className="text-danger mt-2 mb-0">
+            <small>Lưu ý: Hành động này không thể hoàn tác.</small>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeCancelModal}>
+            Thoát
+          </Button>
+          <Button 
+            variant="danger" 
+            onClick={handleCancelBooking}
+            disabled={cancelingId}
+          >
+            {cancelingId ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" />
+                Đang hủy...
+              </>
+            ) : (
+              "Xác nhận hủy"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Toast Notification */}
+      <ToastContainer 
+        position="top-end" 
+        className="p-3 position-fixed"
+        style={{ 
+          zIndex: 9999,
+          top: "100px",
+          right: "20px"
+        }}
+      >
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={4000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success" ? "✅ Thành công" : "❌ Lỗi"}
+            </strong>
+          </Toast.Header>
+          <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 }
