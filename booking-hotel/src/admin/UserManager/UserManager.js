@@ -3,6 +3,7 @@ import { Table, Button, Modal, Form, Spinner, Toast, ToastContainer } from "reac
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import './UserManager.css';
+import { API_BASE_URL } from "../../config/api";
 
 export default function UserManager() {
   const [users, setUsers] = useState([]);
@@ -65,7 +66,7 @@ export default function UserManager() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5360/user/all-user");
+      const res = await axios.get(`${API_BASE_URL}/user/all-user`);
       setUsers(res.data.users || []);
     } catch (err) {
       console.error("Lỗi khi lấy danh sách người dùng:", err);
@@ -93,7 +94,7 @@ export default function UserManager() {
   const handleSaveUser = async () => {
     try {
       await axios.put(
-        `http://localhost:5360/user/update-user/${currentUser.userId}`,
+        `${API_BASE_URL}/user/update-user/${currentUser.userId}`,
         formData
       );
       fetchUsers();
@@ -114,7 +115,7 @@ export default function UserManager() {
     if (!userToDelete) return;
     
     try {
-      await axios.delete(`http://localhost:5360/user/delete/${userToDelete.userId}`);
+      await axios.delete(`${API_BASE_URL}/user/delete/${userToDelete.userId}`);
       fetchUsers();
       setShowDeleteModal(false);
       setUserToDelete(null);
@@ -127,7 +128,7 @@ export default function UserManager() {
 
   const handleCreateUser = async () => {
     try {
-      await axios.post(`http://localhost:5360/auth/register`, createData);
+      await axios.post(`${API_BASE_URL}/auth/register`, createData);
       fetchUsers();
       setShowCreateModal(false);
       setCreateData({ fullname: "", email: "", phone: "", address: "", password: "" });

@@ -10,20 +10,60 @@ import {
   Button,
   Card,
   InputGroup,
+  Toast,
+  ToastContainer,
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import HotelCard from "../HotelCard/HotelCard";
 import { FaSearch } from "react-icons/fa";
 import "./SearchPage.scss";
+import { API_BASE_URL } from "../../config/api";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
+// Hàm chuẩn hóa chuỗi để tìm kiếm tương đối
+const normalizeString = (str) => {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const calculateSimilarity = (str1, str2) => {
+  const normalized1 = normalizeString(str1);
+  const normalized2 = normalizeString(str2);
+
+  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) {
+    return 1;
+  }
+
+  const words1 = normalized1.split(" ");
+  const words2 = normalized2.split(" ");
+
+  let matchCount = 0;
+  words1.forEach((word1) => {
+    if (word1.length < 2) return;
+    words2.forEach((word2) => {
+      if (word2.includes(word1) || word1.includes(word2)) {
+        matchCount++;
+      }
+    });
+  });
+
+  return matchCount / Math.max(words1.length, words2.length);
+};
+
 function SearchPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
   const query = useQuery();
   const [destination, setDestination] = useState(
     query.get("destination") || ""
@@ -32,8 +72,19 @@ function SearchPage() {
   const [visibleCount, setVisibleCount] = useState(9);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [searched, setSearched] = useState(!!query.get("destination"));
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
+  // Hàm hiển thị Toast
+  const showToastMessage = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
 
   const getUserId = useCallback(() => {
     try {
@@ -77,14 +128,16 @@ function SearchPage() {
     setSearched(false);
 
     try {
-      const res = await axios.get("http://localhost:5360/hotel/all");
+      const res = await axios.get(`${API_BASE_URL}/hotel/all`);
       let data = res.data.HotelList || [];
       const dataWithFavorites = await fetchAndMergeFavorites(data);
       setSearchResults(dataWithFavorites);
+      showToastMessage("Đã tải danh sách khách sạn!", "success");
     } catch (err) {
       console.error(err);
       setError("Không thể tải danh sách khách sạn. Vui lòng thử lại sau.");
       setSearchResults([]);
+      showToastMessage("Lỗi khi tải danh sách khách sạn!", "danger");
     } finally {
       setLoading(false);
     }
@@ -92,6 +145,7 @@ function SearchPage() {
 
   const handleSearch = useCallback(async () => {
     if (!destination.trim()) {
+      showToastMessage("Vui lòng nhập địa điểm để tìm kiếm!", "warning");
       fetchAllHotels();
       return;
     }
@@ -101,19 +155,56 @@ function SearchPage() {
     setSearched(true);
 
     try {
-      const res = await axios.get("http://localhost:5360/hotel/all");
+      const res = await axios.get(`${API_BASE_URL}/hotel/all`);
       let data = res.data.HotelList || [];
 
-      const filteredData = data.filter((item) =>
-        item.address.toLowerCase().includes(destination.toLowerCase())
-      );
+      // Tìm kiếm tương đối trên nhiều trường
+      const filteredData = data.filter((item) => {
+        const searchFields = [
+          item.address || "",
+          item.hotelName || "",
+          item.city || "",
+          item.district || "",
+        ].join(" ");
+
+        const similarity = calculateSimilarity(searchFields, destination);
+
+        return similarity > 0.3;
+      });
+
+      // Sắp xếp theo độ tương đồng giảm dần
+      filteredData.sort((a, b) => {
+        const searchFieldsA = [
+          a.address || "",
+          a.hotelName || "",
+          a.city || "",
+          a.district || "",
+        ].join(" ");
+
+        const searchFieldsB = [
+          b.address || "",
+          b.hotelName || "",
+          b.city || "",
+          b.district || "",
+        ].join(" ");
+
+        const similarityA = calculateSimilarity(searchFieldsA, destination);
+        const similarityB = calculateSimilarity(searchFieldsB, destination);
+
+        return similarityB - similarityA;
+      });
 
       const dataWithFavorites = await fetchAndMergeFavorites(filteredData);
       setSearchResults(dataWithFavorites);
+      showToastMessage(
+        `Tìm thấy ${dataWithFavorites.length} khách sạn phù hợp!`,
+        "success"
+      );
     } catch (err) {
       console.error(err);
       setError("Không thể tải danh sách khách sạn. Vui lòng thử lại sau.");
       setSearchResults([]);
+      showToastMessage("Lỗi khi tải dữ liệu khách sạn!", "danger");
     } finally {
       setLoading(false);
     }
@@ -176,7 +267,8 @@ function SearchPage() {
           <h2 className="mb-4 fw-bold">
             {searched ? (
               <>
-                Kết quả cho: <span className="text-primary">{destination}</span>
+                Tìm thấy {searchResults.length} kết quả cho:{" "}
+                <span className="text-primary">"{destination}"</span>
               </>
             ) : (
               "Khám phá tất cả khách sạn"
@@ -186,7 +278,7 @@ function SearchPage() {
             {visibleResults.map((s) => (
               <Col key={s.hotelId}>
                 <HotelCard
-                  hotelId={s.hotelId} 
+                  hotelId={s.hotelId}
                   hotel={s}
                   userId={userId}
                   isFavoriteDefault={s.isFavorite}
@@ -213,7 +305,7 @@ function SearchPage() {
       if (searched) {
         return (
           <Alert variant="warning" className="text-center">
-            Rất tiếc, không tìm thấy khách sạn nào phù hợp tại{" "}
+            Rất tiếc, không tìm thấy khách sạn nào phù hợp với{" "}
             <strong>"{destination}"</strong>.
           </Alert>
         );
@@ -256,6 +348,34 @@ function SearchPage() {
       </Card>
 
       <div className="search-results-container">{renderContent()}</div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-end"
+        className="p-3 position-fixed"
+        style={{
+          zIndex: 9999,
+          top: "100px",
+          right: "20px",
+        }}>
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={4000}
+          autohide
+          bg={toastVariant}>
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success"
+                ? "✅ Thành công"
+                : toastVariant === "danger"
+                ? "❌ Lỗi"
+                : "⚠️ Cảnh báo"}
+            </strong>
+          </Toast.Header>
+          <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </Container>
   );
 }

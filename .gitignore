@@ -1,0 +1,49 @@
+# Environment variables - QUAN TR�ỌNG: Không push file môi trường
+.env*
+!.env.example
+
+# System files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Dependency directories
+node_modules/
+npm-debug.log*
+
+# Runtime data
+.nyc_output
+coverage/
+.nyc_output
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history

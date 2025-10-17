@@ -1,7 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Table, Button, Modal, Form, Toast, ToastContainer } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import axios from "axios";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import { API_BASE_URL } from "../../config/api";
 
 export default function HotelManagement() {
   const [hotels, setHotels] = useState([]);
@@ -33,7 +41,7 @@ export default function HotelManagement() {
 
   const fetchHotels = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5360/hotel/all");
+      const res = await axios.get(`${API_BASE_URL}/hotel/all`);
       setHotels(res.data.HotelList || []);
     } catch (err) {
       console.error("Lỗi khi tải khách sạn:", err);
@@ -45,7 +53,6 @@ export default function HotelManagement() {
   useEffect(() => {
     fetchHotels();
   }, [fetchHotels]);
-
 
   // Mở modal thêm / sửa
   const handleShow = (hotel = null) => {
@@ -84,13 +91,10 @@ export default function HotelManagement() {
       }
 
       if (isEditing) {
-        await axios.put(
-          `http://localhost:5360/hotel/update/${currentId}`,
-          formData
-        );
+        await axios.put(`${API_BASE_URL}/hotel/update/${currentId}`, formData);
         showToastMessage("Cập nhật khách sạn thành công!", "success");
       } else {
-        await axios.post("http://localhost:5360/hotel/create", formData);
+        await axios.post(`${API_BASE_URL}/hotel/create`, formData);
         showToastMessage("Thêm khách sạn mới thành công!", "success");
       }
       fetchHotels();
@@ -109,7 +113,7 @@ export default function HotelManagement() {
     if (!hotelToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5360/hotel/delete/${hotelToDelete}`);
+      await axios.delete(`${API_BASE_URL}/hotel/delete/${hotelToDelete}`);
       fetchHotels();
       setShowDeleteModal(false);
       setHotelToDelete(null);
@@ -155,7 +159,9 @@ export default function HotelManagement() {
               <td>{hotel.address}</td>
               <td>{hotel.description}</td>
               <td>{hotel.manager}</td>
-              <td>{hotel.rating > 0 ? `${hotel.rating} ⭐` : "Chưa có đánh giá"}</td>
+              <td>
+                {hotel.rating > 0 ? `${hotel.rating} ⭐` : "Chưa có đánh giá"}
+              </td>
               <td>
                 {hotel.imageUrl ? (
                   <img
@@ -169,21 +175,23 @@ export default function HotelManagement() {
                   <span>No image</span>
                 )}
               </td>
-              <td>{hotel.createdAt ? new Date(hotel.createdAt).toLocaleString("vi-VN") : "N/A"}</td>
+              <td>
+                {hotel.createdAt
+                  ? new Date(hotel.createdAt).toLocaleString("en-US")
+                  : "N/A"}
+              </td>
               <td>
                 <div className="d-flex justify-content-center align-items-center gap-2 h-100">
                   <Button
                     variant="warning"
                     size="sm"
-                    onClick={() => handleShow(hotel)}
-                  >
+                    onClick={() => handleShow(hotel)}>
                     <FiEdit />
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDeleteClick(hotel.hotelId)}
-                  >
+                    onClick={() => handleDeleteClick(hotel.hotelId)}>
                     <FiTrash2 />
                   </Button>
                 </div>
@@ -196,7 +204,9 @@ export default function HotelManagement() {
       {/* Modal thêm/sửa */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>{isEditing ? "Sửa khách sạn" : "Thêm khách sạn"}</Modal.Title>
+          <Modal.Title>
+            {isEditing ? "Sửa khách sạn" : "Thêm khách sạn"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -283,7 +293,10 @@ export default function HotelManagement() {
       </Modal>
 
       {/* Modal xác nhận xóa */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered>
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa</Modal.Title>
         </Modal.Header>
@@ -292,20 +305,26 @@ export default function HotelManagement() {
           <p className="text-danger mt-2">Hành động này không thể hoàn tác!</p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Hủy</Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>Xóa</Button>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Hủy
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Xóa
+          </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Toast Notification */}
-      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+      <ToastContainer
+        position="top-end"
+        className="p-3"
+        style={{ zIndex: 9999 }}>
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
           delay={4000}
           autohide
-          bg={toastVariant}
-        >
+          bg={toastVariant}>
           <Toast.Header className={`bg-${toastVariant} text-white`}>
             <strong className="me-auto">
               {toastVariant === "success" ? "✅ Thành công" : "❌ Lỗi"}
@@ -314,8 +333,7 @@ export default function HotelManagement() {
               type="button"
               className="btn-close btn-close-white"
               onClick={() => setShowToast(false)}
-              aria-label="Close"
-            ></button>
+              aria-label="Close"></button>
           </Toast.Header>
           <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
         </Toast>

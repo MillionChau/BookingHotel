@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Toast, ToastContainer, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "../../config/api";
 
 export default function PaymentSuccess() {
     const location = useLocation();
@@ -34,7 +35,7 @@ export default function PaymentSuccess() {
                     bookingData.paymentStatus = "Paid";
                     bookingData.paymentDay = new Date();
 
-                    await axios.post("http://localhost:5360/booking/create", bookingData);
+                    await axios.post(`${API_BASE_URL}/booking/create`, bookingData);
                     
                     showToastMessage("Thanh toán và đặt phòng thành công!", "success");
                     

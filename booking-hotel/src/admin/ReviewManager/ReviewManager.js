@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Table, Form, Button, Spinner, Alert, Modal, Badge, Card } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_URL } from "../../config/api";
 
 export default function ReviewManager() {
   const [reviews, setReviews] = useState([]);
@@ -12,11 +13,11 @@ export default function ReviewManager() {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [stats, setStats] = useState({ averageRating: 0, totalReviews: 0 });
 
-  const reviewBaseUrl = "http://localhost:5360/review";
-  const roomBaseUrl = "http://localhost:5360/room";
+  const reviewBaseUrl = `${API_BASE_URL}/review`;
+  const roomBaseUrl = `${API_BASE_URL}/room`;
 
   /** 🏨 Lấy danh sách phòng */
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     try {
       const res = await axios.get(`${roomBaseUrl}/all`);
       setRooms(res.data.rooms || res.data.data || []);
@@ -24,7 +25,7 @@ export default function ReviewManager() {
       console.error("Lỗi khi lấy danh sách phòng:", err);
       setError("Không thể tải danh sách phòng!");
     }
-  };
+  }, [roomBaseUrl]); // ✅ Thêm roomBaseUrl vào dependencies
 
   /** 📝 Lấy danh sách đánh giá */
   const fetchAllReviews = useCallback(async () => {
@@ -50,10 +51,10 @@ export default function ReviewManager() {
     } finally {
       setLoading(false);
     }
-  }, [rooms]); // Thêm rooms vào dependencies vì sử dụng bên trong
+  }, [reviewBaseUrl, rooms]); // ✅ Đã thêm reviewBaseUrl vào dependencies
 
   /** ⭐ Lấy thống kê theo phòng */
-  const fetchRoomStats = async (roomId) => {
+  const fetchRoomStats = useCallback(async (roomId) => {
     if (!roomId) {
       setStats({ averageRating: 0, totalReviews: 0 });
       return;
@@ -69,7 +70,7 @@ export default function ReviewManager() {
       console.error("Lỗi khi lấy thống kê:", err);
       setStats({ averageRating: 0, totalReviews: 0 });
     }
-  };
+  }, [reviewBaseUrl]); // ✅ Thêm reviewBaseUrl vào dependencies
 
   /** 🗑️ Xóa đánh giá */
   const handleDeleteReview = async () => {
@@ -95,7 +96,7 @@ export default function ReviewManager() {
   /** 🧩 Hooks */
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [fetchRooms]); // ✅ Thêm fetchRooms vào dependencies
 
   useEffect(() => {
     if (rooms.length > 0) fetchAllReviews();
@@ -103,7 +104,7 @@ export default function ReviewManager() {
 
   useEffect(() => {
     fetchRoomStats(selectedRoom);
-  }, [selectedRoom]);
+  }, [selectedRoom, fetchRoomStats]); // ✅ Thêm fetchRoomStats vào dependencies
 
   /** Lọc theo phòng */
   const filteredReviews = selectedRoom
@@ -149,7 +150,6 @@ export default function ReviewManager() {
                   <Badge bg="primary">
                     {Number(stats.averageRating || 0).toFixed(1)}/5
                   </Badge>
-
                 </p>
                 <p>
                   Tổng số đánh giá:{" "}

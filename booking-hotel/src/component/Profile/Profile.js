@@ -4,6 +4,7 @@ import { Modal, Alert } from "react-bootstrap";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaKey } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.scss";
+import { API_BASE_URL } from "../../config/api";
 
 // --- COMPONENT CON: Hiển thị thông tin ---
 // Component này chỉ có nhiệm vụ hiển thị dữ liệu.
@@ -231,7 +232,7 @@ function Profile() {
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.get(`http://localhost:5360/user/user-info/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/user/user-info/${userId}`);
       setUserInfo(res.data.user);
       setOriginalInfo(res.data.user);
     } catch (err) {
@@ -269,7 +270,7 @@ function Profile() {
     setIsSubmitting(true);
     setUpdateStatus({ message: "", type: "" });
     try {
-      await axios.put(`http://localhost:5360/user/update-user/${userId}`, userInfo);
+      await axios.put(`${API_BASE_URL}/user/update-user/${userId}`, userInfo);
       setUpdateStatus({ message: "Cập nhật thông tin thành công!", type: "success" });
       setOriginalInfo(userInfo);
       setEditMode(false);
@@ -296,7 +297,7 @@ function Profile() {
     setPasswordSubmitting(true);
     setPasswordError("");
     try {
-      await axios.patch(`http://localhost:5360/user/change-password/${userId}`, {
+      await axios.patch(`${API_BASE_URL}/user/change-password/${userId}`, {
         password: passwordForm.oldPassword,
         newPassword: passwordForm.newPassword,
         validPassword: passwordForm.confirmPassword,

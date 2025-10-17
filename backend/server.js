@@ -8,10 +8,11 @@ const app = express()
 require('./src/services/roomScheduler')
 const momoRoutes = require('./src/routes/momoRoutes');
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -31,6 +32,13 @@ app.get('/health', (req, res) => {
   })
 })
 
+const { register } = require('./src/config/metrics');
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({ 
@@ -39,13 +47,12 @@ app.use((err, req, res, next) => {
   })
 })
 
-app.use('', allRoutes)
-app.use('/api/momo', momoRoutes);
+app.use('/api', allRoutes)
 
 const port = process.env.PORT || 5000
 const server = process.env.NODE_ENV !== 'test' 
-  ? app.listen(port, () => {
-      console.log(`Server is running on http://localhost:${port}`)
+  ? app.listen(port, '0.0.0.0', () => {
+      console.log(`Server is running on http://0.0.0.0:${port}`)
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
     })
   : null
