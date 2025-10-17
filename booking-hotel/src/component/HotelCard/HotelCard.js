@@ -1,135 +1,212 @@
+import React, { useEffect, useState } from "react";
+import { Card, Button, Spinner, Toast, ToastContainer } from "react-bootstrap";
+import { FaStar, FaHeart } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import "./HotelCard.scss";
-import { GeoAlt, StarFill } from "react-bootstrap-icons";
-const hotelCard = [
-  {
-    id: 1,
-    img: "https://fastly.picsum.photos/id/436/600/400.jpg?hmac=6veY95w-1BubK3-QT9BHXUkrpYvfzURjRgNimYhmcmU",
-    nameHotel: "Sunrise Hotel",
-    iconStar: 3,
-    addressHotel: "TP. Hồ Chí Minh",
-    price: 950000,
-    type: "Cao cấp",
-    room: "A201",
-  },
-  {
-    id: 2,
-    img: "https://fastly.picsum.photos/id/787/600/400.jpg?hmac=BNah2GlH1mF6ahc9LeQK6FAvlTiCGUBJjVnPjMtek7A",
-    nameHotel: "Moonlight Resort",
-    iconStar: 5,
-    addressHotel: "Đà Nẵng",
-    price: 2200000,
-    type: "Tổng thống",
-    room: "P01",
-  },
-  {
-    id: 3,
-    img: "https://fastly.picsum.photos/id/21/600/400.jpg?hmac=22djDbPZb-X3QNxWMbezd6UGG8imBp5Pq4-dJg2UPug",
-    nameHotel: "Lotus Inn",
-    iconStar: 3,
-    addressHotel: "Hà Nội",
-    price: 500000,
-    type: "Tiêu chuẩn",
-    room: "B12",
-  },
-  {
-    id: 4,
-    img: "https://fastly.picsum.photos/id/21/600/400.jpg?hmac=22djDbPZb-X3QNxWMbezd6UGG8imBp5Pq4-dJg2UPug",
-    nameHotel: "Ocean View",
-    iconStar: 4,
-    addressHotel: "Nha Trang",
-    price: 1200000,
-    type: "Cao cấp",
-    room: "C08",
-  },
-  {
-    id: 5,
-    img: "https://scontent.iocvnpt.com/resources/portal//Images/QBH/adminqbh/Homestay/Green%20Valley%20Hotel/154179179_636953293903264445.jpg",
-    nameHotel: "Green Valley Hotel",
-    iconStar: 4,
-    addressHotel: "Đà Lạt",
-    price: 1350000,
-    type: "Tiêu chuẩn",
-    room: "B12",
-  },
-  {
-    id: 6,
-    img: "https://q-xx.bstatic.com/xdata/images/hotel/max1024/568642897.jpg?k=68d99023715161fd4411b57894af07f930e48cb8eca39cd83246a09c20c45528&o=",
-    nameHotel: "Golden Dragon Hotel",
-    iconStar: 5,
-    addressHotel: "Huế",
-    price: 1850000,
-    type: "Cao cấp",
-    room: "A201",
-  },
-  {
-    id: 7,
-    img: "https://fastly.picsum.photos/id/436/600/400.jpg?hmac=6veY95w-1BubK3-QT9BHXUkrpYvfzURjRgNimYhmcmU",
-    nameHotel: "Sunrise Hotel",
-    iconStar: 3,
-    addressHotel: "TP. Hồ Chí Minh",
-    price: 950000,
-    type: "Cao cấp",
-    room: "A201",
-  },
-  {
-    id: 8,
-    img: "https://fastly.picsum.photos/id/787/600/400.jpg?hmac=BNah2GlH1mF6ahc9LeQK6FAvlTiCGUBJjVnPjMtek7A",
-    nameHotel: "Moonlight Resort",
-    iconStar: 5,
-    addressHotel: "Đà Nẵng",
-    price: 2200000,
-    type: "Tiêu chuẩn",
-    room: "B12",
-  },
-];
-function HotelCard() {
+import { API_BASE_URL } from "../../config/api";
+
+const HotelCard = ({
+  hotelId,
+  userId,
+  isFavoriteDefault = false,
+  favoriteIdDefault = null,
+  hotel,
+  onToggleFavorite,
+}) => {
+  const [hotelData, setHotelData] = useState(hotel || null);
+  const [loading, setLoading] = useState(!hotel);
+  const [favorite, setFavorite] = useState(isFavoriteDefault);
+  const [favoriteId, setFavoriteId] = useState(favoriteIdDefault);
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
+
+  const triggerToast = (message, variant = "success") => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
+
+  // Lấy userId từ localStorage nếu không được truyền qua props
+  const user = localStorage.getItem("user");
+  if (user) {
+    const userData = JSON.parse(user);
+    userId = userData.id;
+  }
+
+  // Effect fetch dữ liệu khách sạn + kiểm tra trạng thái yêu thích
+  useEffect(() => {
+    if (hotel) return;
+    if (!hotelId) return;
+
+    const fetchHotel = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/hotel/${hotelId}`);
+        if (res.data && res.data.hotel) {
+          setHotelData(res.data.hotel);
+        }
+
+        if (userId) {
+          const resFav = await axios.get(`${API_BASE_URL}/favorite/check`, {
+            params: { userId, hotelId },
+          });
+          if (resFav.data.isFavorite) {
+            setFavorite(true);
+            setFavoriteId(resFav.data.favoriteId);
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi khi load dữ liệu khách sạn:", err);
+        triggerToast("Không thể tải dữ liệu khách sạn.", "danger");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotel();
+  }, [hotelId, userId, hotel]);
+
+  // Thêm / Xóa khách sạn khỏi danh sách yêu thích
+  const toggleFavorite = async () => {
+    try {
+      if (!userId) {
+        triggerToast("Bạn cần đăng nhập để thêm yêu thích.", "warning");
+        return;
+      }
+
+      if (favorite) {
+        await axios.delete(`${API_BASE_URL}/favorite/${favoriteId}`);
+        setFavorite(false);
+        setFavoriteId(null);
+        triggerToast("Đã xóa khách sạn khỏi danh sách yêu thích!", "success");
+        if (onToggleFavorite) {
+          onToggleFavorite(hotelId, false, null);
+        }
+      } else {
+        const res = await axios.post(`${API_BASE_URL}/favorite/create`, {
+          userId,
+          hotelId,
+        });
+        setFavorite(true);
+        setFavoriteId(res.data.favorite._id);
+        triggerToast("Đã thêm khách sạn vào danh sách yêu thích!", "success");
+        if (onToggleFavorite) {
+          onToggleFavorite(hotelId, true, res.data.favorite._id);
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi khi toggle favorite:", err);
+      triggerToast("Thao tác thất bại, vui lòng thử lại.", "danger");
+    }
+  };
+
+  if (loading) return <Spinner animation="border" />;
+  if (!hotelData) return <div>Khách sạn không tồn tại</div>;
+
   return (
     <>
-      <section className="py-4 bg-light mt-5">
-        <div className="container  mb-5">
-          <div className="h4 mb-4">Khách sạn nổi bật</div>
-          <div className="row g-4">
-            {hotelCard.map((hotelItem, index) => (
-              <div key={index} className="hotelCard col-12 col-md-4 col-lg-3">
-                <div className="border rounded shadow-sm d-flex flex-column align-items-start h-100">
-                  <img
-                    src={hotelItem.img}
-                    alt={hotelItem.nameHotel}
-                    className="img-fluid rounded"
-                  />
-                  <div className="p-3 w-100">
-                    <div className=" mt-3 d-flex justify-content-between">
-                      <h4 className="fw-bold  fs-5">{hotelItem.nameHotel}</h4>
-                      <div class="d-flex justify-content-between align-items-start">
-                        <span class="d-flex align-items-center  badge text-bg-warning">
-                          <StarFill />
-                          {hotelItem.iconStar}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center card-text small text-muted mb-2">
-                      <GeoAlt size={14} />
-                      {hotelItem.addressHotel}
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className="fw-semibold">
-                        {hotelItem.price.toLocaleString("vi-VN")} ₫/đêm
-                      </span>
-                      <a
-                        href="booking.html"
-                        className="booking btn btn-sm btn-primary d-flex align-items-center">
-                        Xem chi tiết
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <Card
+        style={{
+          width: "100%",
+          margin: "0 auto",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+        }}
+        className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card"
+      >
+        {/* Icon yêu thích */}
+        <div
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            backgroundColor: "rgba(255,255,255,0.8)",
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            transition: "transform 0.2s ease",
+          }}
+          onClick={toggleFavorite}
+          className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center"
+        >
+          <FaHeart
+            style={{ color: favorite ? "#ff4d6d" : "#999", fontSize: "18px" }}
+          />
         </div>
-      </section>
+
+        {/* Ảnh khách sạn */}
+        <Card.Img
+          src={hotelData.imageUrl}
+          alt={hotelData.name}
+          style={{ height: "200px", objectFit: "cover", width: "100%" }}
+        />
+
+        {/* Thông tin khách sạn */}
+        <Card.Body className="d-flex flex-column p-3">
+          <Card.Title className="fw-bold fs-6 my-1 hotel-title">
+            {hotelData.name}
+          </Card.Title>
+          <Card.Text className="text-muted small hotel-title my-1">
+            {hotelData.address}
+          </Card.Text>
+
+          <div className="d-flex align-items-center my-2">
+            <FaStar className="text-warning me-2" />
+            {hotelData.rating && hotelData.rating > 0 ? (
+              <span>{hotelData.rating.toFixed(1)} / 5</span>
+            ) : (
+              <span className="text-muted">Chưa có đánh giá</span>
+            )}
+          </div>
+
+          <Link to={`/HotelDetail/${hotelData.hotelId}`} className="mt-auto w-100">
+            <Button
+              variant="primary"
+              className="w-100 mt-2"
+              style={{
+                borderRadius: "8px",
+                padding: "0.5rem 0",
+                fontWeight: "500",
+              }}
+            >
+              Xem chi tiết
+            </Button>
+          </Link>
+        </Card.Body>
+      </Card>
+
+      {/* Toast thông báo */}
+      <ToastContainer
+        position="top-end"
+        className="p-3 position-fixed"
+        style={{
+          zIndex: 9999,
+          top: "100px",
+          right: "20px",
+        }}
+      >
+        <Toast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          delay={4000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header className={`bg-${toastVariant} text-white`}>
+            <strong className="me-auto">
+              {toastVariant === "success"
+                ? "✅ Thành công"
+                : toastVariant === "danger"
+                ? "❌ Lỗi"
+                : "⚠️ Cảnh báo"}
+            </strong>
+          </Toast.Header>
+          <Toast.Body className="bg-light">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
-}
+};
 
-export { HotelCard, hotelCard };
+export default HotelCard;

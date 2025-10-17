@@ -79,18 +79,18 @@ class hotelController {
             });
         } catch (err) {
             console.error('Error creating hotel:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 message: 'Lỗi server khi thêm khách sạn',
                 error: process.env.NODE_ENV === 'development' ? err.message : undefined
             });
         }
     }
     async updateHotel(req, res) {
-        const hotelId = req.params
+        const { hotelId } = req.params
         const { name, address, description, manager, imageUrl } = req.body
 
         try {
-            const editHotel = await Hotel.findOne(hotelId)
+            const editHotel = await Hotel.findOne({ hotelId })
 
             if (!editHotel)
                 return res.status(404).json({ message: 'Khách sạn không tồn tại!' })
@@ -105,7 +105,7 @@ class hotelController {
 
             res.status(200).json({ message: 'Chỉnh sửa thông tin khách sạn thành công!' })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
@@ -121,40 +121,42 @@ class hotelController {
                 HotelList: hotels
             })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
     async getHotelById(req, res) {
-        const hotelId = req.params
+        const { hotelId } = req.params
         try {
-            const hotel = await Hotel.findOne(hotelId)
+            const hotel = await Hotel.findOne({ hotelId })
 
             if (!hotel)
-                res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
+                return res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
 
             res.status(200).json({
                 message: 'Lấy khách sạn thành công!',
                 hotel: hotel
             })
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message })
         }
     }
 
     async deleteHotel(req, res) {
-        const hotelId = req.params
+        const { hotelId } = req.params;
 
         try {
-            const deleteHotel = await Hotel.find({ hotelId })
+            const hotel = await Hotel.findOne({ hotelId });
 
-            if (!deleteHotel)
-                return res.status(404).json({ message: 'Không tìm thấy khách sạn!' })
+            if (!hotel) {
+                return res.status(404).json({ message: 'Không tìm thấy khách sạn!' });
+            }
 
-            await Hotel.deleteOne(deleteHotel)
-            res.status(200).json({ message: 'Xoá khách sạn thành công!' })
+            await Hotel.deleteOne({ hotelId });
+
+            res.status(200).json({ message: 'Xoá khách sạn thành công!' });
         } catch (err) {
-            res.status(500).json({ message: err.message })
+            return res.status(500).json({ message: err.message });
         }
     }
 }

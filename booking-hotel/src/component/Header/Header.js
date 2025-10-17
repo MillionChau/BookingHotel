@@ -1,116 +1,120 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Logo from "../../assets/Logo.png";
+import Logo2 from "../../assets/Logo2.png";
+import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Header.scss";
-export function Header() {
-  // state lưu thông tin user
-  // null = chưa đăng nhập,có = chứa thông tin user
-  const [user, setUser] = useState(null);
 
-  //đăng nhập
-  const handleLogin = () => {
-    setUser({ username: "" });
-  };
+function Header({ user, onLogout }) {
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
-  //đăng xuất
-  const handleLogout = () => {
-    setUser(null);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const logoutHandler = () => {
+    onLogout();
+    navigate('/login');
+  }
+
+  // Nếu không phải trang chủ thì coi như đã scroll
+  const isNotHome = location.pathname !== "/";
+  const headerClass = `header ${
+    scrolled || isNotHome ? "header-scrolled" : ""
+  }`;
 
   return (
-    <>
-      <div className="header">
-        <Navbar expand="lg" className="shadow-sm">
-          <Container>
-            {/* logo */}
-            <Navbar.Brand href="/" className="fw-bold">
-              <i className="bi bi-building me-2"></i> BookingHotel
-            </Navbar.Brand>
+    <div className={headerClass}>
+      <Navbar expand="lg" className="shadow-sm">
+        <Container>
+          {/* Logo */}
+          <Navbar.Brand as={NavLink} to="/" className="fw-bold">
+            <img
+              src={scrolled || isNotHome ? Logo2 : Logo}
+              alt="Logo travel"
+              className="header-img"
+            />
+          </Navbar.Brand>
 
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              {/* menu trái */}
-              <Nav className="me-auto">
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  href="/">
-                  Trang chủ
-                </Nav.Link>
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  as={NavLink}
-                  to="./BookingHotel">
-                  Đặt phòng
-                </Nav.Link>
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  as={NavLink}
-                  to="./FavoriteCard">
-                  Yêu thích
-                </Nav.Link>
-                <Nav.Link
-                  className={({ isActive }) =>
-                    isActive ? "active nav-link" : "nav-link"
-                  }
-                  as={NavLink}
-                  to="./BookingList">
-                  Phòng đã đặt
-                </Nav.Link>
-              </Nav>
+          {/* Nút thu gọn menu cho mobile */}
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-              {/* menu phải */}
-              <Nav>
-                <Nav.Link className="evaluate" href="/danh-gia">
-                  <i className="bi bi-star me-1"></i> Đánh giá
-                </Nav.Link>
+          <Navbar.Collapse id="basic-navbar-nav">
+            {/* Menu điều hướng chính */}
+            <Nav className="me-auto">
+              <Nav.Link as={NavLink} to="/" end>
+                Trang chủ
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/search">
+                Đặt phòng
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/favoriteList">
+                Yêu thích
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/bookingList">
+                Phòng đã đặt
+              </Nav.Link>
+            </Nav>
+            {/* menu phải */}
+            <Nav>
+              <Nav.Link as={NavLink} to="/danh-gia" className="feedback">
+                <i className="bi bi-star me-1"></i> Đánh giá
+              </Nav.Link>
 
-                {/*chưa đăng nhập */}
-                {!user && (
-                  <NavDropdown
-                    title={
-                      <span>
-                        <i className="bi bi-person-circle me-1"></i> Tài khoản
-                      </span>
-                    }
-                    id="basic-nav-dropdown"
-                    align="end">
-                    {/* === THAY ĐỔI DÒNG NÀY === */}
-                    <NavDropdown.Item as={NavLink} to="/login">
-                      Đăng nhập
-                    </NavDropdown.Item>
-                    <NavDropdown.Item as={NavLink} to="/register">
-                      Đăng ký
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                )}
-
-                {/*đã đăng nhập */}
-                {user && (
-                  <NavDropdown
-                    title={
-                      <span>
-                        <i className="bi bi-person-circle me-1"></i>{" "}
-                        {user.username}
-                      </span>
-                    }
-                    id="user-nav-dropdown"
-                    align="end">
-                    <NavDropdown.Item onClick={handleLogout}>
-                      Đăng xuất
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                )}
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
-      </div>
-    </>
+              {!user ? (
+                // Chưa đăng nhập
+                <NavDropdown
+                  title={
+                    <span className="account">
+                      <i className="bi bi-person-circle me-1"></i> Tài khoản
+                    </span>
+                  }
+                  id="basic-nav-dropdown"
+                  align="end"
+                >
+                  <NavDropdown.Item as={NavLink} to="/login">
+                    Đăng nhập
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={NavLink} to="/register">
+                    Đăng ký
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                // Đã đăng nhập
+                <NavDropdown
+                  title={
+                    <span style={{ color: "#fff" }}>
+                      <i className="bi bi-person-circle me-1"></i>{" "}
+                      {user.fullname}
+                    </span>
+                  }
+                  id="user-nav-dropdown"
+                  align="end">
+                  <NavDropdown.Item as={NavLink} to="/profile">
+                    Thông tin tài khoản
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={logoutHandler}>
+                    Đăng xuất
+                  </NavDropdown.Item>
+                </NavDropdown>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </div>
   );
 }
+
+export default Header;

@@ -9,7 +9,7 @@ const Loading = () => {
         <div
           className="spinner-border text-primary"
           role="status"
-          style={{ width: "4rem", height: "4rem" }}>
+          style={{ width: "3rem", height: "3rem" }}>
           <span className="visually-hidden">Loading...</span>
         </div>
 

@@ -1,0 +1,59 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main, develop, MillionChau ]
+    paths:
+      - 'booking-hotel/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'booking-hotel/**'
+
+jobs:
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./booking-hotel
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref }}
+
+      - name: Clean workspace
+        run: |
+          git reset --hard
+          git clean -fdx
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: './booking-hotel/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Clear ESLint and build cache
+        run: |
+          rm -rf node_modules/.cache
+          rm -f .eslintcache
+
+      - name: Run Jest tests
+        run: npm test -- --coverage --watchAll=false --passWithNoTests
+
+      - name: Build production
+        run: npm run build --no-cache
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: booking-hotel/build/
+          retention-days: 7

@@ -3,9 +3,12 @@ const roomController = require('../controllers/roomController')
 const router = express.Router()
 
 router.post('/create', roomController.createRoom)
-router.put('/:id', roomController.updateRoom)
+router.put('/update/:roomId', roomController.updateRoom)
+router.get('/all', roomController.getAllRoom)
+router.get('/hotel/:hotelId/occupancy', roomController.getHotelOccupany)
+router.get('/hotel/:hotelId/occupied-count', roomController.getOccupiedRoomCount)
 router.get('/hotel/:hotelId', roomController.getRoomsByHotel)
-router.get('/:id', roomController.getRoomById)
-router.delete('/:id', roomController.deleteRoom)
+router.get('/:roomId', roomController.getRoomById)
+router.delete('/delete/:roomId', roomController.deleteRoom)
 
 module.exports = router

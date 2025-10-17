@@ -1,7 +1,24 @@
-.Sidebar{
-    width: 220px;
-    min-height: 100vh;
-    border-right: 1px solid #ddd;
-    padding: 16px 8px;
-    background: #f9f9f9;
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.Sidebar {
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+.admin-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  height: 100vh;
 }

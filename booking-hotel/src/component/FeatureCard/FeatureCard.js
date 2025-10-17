@@ -1,53 +1,51 @@
 import React from "react";
-
+import { Carousel } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./FeatureCard.scss";
 
 const FeatureCard = () => {
-  const features = [
+  const slides = [
     {
-      icon: "https://cdn.pixabay.com/animation/2023/06/13/15/12/15-12-51-616_512.gif",
-      title: "Lọc thông minh",
-      description:
-        "Lọc theo địa điểm, giá, loại phòng, số sao để tìm phòng phù hợp nhất.",
+      img: "https://mrvivu.com/wp-content/uploads/2022/12/dat-khach-san-vi-mo-mo.png",
+      title: "Đặt phòng dễ dàng",
+      desc: "Chỉ vài bước để đặt khách sạn yêu thích nhanh chóng.",
+      color: "text-warning",
     },
     {
-      icon: "https://phtd.com.vn/wp-content/uploads/2024/01/icon-bao-mat.png",
-      title: "Bảo mật",
-      description:
-        "Mã hóa dữ liệu người dùng, xác thực phiên đăng nhập an toàn.",
+      img: "https://www.vietnambooking.com/wp-content/uploads/2020/08/LeQuocKhanh_checkin.png",
+      title: "Ưu đãi mỗi ngày",
+      desc: "Săn deal khách sạn giá tốt, tiết kiệm đến 29%.",
+      color: "text-success",
     },
     {
-      icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFo6kb0wMwT_-uEjjV22GdAErKC4vHIqXhUw&s",
-      title: "Responsive",
-      description: "Trải nghiệm mượt mà trên cả mobile và desktop.",
+      img: "https://acihome.vn/uploads/15/mau-thiet-ke-noi-that-phong-2-giuong-don-ben-trong-khach-san-3-4-5-sao-2.JPG",
+      title: "Trải nghiệm tuyệt vời",
+      desc: "Khám phá hàng nghìn khách sạn ở Việt Nam và quốc tế.",
+      color: "text-danger",
     },
   ];
 
   return (
-    <>
-      <div className="container mt-5">
-        <div className="row g-4">
-          {features.map((feature, index) => (
-            <div key={index} className="col-12 col-md-4 col-sm-12">
-              <div className="border rounded p-4 shadow-sm d-flex flex-column align-items-start h-100">
-                <div className="d-flex align-items-center iconFeature">
-                  <img
-                    width={70}
-                    height={70}
-                    src={feature.icon}
-                    alt={feature.title}
-                    className="img"
-                  />
-                  <h3 className="fw-bold fs-5">{feature.title}</h3>
-                </div>
-                <p className="text-muted">{feature.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+    <div className="container feature-slider mt-4">
+      <h2 className="fw-bold text-center text-uppercase section-title pb-2 mb-4 ">
+        Lý do bạn đến với chúng tôi
+      </h2>
+      <Carousel fade interval={4000} pause="hover">
+        {slides.map((slide, index) => (
+          <Carousel.Item key={index}>
+            <img
+              className="d-block w-100 slider-img"
+              src={slide.img}
+              alt={slide.title}
+            />
+            <Carousel.Caption className="caption-bg">
+              <h3 className={`fw-bold ${slide.color}`}>{slide.title}</h3>
+              <p className="fw-semibold">{slide.desc}</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+        ))}
+      </Carousel>
+    </div>
   );
 };
 

@@ -1,0 +1,224 @@
+
+
+.reviews-container {
+  margin: 50px auto 0;
+
+  .reviews-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    padding-bottom: 15px;
+    position: relative;
+
+    &::after {
+      position: absolute;
+      left: 0;
+      top: -10px;
+      font-size: 32px;
+    }
+  }
+
+  .no-reviews {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    color: #6c757d;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &::before {
+      display: block;
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+  }
+
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .review-card {
+    border: none;
+    border-radius: 20px;
+    padding: 25px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #17a2b8, #007bff);
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+      .review-content {
+        border-left-color: #007bff;
+      }
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      .room-name {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 22px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::before {
+          font-size: 24px;
+        }
+      }
+
+      .room-type-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        padding: 8px 15px;
+        border-radius: 25px;
+        font-size: 14px;
+        color: #27ae60;
+        font-weight: 600;
+        border: 1px solid rgba(40, 167, 69, 0.2);
+      }
+    }
+
+    .review-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 15px;
+
+      .reviewer-info {
+        margin: 0;
+        color: #555;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::before {
+          content: "👤";
+        }
+      }
+
+      .rating-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #fff3cd;
+        padding: 8px 15px;
+        border-radius: 20px;
+        border: 1px solid #ffeaa7;
+
+        strong {
+          color: #856404;
+          font-size: 14px;
+        }
+
+        .stars {
+          display: flex;
+          color: #f39c12;
+          font-size: 18px;
+        }
+
+        .rating-score {
+          color: #856404;
+          font-size: 14px;
+          font-weight: 600;
+          margin-left: 5px;
+        }
+      }
+    }
+
+    .review-content {
+      margin: 20px 0;
+      color: #34495e;
+      line-height: 1.7;
+      font-size: 16px;
+      padding-left: 20px;
+      border-left: 4px solid #17a2b8;
+      background-color: rgba(23, 162, 184, 0.05);
+      padding: 15px 0 15px 20px;
+      border-radius: 0 10px 10px 0;
+
+      strong {
+        color: #17a2b8;
+        display: block;
+        margin-bottom: 8px;
+
+        &::before {
+          content: "💬";
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .review-date {
+      margin: 0;
+      font-style: italic;
+      color: #7f8c8d;
+      text-align: right;
+      font-size: 14px;
+      border-top: 1px solid #e9ecef;
+      padding-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+
+      &::before {
+        content: "📅";
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 15px;
+
+    .review-card {
+      padding: 20px;
+
+      .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .room-name {
+          font-size: 20px;
+        }
+      }
+
+      .review-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+  }
+}
