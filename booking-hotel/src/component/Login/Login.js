@@ -13,13 +13,13 @@ function Login({ setUser }) {
     event.preventDefault();
 
     if (!email && !password) {
-      setError("Please enter your Email and Password.");
+      setError("Vui lòng nhập Email và Password.");
       return;
     } else if (!email) {
-      setError("Please enter your Email.");
+      setError("Vui lòng nhập Email.");
       return;
     } else if (!password) {
-      setError("Please enter your Password.");
+      setError("Vui lòng nhập Password.");
       return;
     }
 

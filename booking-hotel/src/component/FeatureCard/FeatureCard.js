@@ -1,7 +1,7 @@
 import React from "react";
 import { Carousel } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./FeatureCard.scss";
+import "./FeatureCard.css";
 
 const FeatureCard = () => {
   const slides = [

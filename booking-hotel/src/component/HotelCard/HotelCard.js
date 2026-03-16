@@ -3,7 +3,7 @@ import { Card, Button, Spinner, Toast, ToastContainer } from "react-bootstrap";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import "./HotelCard.scss";
+import "./HotelCard.css";
 import { API_BASE_URL } from "../../config/api";
 
 const HotelCard = ({
@@ -14,7 +14,8 @@ const HotelCard = ({
   hotel,
   onToggleFavorite,
 }) => {
-  const [hotelData, setHotelData] = useState(hotel || null);
+  const [hotelData, setHotelData] = useState([]);
+  console.log(hotelData);
   const [loading, setLoading] = useState(!hotel);
   const [favorite, setFavorite] = useState(isFavoriteDefault);
   const [favoriteId, setFavoriteId] = useState(favoriteIdDefault);
@@ -30,7 +31,6 @@ const HotelCard = ({
     setShowToast(true);
   };
 
-  // Lấy userId từ localStorage nếu không được truyền qua props
   const user = localStorage.getItem("user");
   if (user) {
     const userData = JSON.parse(user);
@@ -114,22 +114,17 @@ const HotelCard = ({
           margin: "0 auto",
           transition: "transform 0.3s ease, box-shadow 0.3s ease",
         }}
-        className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card"
-      >
+        className="h-100 shadow-sm rounded-4 overflow-hidden position-relative hotel-card">
         {/* Icon yêu thích */}
         <div
+          className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center rounded-circle bg-white bg-opacity-75 shadow-sm"
           style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            backgroundColor: "rgba(255,255,255,0.8)",
+            width: 36,
+            height: 36,
             cursor: "pointer",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
             transition: "transform 0.2s ease",
           }}
-          onClick={toggleFavorite}
-          className="favorite-icon position-absolute top-0 end-0 m-2 d-flex justify-content-center align-items-center"
-        >
+          onClick={toggleFavorite}>
           <FaHeart
             style={{ color: favorite ? "#ff4d6d" : "#999", fontSize: "18px" }}
           />
@@ -160,7 +155,9 @@ const HotelCard = ({
             )}
           </div>
 
-          <Link to={`/HotelDetail/${hotelData.hotelId}`} className="mt-auto w-100">
+          <Link
+            to={`/HotelDetail/${hotelData.hotelId}`}
+            className="mt-auto w-100">
             <Button
               variant="primary"
               className="w-100 mt-2"
@@ -168,8 +165,7 @@ const HotelCard = ({
                 borderRadius: "8px",
                 padding: "0.5rem 0",
                 fontWeight: "500",
-              }}
-            >
+              }}>
               Xem chi tiết
             </Button>
           </Link>
@@ -184,22 +180,20 @@ const HotelCard = ({
           zIndex: 9999,
           top: "100px",
           right: "20px",
-        }}
-      >
+        }}>
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
           delay={4000}
           autohide
-          bg={toastVariant}
-        >
+          bg={toastVariant}>
           <Toast.Header className={`bg-${toastVariant} text-white`}>
             <strong className="me-auto">
               {toastVariant === "success"
-                ? "✅ Thành công"
+                ? "Thành công"
                 : toastVariant === "danger"
-                ? "❌ Lỗi"
-                : "⚠️ Cảnh báo"}
+                  ? "Lỗi"
+                  : "Cảnh báo"}
             </strong>
           </Toast.Header>
           <Toast.Body className="bg-light">{toastMessage}</Toast.Body>

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import Fuse from "fuse.js";
-import "./SearchPage.scss";
+import "./SearchPage.css";
 import {
   Container,
   Row,
@@ -66,7 +66,7 @@ function SearchPage() {
       if (userId) {
         try {
           const resFav = await axios.get(
-            `${API_BASE_URL}/favorite/user/${userId}`
+            `${API_BASE_URL}/favorite/user/${userId}`,
           );
           favoriteList = resFav.data || [];
         } catch {
@@ -82,7 +82,7 @@ function SearchPage() {
         };
       });
     },
-    [userId]
+    [userId],
   );
 
   // Lấy danh sách khách sạn
@@ -133,18 +133,16 @@ function SearchPage() {
         searchKeys.push(...Object.keys(sample));
       }
 
-      // ✅ Cấu hình Fuse.js cho tìm kiếm tương đối
       const fuse = new Fuse(data, {
         keys: searchKeys,
         includeScore: true,
-        threshold: 0.45, // cho phép sai khác nhẹ (fuzzy)
+        threshold: 0.45,
         distance: 100,
         ignoreLocation: true,
         minMatchCharLength: 1,
       });
 
       const results = fuse.search(destination);
-      console.log("🔍 Kết quả Fuse:", results);
 
       const matched = results.map((r) => r.item);
       const withFav = await fetchAndMergeFavorites(matched);
@@ -153,12 +151,12 @@ function SearchPage() {
       if (withFav.length === 0) {
         showToastMessage(
           `Không tìm thấy khách sạn phù hợp với "${destination}".`,
-          "warning"
+          "warning",
         );
       } else {
         showToastMessage(
           `Tìm thấy ${withFav.length} khách sạn phù hợp!`,
-          "success"
+          "success",
         );
       }
     } catch (err) {
@@ -181,8 +179,8 @@ function SearchPage() {
       prev.map((hotel) =>
         hotel.hotelId === hotelId
           ? { ...hotel, isFavorite: isFav, favoriteId: favId }
-          : hotel
-      )
+          : hotel,
+      ),
     );
   };
 
@@ -324,8 +322,8 @@ function SearchPage() {
               {toastVariant === "success"
                 ? "✅ Thành công"
                 : toastVariant === "danger"
-                ? "❌ Lỗi"
-                : "⚠️ Cảnh báo"}
+                  ? "❌ Lỗi"
+                  : "⚠️ Cảnh báo"}
             </strong>
           </Toast.Header>
           <Toast.Body className="bg-light">{toastMessage}</Toast.Body>

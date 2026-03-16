@@ -3,7 +3,7 @@ import axios from "axios";
 import { Row, Col, Toast, ToastContainer } from "react-bootstrap";
 import HotelCard from "../HotelCard/HotelCard";
 import Loading from "../Loading/Loading";
-import "./FavoriteList.scss";
+import "./FavoriteList.css";
 import { API_BASE_URL } from "../../config/api";
 
 function FavoriteList({ userId: propUserId }) {
@@ -105,8 +105,7 @@ function FavoriteList({ userId: propUserId }) {
             bg={toast.variant}
             onClose={() => setToast((prev) => ({ ...prev, show: false }))}
             delay={3000}
-            autohide
-          >
+            autohide>
             <Toast.Body className="text-white fw-semibold">
               {toast.message}
             </Toast.Body>
@@ -138,8 +137,7 @@ function FavoriteList({ userId: propUserId }) {
           bg={toast.variant}
           onClose={() => setToast((prev) => ({ ...prev, show: false }))}
           delay={3000}
-          autohide
-        >
+          autohide>
           <Toast.Body className="text-white fw-semibold">
             {toast.message}
           </Toast.Body>

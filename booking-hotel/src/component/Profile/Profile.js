@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Modal, Alert } from "react-bootstrap";
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaKey } from "react-icons/fa";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./Profile.scss";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaEdit,
+  FaKey,
+} from "react-icons/fa";
+import "./Profile.css";
 import { API_BASE_URL } from "../../config/api";
 
-// --- COMPONENT CON: Hiển thị thông tin ---
-// Component này chỉ có nhiệm vụ hiển thị dữ liệu.
 const UserInfoDisplay = ({ userInfo, onEditClick, onChangePasswordClick }) => (
   <div className="user-info-display">
     <div className="info-item">
@@ -49,8 +53,6 @@ const UserInfoDisplay = ({ userInfo, onEditClick, onChangePasswordClick }) => (
   </div>
 );
 
-// --- COMPONENT CON: Form chỉnh sửa thông tin ---
-// Component này chứa logic của form.
 const UserInfoForm = ({
   userInfo,
   onUserInfoChange,
@@ -106,11 +108,13 @@ const UserInfoForm = ({
         type="button"
         className="btn btn-success w-100 mb-2"
         onClick={onUpdate}
-        disabled={isSubmitting}
-      >
+        disabled={isSubmitting}>
         {isSubmitting ? "Đang lưu..." : "Lưu"}
       </button>
-      <button type="button" className="btn btn-secondary w-100" onClick={onCancel}>
+      <button
+        type="button"
+        className="btn btn-secondary w-100"
+        onClick={onCancel}>
         Quay lại
       </button>
     </div>
@@ -172,16 +176,14 @@ const ChangePasswordForm = ({
         type="button"
         className="btn btn-success flex-grow-1"
         onClick={onSubmit}
-        disabled={isSubmitting}
-      >
+        disabled={isSubmitting}>
         {isSubmitting ? "Đang thay đổi..." : "Thay đổi"}
       </button>
       <button
         type="button"
         className="btn btn-secondary"
         onClick={onClose}
-        disabled={isSubmitting}
-      >
+        disabled={isSubmitting}>
         Hủy
       </button>
     </div>
@@ -271,12 +273,18 @@ function Profile() {
     setUpdateStatus({ message: "", type: "" });
     try {
       await axios.put(`${API_BASE_URL}/user/update-user/${userId}`, userInfo);
-      setUpdateStatus({ message: "Cập nhật thông tin thành công!", type: "success" });
+      setUpdateStatus({
+        message: "Cập nhật thông tin thành công!",
+        type: "success",
+      });
       setOriginalInfo(userInfo);
       setEditMode(false);
     } catch (err) {
       console.error("Lỗi khi cập nhật", err);
-      setUpdateStatus({ message: "Cập nhật thất bại. Vui lòng thử lại.", type: "danger" });
+      setUpdateStatus({
+        message: "Cập nhật thất bại. Vui lòng thử lại.",
+        type: "danger",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -303,12 +311,19 @@ function Profile() {
         validPassword: passwordForm.confirmPassword,
       });
       // Clear form sau khi thành công
-      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
       setShowPasswordModal(false);
       setUpdateStatus({ message: "Đổi mật khẩu thành công!", type: "success" });
     } catch (err) {
       console.error("Lỗi khi đổi mật khẩu", err);
-      setPasswordError(err.response?.data?.message || "Đổi mật khẩu thất bại. Vui lòng thử lại.");
+      setPasswordError(
+        err.response?.data?.message ||
+          "Đổi mật khẩu thất bại. Vui lòng thử lại.",
+      );
     } finally {
       setPasswordSubmitting(false);
     }
@@ -329,43 +344,44 @@ function Profile() {
   };
 
   // Hiển thị thông báo loading hoặc lỗi
-  if (loading) return (
-    <div className="container text-center mt-5">
-      <div className="spinner-border" role="status">
-        <span className="visually-hidden">Đang tải...</span>
+  if (loading)
+    return (
+      <div className="container text-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Đang tải...</span>
+        </div>
+        <p className="mt-2">Đang tải thông tin...</p>
       </div>
-      <p className="mt-2">Đang tải thông tin...</p>
-    </div>
-  );
-  if (error) return (
-    <div className="container text-center mt-5">
-      <Alert variant="danger">{error}</Alert>
-    </div>
-  );
+    );
+  if (error)
+    return (
+      <div className="container text-center mt-5">
+        <Alert variant="danger">{error}</Alert>
+      </div>
+    );
 
   return (
     <div className="container mb-5 profile pt-5">
       <div className="row justify-content-center pt-5">
         {/* Thông tin cá nhân */}
         <div className="col-md-8 col-lg-6">
-          <div className="card shadow-lg border-0 profile-card">
+          <div className="card shadow-lg border-0 profile-card w-100">
             <div className="card-body p-4">
               <h5 className="card-title mb-4 text-center">
                 <FaUser className="me-2" /> Thông tin cá nhân
               </h5>
-              
+
               {/* Hiển thị thông báo cập nhật */}
               {updateStatus.message && (
-                <Alert 
-                  variant={updateStatus.type} 
-                  className="mb-3" 
-                  onClose={() => setUpdateStatus({ message: "", type: "" })} 
-                  dismissible
-                >
+                <Alert
+                  variant={updateStatus.type}
+                  className="mb-3"
+                  onClose={() => setUpdateStatus({ message: "", type: "" })}
+                  dismissible>
                   {updateStatus.message}
                 </Alert>
               )}
-              
+
               {!editMode ? (
                 <UserInfoDisplay
                   userInfo={userInfo}
@@ -387,7 +403,11 @@ function Profile() {
       </div>
 
       {/* Modal đổi mật khẩu */}
-      <Modal show={showPasswordModal} onHide={handleClosePasswordModal} centered size="md">
+      <Modal
+        show={showPasswordModal}
+        onHide={handleClosePasswordModal}
+        centered
+        size="md">
         <Modal.Header closeButton className="bg-light">
           <Modal.Title>
             <FaKey className="me-2" /> Đổi mật khẩu

@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Banner.scss";
+import "./Banner.css";
 import { Link } from "react-router-dom";
 
 function Banner() {
@@ -11,16 +11,9 @@ function Banner() {
         <h1 className="fw-bold mb-3">
           Đặt phòng khách sạn dễ dàng, nhanh chóng, minh bạch
         </h1>
-        <p className="mb-4">
-          Tìm kiếm – Đặt phòng – Quản lý mọi lúc, mọi nơi.
-        </p>
+        <p className="mb-4">Tìm kiếm – Đặt phòng – Quản lý mọi lúc, mọi nơi.</p>
         <div>
-          <Button
-            as={Link}
-            to="/search"
-            variant="light"
-            className="btn-hero" 
-          >
+          <Button as={Link} to="/search" variant="light" className="btn-hero">
             <i className="bi bi-calendar-check me-1"></i> Khám phá khách sạn
           </Button>
         </div>

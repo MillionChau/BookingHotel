@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
 import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
-import SearchForm from "../SearchForm/SearchForm"; // Đảm bảo đường dẫn này đúng
-import HotelCard from "../HotelCard/HotelCard"; // Đảm bảo đường dẫn này đúng
+import SearchForm from "../SearchForm/SearchForm";
+import HotelCard from "../HotelCard/HotelCard";
 
 function SearchPage() {
   const [hotels, setHotels] = useState([]);
@@ -56,13 +56,21 @@ function SearchPage() {
     if (error) {
       return <Alert variant="danger">{error}</Alert>;
     }
-    
+
     if (!searched) {
-         return <Alert variant="info">Vui lòng nhập thông tin và nhấn tìm kiếm để xem kết quả.</Alert>;
+      return (
+        <Alert variant="info">
+          Vui lòng nhập thông tin và nhấn tìm kiếm để xem kết quả.
+        </Alert>
+      );
     }
 
     if (hotels.length === 0) {
-      return <Alert variant="warning">Không tìm thấy khách sạn nào phù hợp với tiêu chí của bạn.</Alert>;
+      return (
+        <Alert variant="warning">
+          Không tìm thấy khách sạn nào phù hợp với tiêu chí của bạn.
+        </Alert>
+      );
     }
 
     return (

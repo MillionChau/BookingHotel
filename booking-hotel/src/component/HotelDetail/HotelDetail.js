@@ -1,10 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { FaStar, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
-import { Carousel, Modal, Button, Form, Toast, ToastContainer } from "react-bootstrap";
+import {
+  Carousel,
+  Modal,
+  Button,
+  Form,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import axios from "axios";
 import Loading from "../Loading/Loading";
-import "./HotelDetail.scss";
 import HotelReviews from "../HotelReview/HotelReview";
 import { API_BASE_URL } from "../../config/api";
 
@@ -52,7 +58,9 @@ const HotelDetail = () => {
 
   const nights =
     startDate && endDate
-      ? Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))
+      ? Math.ceil(
+          (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24),
+        )
       : 0;
 
   const handleStartChange = (e) => {
@@ -76,7 +84,9 @@ const HotelDetail = () => {
         const hotelRes = await axios.get(`${API_BASE_URL}/hotel/${hotelId}`);
         if (hotelRes.data && hotelRes.data.hotel) setHotel(hotelRes.data.hotel);
 
-        const roomRes = await axios.get(`${API_BASE_URL}/room/hotel/${hotelId}`);
+        const roomRes = await axios.get(
+          `${API_BASE_URL}/room/hotel/${hotelId}`,
+        );
         const allRooms = roomRes.data.rooms || [];
         setRooms(allRooms);
 
@@ -92,10 +102,14 @@ const HotelDetail = () => {
               };
             }
             acc[room.type].images.push(room.imageUrl);
-            acc[room.type].minPrice = Math.min(acc[room.type].minPrice, room.price);
-            if (room.status === "Trống" || room.status === 'available') acc[room.type].availableCount += 1;
+            acc[room.type].minPrice = Math.min(
+              acc[room.type].minPrice,
+              room.price,
+            );
+            if (room.status === "Trống" || room.status === "available")
+              acc[room.type].availableCount += 1;
             return acc;
-          }, {})
+          }, {}),
         );
 
         const finalData = grouped.map((g) => {
@@ -117,7 +131,10 @@ const HotelDetail = () => {
 
   if (!hotel) return <Loading />;
 
-  const allImages = [hotel.imageUrl, ...roomTypes.flatMap((r) => r.images)].filter(Boolean);
+  const allImages = [
+    hotel.imageUrl,
+    ...roomTypes.flatMap((r) => r.images),
+  ].filter(Boolean);
   const mainImage = allImages[0];
   const thumbnails = allImages.slice(1, 9);
   const moreImages = allImages.length - 8;
@@ -144,7 +161,10 @@ const HotelDetail = () => {
       });
 
       if (res.data && res.data.payUrl) {
-        showToastMessage("Đang chuyển hướng đến trang thanh toán...", "success");
+        showToastMessage(
+          "Đang chuyển hướng đến trang thanh toán...",
+          "success",
+        );
         setTimeout(() => {
           window.location.href = res.data.payUrl;
         }, 1500);
@@ -154,19 +174,27 @@ const HotelDetail = () => {
     } catch (err) {
       console.error("Axios error:", err.response?.data || err.message);
       showToastMessage(
-        "Có lỗi khi tạo thanh toán: " + (err.response?.data?.message || err.message),
-        "danger"
+        "Có lỗi khi tạo thanh toán: " +
+          (err.response?.data?.message || err.message),
+        "danger",
       );
     }
   };
 
   const handleRoomSelection = (room) => {
     if (!startDate || !endDate) {
-      showToastMessage("Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!", "warning");
+      showToastMessage(
+        "Vui lòng chọn ngày nhận phòng và trả phòng trước khi đặt!",
+        "warning",
+      );
       return;
     }
 
-    const foundRoom = rooms.find(r => (r.type === room.type && (r.status === "Trống" || r.status === 'available')));
+    const foundRoom = rooms.find(
+      (r) =>
+        r.type === room.type &&
+        (r.status === "Trống" || r.status === "available"),
+    );
     if (!foundRoom) {
       showToastMessage("Không còn phòng trống!", "danger");
       return;
@@ -178,7 +206,9 @@ const HotelDetail = () => {
   return (
     <div className="container mt-5 pt-5">
       {/* Thanh chọn ngày */}
-      <div className="bg-white rounded-3 shadow p-3 d-flex align-items-center gap-3 mb-4 border border-info position-fixed w-100 z-3" style={{ top: "80px", maxWidth: "86%" }}>
+      <div
+        className="bg-white rounded-3 shadow p-3 d-flex align-items-center gap-3 mb-4 border border-info position-fixed w-100 z-3"
+        style={{ top: "80px", maxWidth: "86%" }}>
         <div className="d-flex align-items-center bg-info bg-opacity-25 rounded px-3 py-2 flex-grow-1">
           <FaMapMarkerAlt className="me-2 text-info" />
           <span className="fw-semibold text-dark">{hotel.name}</span>
@@ -206,7 +236,9 @@ const HotelDetail = () => {
         </div>
 
         {nights > 0 && (
-          <span className="badge bg-info text-white px-3 py-2">{nights} đêm</span>
+          <span className="badge bg-info text-white px-3 py-2">
+            {nights} đêm
+          </span>
         )}
       </div>
 
@@ -248,8 +280,7 @@ const HotelDetail = () => {
                   <div
                     className="position-relative"
                     onClick={() => setShowGallery(true)}
-                    style={{ cursor: "pointer" }}
-                  >
+                    style={{ cursor: "pointer" }}>
                     <img
                       src={img}
                       alt={`thumb-${idx}`}
@@ -310,7 +341,7 @@ const HotelDetail = () => {
 
       {/* --- Loại phòng --- */}
       {roomTypes.map((room) => (
-        <div key={room.type} className="card mb-3 shadow-sm border-0">
+        <div key={room.type} className="card mb-3 shadow-sm border-0 w-100 ">
           <div className="row g-0 align-items-center">
             {/* Hình ảnh */}
             <div className="col-md-4 p-3">
@@ -319,13 +350,23 @@ const HotelDetail = () => {
                   <Carousel interval={null}>
                     {room.images.map((img, idx) => (
                       <Carousel.Item key={idx}>
-                        <img src={img} alt={`${room.type}-${idx}`} className="d-block w-100" style={{ minHeight: '200px', objectFit: 'cover' }} />
+                        <img
+                          src={img}
+                          alt={`${room.type}-${idx}`}
+                          className="d-block w-100"
+                          style={{ minHeight: "200px", objectFit: "cover" }}
+                        />
                       </Carousel.Item>
                     ))}
                   </Carousel>
                 ) : (
                   room.images[0] && (
-                    <img src={room.images[0]} alt={room.type} className="img-fluid rounded" style={{ minHeight: '200px', objectFit: 'cover' }} />
+                    <img
+                      src={room.images[0]}
+                      alt={room.type}
+                      className="img-fluid rounded"
+                      style={{ minHeight: "200px", objectFit: "cover" }}
+                    />
                   )
                 )}
               </div>
@@ -337,7 +378,9 @@ const HotelDetail = () => {
               <ul className="list-unstyled small mt-2">
                 <li className="mb-2">Tối đa 2 khách</li>
                 <li className="mb-2">Đầy đủ tiện nghi cơ bản</li>
-                <li className="mb-2 text-success">Thanh toán tại khách sạn hoặc online</li>
+                <li className="mb-2 text-success">
+                  Thanh toán tại khách sạn hoặc online
+                </li>
               </ul>
             </div>
 
@@ -347,7 +390,9 @@ const HotelDetail = () => {
                 {room.minPrice.toLocaleString("vi-VN")} ₫
               </div>
               <div className="small text-muted">/ đêm</div>
-              <div className="small text-muted mt-1" style={{ fontSize: '0.75rem' }}>
+              <div
+                className="small text-muted mt-1"
+                style={{ fontSize: "0.75rem" }}>
                 Đã bao gồm thuế và phí
               </div>
             </div>
@@ -357,21 +402,28 @@ const HotelDetail = () => {
               <div className="d-grid">
                 <button
                   className="btn btn-primary fw-semibold"
-                  onClick={() => handleRoomSelection(room)}
-                >
+                  onClick={() => handleRoomSelection(room)}>
                   Chọn
                 </button>
               </div>
-              <div className="small text-danger text-center mt-2">{room.status}</div>
+              <div className="small text-danger text-center mt-2">
+                {room.status}
+              </div>
             </div>
           </div>
         </div>
       ))}
 
       {/* Modal xác nhận */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        size="lg">
         <Modal.Header closeButton className="border-0">
-          <Modal.Title className="fw-bold text-primary">Xác nhận đặt phòng</Modal.Title>
+          <Modal.Title className="fw-bold text-primary">
+            Xác nhận đặt phòng
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-light">
           {selectedRoom && (
@@ -384,15 +436,24 @@ const HotelDetail = () => {
                   <Form>
                     <Form.Group className="mb-3">
                       <Form.Label>Họ tên</Form.Label>
-                      <Form.Control type="text" defaultValue={userId?.fullname || ""} />
+                      <Form.Control
+                        type="text"
+                        defaultValue={userId?.fullname || ""}
+                      />
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>Email</Form.Label>
-                      <Form.Control type="email" defaultValue={userId?.email || ""} />
+                      <Form.Control
+                        type="email"
+                        defaultValue={userId?.email || ""}
+                      />
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>Số điện thoại</Form.Label>
-                      <Form.Control type="text" defaultValue={userId?.phone || ""} />
+                      <Form.Control
+                        type="text"
+                        defaultValue={userId?.phone || ""}
+                      />
                     </Form.Group>
                   </Form>
                 </div>
@@ -404,14 +465,26 @@ const HotelDetail = () => {
                     Thông tin đặt phòng
                   </h6>
                   <ul className="list-unstyled mb-0 small">
-                    <li><strong>Khách sạn:</strong> {hotel.name}</li>
-                    <li><strong>Phòng:</strong> {selectedRoom.name} ({selectedRoom.type})</li>
-                    <li><strong>Ngày nhận:</strong> {startDate}</li>
-                    <li><strong>Ngày trả:</strong> {endDate}</li>
-                    <li><strong>Số đêm:</strong> {nights}</li>
+                    <li>
+                      <strong>Khách sạn:</strong> {hotel.name}
+                    </li>
+                    <li>
+                      <strong>Phòng:</strong> {selectedRoom.name} (
+                      {selectedRoom.type})
+                    </li>
+                    <li>
+                      <strong>Ngày nhận:</strong> {startDate}
+                    </li>
+                    <li>
+                      <strong>Ngày trả:</strong> {endDate}
+                    </li>
+                    <li>
+                      <strong>Số đêm:</strong> {nights}
+                    </li>
                     <li className="mt-3">
                       <span className="fw-bold text-danger fs-5">
-                        Giá: {(selectedRoom.price * nights).toLocaleString("vi-VN", {
+                        Giá:{" "}
+                        {(selectedRoom.price * nights).toLocaleString("vi-VN", {
                           style: "currency",
                           currency: "VND",
                         })}
@@ -424,10 +497,15 @@ const HotelDetail = () => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-0">
-          <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowModal(false)}>
             Huỷ
           </Button>
-          <Button variant="primary" className="px-4 fw-semibold" onClick={handleConfirmBooking}>
+          <Button
+            variant="primary"
+            className="px-4 fw-semibold"
+            onClick={handleConfirmBooking}>
             Xác nhận
           </Button>
         </Modal.Footer>
@@ -440,20 +518,21 @@ const HotelDetail = () => {
         style={{
           zIndex: 9999,
           top: "100px",
-          right: "20px"
-        }}
-      >
+          right: "20px",
+        }}>
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
           delay={4000}
           autohide
-          bg={toastVariant}
-        >
+          bg={toastVariant}>
           <Toast.Header className={`bg-${toastVariant} text-white`}>
             <strong className="me-auto">
-              {toastVariant === "success" ? "✅ Thành công" :
-                toastVariant === "danger" ? "❌ Lỗi" : "⚠️ Cảnh báo"}
+              {toastVariant === "success"
+                ? "✅ Thành công"
+                : toastVariant === "danger"
+                  ? "❌ Lỗi"
+                  : "⚠️ Cảnh báo"}
             </strong>
           </Toast.Header>
           <Toast.Body className="bg-light">{toastMessage}</Toast.Body>

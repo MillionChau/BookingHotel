@@ -1,0 +1,150 @@
+/* --- Biến CSS (Được thay thế trực tiếp vào mã) --- */
+
+.footer-container {
+  background-color: #1a202c;
+  color: #e2e8f0;
+  padding: 60px 40px 30px 40px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.footer-content-wrapper {
+  max-width: 1320px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px 20px;
+}
+
+.footer-column h3,
+.footer-social h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.footer-column ul,
+.footer-social ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-column a,
+.footer-social a {
+  color: #a0aec0;
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-column a i,
+.footer-social a i {
+  font-size: 18px;
+  color: #4299e1;
+  transition: transform 0.2s ease;
+}
+
+.footer-column a:hover,
+.footer-social a:hover {
+  color: #ffffff;
+}
+
+.footer-column a:hover i,
+.footer-social a:hover i {
+  transform: scale(1.1);
+}
+
+/* --- Phần bản quyền --- */
+.footer-legal {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 13px;
+  color: #a0aec0;
+  line-height: 1.6;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #2d3748;
+}
+
+.footer-legal p {
+  margin: 5px 0;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+  .footer-content-wrapper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    padding: 40px 20px;
+  }
+
+  .footer-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .footer-column {
+    border-bottom: 1px solid #2d3748;
+  }
+
+  .footer-column h3 {
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 0;
+    padding: 18px 0;
+    font-weight: 500;
+  }
+
+  .footer-column h3::after {
+    content: "›";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 28px;
+    transition: transform 0.3s ease;
+  }
+
+  .footer-column ul {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease-out;
+    padding: 0 15px;
+    gap: 0;
+  }
+
+  .footer-column.open h3::after {
+    transform: translateY(-50%) rotate(-90deg);
+  }
+
+  .footer-column.open ul {
+    max-height: 400px;
+    padding: 15px 15px 25px 15px;
+    gap: 18px;
+  }
+
+  .footer-social {
+    border-bottom: 1px solid #2d3748;
+    padding-bottom: 20px;
+  }
+
+  .footer-legal {
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+}

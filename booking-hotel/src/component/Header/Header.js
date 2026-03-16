@@ -4,7 +4,7 @@ import Logo2 from "../../assets/Logo2.png";
 import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
-import "./Header.scss";
+import "./Header.css";
 
 function Header({ user, onLogout }) {
   const location = useLocation();
@@ -25,8 +25,8 @@ function Header({ user, onLogout }) {
 
   const logoutHandler = () => {
     onLogout();
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
   // Nếu không phải trang chủ thì coi như đã scroll
   const isNotHome = location.pathname !== "/";
@@ -81,8 +81,7 @@ function Header({ user, onLogout }) {
                     </span>
                   }
                   id="basic-nav-dropdown"
-                  align="end"
-                >
+                  align="end">
                   <NavDropdown.Item as={NavLink} to="/login">
                     Đăng nhập
                   </NavDropdown.Item>

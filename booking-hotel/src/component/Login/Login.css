@@ -145,14 +145,6 @@
   margin-bottom: 15px;
 }
 
-/* .header-scrolled,
-.footer-container {
-  display: none;
-} */
-
-/* --- RESPONSIVE DESIGN --- */
-
-/* For Tablets */
 @media (max-width: 992px) {
   .login-container {
     flex-direction: column;

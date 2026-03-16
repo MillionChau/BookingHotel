@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Register.scss";
+import "./Register.css";
 import { API_BASE_URL } from "../../config/api";
 
 function Register() {
@@ -20,30 +20,30 @@ function Register() {
     const newErrors = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+      newErrors.fullName = "Vui lòng nhập tên đầy đủ";
     } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = "Full name must be at least 3 characters";
+      newErrors.fullName = "Tên đầy đủ phải có ít nhất 3 ký tự";
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Vui lòng nhập email";
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email format";
+      newErrors.email = "Định dạng email không hợp lệ";
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = "Vui lòng nhập password";
     } else if (!passwordRegex.test(formData.password)) {
       newErrors.password =
-        "Password ≥6 chars, include uppercase, lowercase and number";
+        "Mật khẩu ≥6 ký tự, bao gồm chữ hoa, chữ thường và số";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm password";
+      newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = "Mật khẩu không khớp";
     }
 
     return newErrors;

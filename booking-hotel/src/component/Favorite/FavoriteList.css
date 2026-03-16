@@ -1,0 +1,25 @@
+.favoriteList {
+  margin-top: 150px !important;
+}
+@media (min-width: 768px) {
+  .favorite-page-container {
+    max-width: 1200px;
+    margin: 32px auto 80px auto;
+    padding: 30px 24px 0;
+  }
+  .page-title {
+    font-size: 29px;
+    margin-bottom: 32px;
+  }
+
+  .favorite-card-wrapper {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  .card {
+    width: calc(50% - 10px);
+    max-width: none;
+  }
+}
